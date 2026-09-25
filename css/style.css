@@ -651,6 +651,30 @@ body.dark .mode-btn.active {
   margin-bottom: 8px;
 }
 
+.cat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mini-cat-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--accent-primary);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mini-cat-btn:hover, .mini-cat-btn.active {
+  background: var(--accent-light);
+  border-color: var(--accent-primary);
+  color: var(--accent-text);
+}
+
 .category-pills-header small {
   color: var(--accent-primary);
   font-weight: 600;
@@ -694,10 +718,25 @@ body.dark .mode-btn.active {
   overflow-x: auto;
   padding-bottom: 4px;
   scrollbar-width: thin;
+  transition: all var(--transition-normal);
+}
+
+.category-pills-bar.is-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 6px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
 }
 
 .category-pills-bar::-webkit-scrollbar {
   height: 4px;
+  width: 4px;
 }
 
 .category-pills-bar::-webkit-scrollbar-thumb {
@@ -720,6 +759,18 @@ body.dark .mode-btn.active {
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
+  user-select: none;
+}
+
+.category-pills-bar.is-grid .category-pill {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.category-pill * {
+  pointer-events: none;
 }
 
 .category-pill:hover {
@@ -740,6 +791,17 @@ body.dark .mode-btn.active {
 .category-pill-num {
   font-size: 9px;
   opacity: 0.75;
+}
+
+.card-category-tag, .card-subcategory-tag, .table-tag {
+  cursor: pointer !important;
+  transition: all var(--transition-fast);
+}
+
+.card-category-tag:hover, .card-subcategory-tag:hover, .table-tag:hover {
+  transform: scale(1.05);
+  filter: brightness(1.15);
+  box-shadow: 0 2px 6px rgba(89, 99, 232, 0.25);
 }
 
 .badge-count {

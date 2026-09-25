@@ -76,21 +76,7 @@
 
     // 10. Setup category event listeners
     $('category').addEventListener('change', () => {
-      updateSubcategories(false);
-      updateLiveConceptPreview();
-      const val = $('category').value;
-      const absCat = STOCK_DATA.findAbstractCategory(val);
-      const code = absCat ? absCat.code : '';
-      const bar = $('categoryPillsBar');
-      if (bar) {
-        bar.querySelectorAll('.category-pill').forEach(p => {
-          const isActive = (p.dataset.code === code || p.dataset.cat === val);
-          p.classList.toggle('active', isActive);
-          if (isActive) {
-            p.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-          }
-        });
-      }
+      selectCategory($('category').value, true);
     });
 
     // 11. Populate filter category dropdown
@@ -169,7 +155,57 @@
     updateLiveConceptPreview();
   }
 
-  // Render Horizontal Category Pills for Quick 1-Click Access
+  // Central Category Selection Engine (Instant 1-Click Action)
+  function selectCategory(catKey, isUserClick = false) {
+    if (!catKey) return;
+    const catSelect = $('category');
+    if (catSelect) {
+      let matched = false;
+      for (let i = 0; i < catSelect.options.length; i++) {
+        const val = catSelect.options[i].value;
+        if (val.toLowerCase() === catKey.toLowerCase() ||
+            val.toLowerCase().includes(catKey.toLowerCase()) ||
+            catKey.toLowerCase().includes(val.toLowerCase())) {
+          catSelect.selectedIndex = i;
+          catKey = val;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        catSelect.value = catKey;
+      }
+    }
+
+    updateSubcategories(false);
+    updateLiveConceptPreview();
+
+    const absCat = STOCK_DATA.findAbstractCategory(catKey);
+    const code = absCat ? absCat.code : '';
+    const bar = $('categoryPillsBar');
+    if (bar) {
+      bar.querySelectorAll('.category-pill').forEach(p => {
+        const isActive = (p.dataset.cat === catKey || p.dataset.code === code);
+        p.classList.toggle('active', isActive);
+        if (isActive && isUserClick && !bar.classList.contains('is-grid')) {
+          p.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      });
+    }
+
+    // Also sync filter in Results panel
+    const filterCat = $('filterCategory');
+    if (filterCat) {
+      filterCat.value = catKey;
+      renderAll();
+    }
+
+    if (isUserClick) {
+      Toast.show(`✓ Category Selected: ${catKey}`, 'success', 2200);
+    }
+  }
+
+  // Render Horizontal Category Pills / Grid for Quick 1-Click Access
   function renderCategoryPills() {
     const bar = $('categoryPillsBar');
     if (!bar) return;
@@ -182,7 +218,7 @@
       const entry = STOCK_DATA.abstractTaxonomy[key];
       const isActive = entry.code === activeKey;
       return `
-        <button type="button" class="category-pill ${isActive ? 'active' : ''}" data-cat="${UI.esc(key)}" data-code="${entry.code}" title="${UI.esc(key)} (${entry.subcategories.length} sub-styles)">
+        <button type="button" class="category-pill ${isActive ? 'active' : ''}" data-cat="${UI.esc(key)}" data-code="${entry.code}" title="${UI.esc(key)} (${entry.subcategories.length} sub-styles) - Click to select">
           <span class="category-pill-num">${entry.code}</span>
           <span>${UI.esc(entry.shortName)}</span>
         </button>
@@ -191,19 +227,12 @@
 
     bar.innerHTML = pillHTML;
 
-    // Attach click events
+    // Attach direct button click events
     bar.querySelectorAll('.category-pill').forEach(btn => {
-      btn.onclick = () => {
-        const catKey = btn.dataset.cat;
-        $('category').value = catKey;
-        updateSubcategories();
-        updateLiveConceptPreview();
-
-        bar.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-
-        // Scroll into view smoothly
-        btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        selectCategory(btn.dataset.cat, true);
       };
     });
 
@@ -214,7 +243,7 @@
       bar.querySelectorAll('.category-pill').forEach(p => {
         const catText = (p.dataset.cat || '').toLowerCase();
         const code = (p.dataset.code || '').toLowerCase();
-        p.style.display = (!q || catText.includes(q) || code.includes(q)) ? 'inline-flex' : 'none';
+        p.style.display = (!q || catText.includes(q) || code.includes(q)) ? (bar.classList.contains('is-grid') ? 'flex' : 'inline-flex') : 'none';
       });
     }
   }
@@ -302,58 +331,80 @@
     });
   }
 
-  // Setup Category Search Input Listener
+  // Setup Category Search Input & Grid Toggle
   function setupCategorySearch() {
     const catSearch = $('catFilterInput');
-    if (!catSearch) return;
+    const bar = $('categoryPillsBar');
+    const toggleBtn = $('toggleCatGridBtn');
 
-    catSearch.addEventListener('input', () => {
-      const query = catSearch.value.toLowerCase().trim();
-      const pills = document.querySelectorAll('.category-pill');
-      let matchCount = 0;
-      let firstMatchCat = null;
+    // Toggle between single-row strip and expanded full grid view
+    if (toggleBtn && bar) {
+      toggleBtn.onclick = () => {
+        bar.classList.toggle('is-grid');
+        const isGrid = bar.classList.contains('is-grid');
+        toggleBtn.textContent = isGrid ? '≡ Strip View' : '⊞ Grid View';
+        toggleBtn.classList.toggle('active', isGrid);
+      };
+    }
 
-      pills.forEach(p => {
-        const catText = (p.dataset.cat || '').toLowerCase();
-        const code = (p.dataset.code || '').toLowerCase();
-        const matches = !query || catText.includes(query) || code.includes(query);
-        p.style.display = matches ? 'inline-flex' : 'none';
-        if (matches) {
-          matchCount++;
-          if (!firstMatchCat) firstMatchCat = p.dataset.cat;
+    // Container event delegation for category pills
+    if (bar) {
+      bar.addEventListener('click', (e) => {
+        const btn = e.target.closest('.category-pill');
+        if (!btn || !btn.dataset.cat) return;
+        e.preventDefault();
+        e.stopPropagation();
+        selectCategory(btn.dataset.cat, true);
+      });
+    }
+
+    if (catSearch) {
+      catSearch.addEventListener('input', () => {
+        const query = catSearch.value.toLowerCase().trim();
+        const pills = document.querySelectorAll('.category-pill');
+        let matchCount = 0;
+        let firstMatchCat = null;
+
+        pills.forEach(p => {
+          const catText = (p.dataset.cat || '').toLowerCase();
+          const code = (p.dataset.code || '').toLowerCase();
+          const matches = !query || catText.includes(query) || code.includes(query);
+          p.style.display = matches ? (bar && bar.classList.contains('is-grid') ? 'flex' : 'inline-flex') : 'none';
+          if (matches) {
+            matchCount++;
+            if (!firstMatchCat) firstMatchCat = p.dataset.cat;
+          }
+        });
+
+        // Filter select dropdown options too
+        const catSelect = $('category');
+        if (catSelect) {
+          Array.from(catSelect.options).forEach(opt => {
+            const optText = opt.value.toLowerCase();
+            const matches = !query || optText.includes(query);
+            opt.hidden = !matches;
+          });
+
+          if (query && firstMatchCat) {
+            selectCategory(firstMatchCat, false);
+          }
+        }
+
+        const hint = $('activeCatHint');
+        if (hint) {
+          hint.textContent = query ? `${matchCount} / 80 matching` : '80 Categories Available';
         }
       });
 
-      // Filter select dropdown options too
-      const catSelect = $('category');
-      if (catSelect) {
-        Array.from(catSelect.options).forEach(opt => {
-          const optText = opt.value.toLowerCase();
-          const matches = !query || optText.includes(query);
-          opt.hidden = !matches;
-        });
-
-        if (query && firstMatchCat) {
-          catSelect.value = firstMatchCat;
-          updateSubcategories(false);
-          updateLiveConceptPreview();
+      catSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const visiblePills = [...document.querySelectorAll('.category-pill')].filter(p => p.style.display !== 'none');
+          if (visiblePills.length) {
+            selectCategory(visiblePills[0].dataset.cat, true);
+          }
         }
-      }
-
-      const hint = $('activeCatHint');
-      if (hint) {
-        hint.textContent = query ? `${matchCount} / 80 matching` : '80 Categories Available';
-      }
-    });
-
-    catSearch.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        const visiblePills = [...document.querySelectorAll('.category-pill')].filter(p => p.style.display !== 'none');
-        if (visiblePills.length) {
-          visiblePills[0].click();
-        }
-      }
-    });
+      });
+    }
   }
 
   // Setup Surprise Me Randomize Button
@@ -952,6 +1003,14 @@
 
   // Results Click Delegate
   $('results').onclick = e => {
+    // 1. Check if category or subcategory tag was clicked
+    const catTag = e.target.closest('.card-category-tag, .card-subcategory-tag');
+    if (catTag) {
+      const catName = catTag.textContent.trim();
+      selectCategory(catName, true);
+      return;
+    }
+
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
 
@@ -1051,6 +1110,14 @@
 
   // History Table Click Delegate
   $('historyBody').onclick = e => {
+    // Check if table category tag was clicked
+    const catTag = e.target.closest('.table-tag');
+    if (catTag) {
+      const catName = catTag.textContent.trim();
+      selectCategory(catName, true);
+      return;
+    }
+
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
 
