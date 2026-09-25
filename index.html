@@ -139,15 +139,22 @@
           <select id="category" aria-label="Abstract Category Selector"></select>
         </div>
 
-        <!-- Subcategory / Specific Theme Group (Cascading) -->
+        <!-- Subcategory / Specific Theme Group (Cascading & Clickable Pills) -->
         <div class="form-group" id="subcategoryGroup">
-          <label for="subcategory">Abstract Sub-Theme / Style
-            <span class="badge-count" id="subcategoryCountBadge">15 Styles</span>
-            <span class="tooltip-hint" title="Pick a specific sub-type or keep on Auto Diversity">ⓘ</span>
-          </label>
+          <div class="subcat-header">
+            <label for="subcategory">Abstract Sub-Theme / Style
+              <span class="badge-count" id="subcategoryCountBadge">15 Styles</span>
+              <span class="tooltip-hint" title="Pick a specific sub-type or keep on Auto Diversity">ⓘ</span>
+            </label>
+            <span class="subcat-hint-pill">Click style below</span>
+          </div>
           <select id="subcategory">
             <option value="Auto Diversity">✦ Auto Diversity (All Sub-types)</option>
           </select>
+          <div class="subcategory-pills-bar" id="subcategoryPillsBar"></div>
+          <button type="button" id="browseAll749Btn" class="all-subcats-launch-btn">
+            🔍 Browse All 749 Sub-Categories Catalog
+          </button>
         </div>
 
         <div class="grid-2-col">
@@ -515,6 +522,27 @@
         <button id="modalDownloadSingleBtn" class="ghost small">📥 Download Package (.txt)</button>
         <button id="modalSaveEditsBtn" class="primary small">Save Changes to Design</button>
         <button id="modalDoneBtn" class="ghost small">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- All 749 Sub-Categories Catalog Modal -->
+  <div id="catalogModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="catalogModalTitle">
+    <div class="modal-container catalog-modal-container">
+      <div class="modal-header">
+        <div>
+          <h3 id="catalogModalTitle">All 749 Abstract Sub-Categories Catalog</h3>
+          <p class="modal-subtitle">749 unique styles across all 80 abstract background categories</p>
+        </div>
+        <button id="catalogModalClose" class="icon-btn" aria-label="Close catalog">✕</button>
+      </div>
+      <div class="catalog-search-wrap">
+        <input type="text" id="catalogSearchInput" placeholder="Search 749 sub-styles (e.g. chrome, marble, neon, crystal, aurora, wave, cyber)...">
+        <span class="cat-search-icon">🔍</span>
+      </div>
+      <div class="modal-body catalog-body" id="catalogContent"></div>
+      <div class="modal-footer">
+        <button id="catalogDoneBtn" class="primary small">Close Catalog</button>
       </div>
     </div>
   </div>

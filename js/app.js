@@ -74,9 +74,12 @@
     // 9. Setup metadata modal
     setupMetadataModal();
 
-    // 10. Setup category event listeners
+    // 10. Setup category & subcategory event listeners
     $('category').addEventListener('change', () => {
       selectCategory($('category').value, true);
+    });
+    $('subcategory').addEventListener('change', () => {
+      selectSubcategory($('subcategory').value, false);
     });
 
     // 11. Populate filter category dropdown
@@ -86,6 +89,8 @@
     populateCustomDNADropdowns();
     setupLiveConceptPreview();
     setupCategorySearch();
+    setupSubcategoryPills();
+    setupCatalogModal();
     setupSurpriseButton();
 
     // 13. Load initial view
@@ -156,7 +161,7 @@
   }
 
   // Central Category Selection Engine (Instant 1-Click Action)
-  function selectCategory(catKey, isUserClick = false) {
+  function selectCategory(catKey, isUserClick = false, targetSubcat = null) {
     if (!catKey) return;
     const catSelect = $('category');
     if (catSelect) {
@@ -178,6 +183,9 @@
     }
 
     updateSubcategories(false);
+    if (targetSubcat) {
+      selectSubcategory(targetSubcat, false);
+    }
     updateLiveConceptPreview();
 
     const absCat = STOCK_DATA.findAbstractCategory(catKey);
@@ -248,7 +256,7 @@
     }
   }
 
-  // Dynamic Cascading Subcategories Dropdown
+  // Dynamic Cascading Subcategories Dropdown & Clickable Subcategory Pills
   function updateSubcategories(preserveSelection = false) {
     const catVal = $('category').value.trim();
     const absCat = STOCK_DATA.findAbstractCategory(catVal);
@@ -278,6 +286,9 @@
         subcatSelect.value = 'Auto Diversity';
       }
 
+      // Render horizontal clickable pills for this active category
+      renderSubcategoryPills(absCat, subcatSelect.value);
+
       // Update pills active highlight
       const bar = $('categoryPillsBar');
       if (bar) {
@@ -290,7 +301,217 @@
         subcatGroup.style.display = 'none';
       }
       if (hint) hint.textContent = catVal;
+      const subBar = $('subcategoryPillsBar');
+      if (subBar) subBar.innerHTML = '';
     }
+  }
+
+  // Render Horizontal Clickable Subcategory Pills for Active Category
+  function renderSubcategoryPills(absCat, activeSub) {
+    const subBar = $('subcategoryPillsBar');
+    if (!subBar) return;
+    if (!absCat || !absCat.subcategories || !absCat.subcategories.length) {
+      subBar.innerHTML = '';
+      return;
+    }
+
+    const currentSub = activeSub || 'Auto Diversity';
+    const isAuto = currentSub === 'Auto Diversity';
+
+    let html = `
+      <button type="button" class="subcat-pill ${isAuto ? 'active' : ''}" data-sub="Auto Diversity" title="Auto Diversity (Randomize across all ${absCat.subcategories.length} styles)">
+        ✦ Auto Diversity
+      </button>
+    `;
+
+    absCat.subcategories.forEach(sub => {
+      const isActive = currentSub === sub;
+      html += `
+        <button type="button" class="subcat-pill ${isActive ? 'active' : ''}" data-sub="${UI.esc(sub)}" title="Style: ${UI.esc(sub)}">
+          ${UI.esc(sub)}
+        </button>
+      `;
+    });
+
+    subBar.innerHTML = html;
+  }
+
+  // Helper to Select Subcategory with bi-directional sync, preview, and toast
+  function selectSubcategory(subName, isUserClick = true) {
+    const subSelect = $('subcategory');
+    if (subSelect) {
+      subSelect.value = subName;
+    }
+
+    const subBar = $('subcategoryPillsBar');
+    if (subBar) {
+      subBar.querySelectorAll('.subcat-pill').forEach(p => {
+        const isActive = p.dataset.sub === subName;
+        p.classList.toggle('active', isActive);
+        if (isActive && isUserClick) {
+          p.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      });
+    }
+
+    updateLiveConceptPreview();
+
+    if (isUserClick) {
+      Toast.show(`✓ Style Selected: ${subName}`, 'info', 1800);
+    }
+  }
+
+  // Setup Event Delegation for Subcategory Pills
+  function setupSubcategoryPills() {
+    const subBar = $('subcategoryPillsBar');
+    if (!subBar) return;
+
+    subBar.addEventListener('click', (e) => {
+      const btn = e.target.closest('.subcat-pill');
+      if (!btn || !btn.dataset.sub) return;
+      e.preventDefault();
+      e.stopPropagation();
+      selectSubcategory(btn.dataset.sub, true);
+    });
+  }
+
+  // Setup All 749 Sub-Categories Catalog Modal
+  function setupCatalogModal() {
+    const modal = $('catalogModal');
+    const openBtn = $('browseAll749Btn');
+    const closeBtn = $('catalogModalClose');
+    const doneBtn = $('catalogDoneBtn');
+    const searchInput = $('catalogSearchInput');
+    const content = $('catalogContent');
+
+    if (!modal) return;
+
+    const openCatalog = () => {
+      renderCatalogModal();
+      modal.classList.remove('hidden');
+      document.body.classList.add('modal-open');
+      if (searchInput) {
+        searchInput.value = '';
+        setTimeout(() => searchInput.focus(), 120);
+      }
+    };
+
+    const closeCatalog = () => {
+      modal.classList.add('hidden');
+      document.body.classList.remove('modal-open');
+    };
+
+    if (openBtn) openBtn.onclick = openCatalog;
+    if (closeBtn) closeBtn.onclick = closeCatalog;
+    if (doneBtn) doneBtn.onclick = closeCatalog;
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeCatalog();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeCatalog();
+      }
+    });
+
+    // Real-time Search Filtering across 80 Categories & 749 Subcategories
+    if (searchInput && content) {
+      searchInput.addEventListener('input', () => {
+        const q = searchInput.value.toLowerCase().trim();
+        const cards = content.querySelectorAll('.catalog-cat-card');
+
+        cards.forEach(card => {
+          const catName = (card.dataset.cat || '').toLowerCase();
+          const code = (card.dataset.code || '').toLowerCase();
+          const chips = card.querySelectorAll('.catalog-sub-chip');
+          let matchedChipsCount = 0;
+
+          chips.forEach(chip => {
+            const sub = (chip.dataset.sub || '').toLowerCase();
+            const match = !q || sub.includes(q) || catName.includes(q) || code.includes(q);
+            chip.style.display = match ? 'inline-flex' : 'none';
+            if (match) matchedChipsCount++;
+          });
+
+          // Show card if card name matches or any sub matches
+          const showCard = !q || catName.includes(q) || code.includes(q) || matchedChipsCount > 0;
+          card.style.display = showCard ? 'block' : 'none';
+        });
+      });
+    }
+
+    // Event Delegation inside Catalog Modal Content
+    if (content) {
+      content.addEventListener('click', (e) => {
+        // 1. Clicked a subcategory chip
+        const subChip = e.target.closest('.catalog-sub-chip');
+        if (subChip && subChip.dataset.cat && subChip.dataset.sub) {
+          e.preventDefault();
+          e.stopPropagation();
+          const catKey = subChip.dataset.cat;
+          const subName = subChip.dataset.sub;
+
+          selectCategory(catKey, false, subName);
+          closeCatalog();
+          Toast.show(`✓ Selected: ${catKey} • ${subName}`, 'success', 2500);
+          return;
+        }
+
+        // 2. Clicked "Select Category" button on card header
+        const catBtn = e.target.closest('.select-all-cat-btn');
+        if (catBtn && catBtn.dataset.cat) {
+          e.preventDefault();
+          e.stopPropagation();
+          const catKey = catBtn.dataset.cat;
+          selectCategory(catKey, true, 'Auto Diversity');
+          closeCatalog();
+        }
+      });
+    }
+  }
+
+  // Render Full 80-Category / 749-Subcategory Catalog Content
+  function renderCatalogModal() {
+    const content = $('catalogContent');
+    if (!content) return;
+
+    const currentCat = $('category') ? $('category').value.trim() : '';
+    const currentSub = $('subcategory') ? $('subcategory').value.trim() : '';
+
+    const keys = Object.keys(STOCK_DATA.abstractTaxonomy);
+    const html = keys.map(key => {
+      const entry = STOCK_DATA.abstractTaxonomy[key];
+      const isCurrentCat = (currentCat === key || currentCat.startsWith(entry.code));
+
+      const chipsHTML = entry.subcategories.map(sub => {
+        const isActive = isCurrentCat && (currentSub === sub);
+        return `
+          <button type="button" class="catalog-sub-chip ${isActive ? 'active' : ''}" data-cat="${UI.esc(key)}" data-sub="${UI.esc(sub)}" title="Choose ${UI.esc(key)} • ${UI.esc(sub)}">
+            ${UI.esc(sub)}
+          </button>
+        `;
+      }).join('');
+
+      return `
+        <div class="catalog-cat-card" data-cat="${UI.esc(key)}" data-code="${entry.code}">
+          <div class="catalog-cat-head">
+            <div class="catalog-cat-title">
+              <span>${entry.code}. ${UI.esc(entry.fullName || entry.name)}</span>
+              <span class="catalog-cat-badge">${entry.subcategories.length} Styles</span>
+            </div>
+            <button type="button" class="mini select-all-cat-btn" data-cat="${UI.esc(key)}" title="Select this category on Auto Diversity">
+              Select Category
+            </button>
+          </div>
+          <div class="catalog-subs-grid">
+            ${chipsHTML}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    content.innerHTML = html;
   }
 
   // Populate Filter Category Dropdown in Results
@@ -1004,10 +1225,23 @@
   // Results Click Delegate
   $('results').onclick = e => {
     // 1. Check if category or subcategory tag was clicked
-    const catTag = e.target.closest('.card-category-tag, .card-subcategory-tag');
+    const subcatTag = e.target.closest('.card-subcategory-tag');
+    if (subcatTag) {
+      const card = subcatTag.closest('.card');
+      const cardId = card ? card.dataset.id : null;
+      const d = cardId ? findDesign(cardId) : null;
+      if (d) {
+        if (d.category) selectCategory(d.category, false, d.subcategory || null);
+        if (window.innerWidth <= 768) switchMobileTab('generator');
+        return;
+      }
+    }
+
+    const catTag = e.target.closest('.card-category-tag');
     if (catTag) {
       const catName = catTag.textContent.trim();
       selectCategory(catName, true);
+      if (window.innerWidth <= 768) switchMobileTab('generator');
       return;
     }
 
