@@ -100,8 +100,13 @@ window.DiversityEngine = (() => {
       const isLocked = settings.locks && settings.locks.includes(k);
       const lockedVal = settings.lockValues ? settings.lockValues[k] : null;
       const isVaried = settings.variations && settings.variations.includes(k);
+      const customVal = settings.customDNA && settings.customDNA[k] && settings.customDNA[k] !== 'Auto'
+        ? settings.customDNA[k]
+        : null;
 
-      if (isLocked && lockedVal) {
+      if (customVal) {
+        dna[k] = customVal;
+      } else if (isLocked && lockedVal) {
         dna[k] = lockedVal;
       } else if (!isVaried && settings.base && settings.base[k]) {
         dna[k] = settings.base[k];
@@ -109,6 +114,10 @@ window.DiversityEngine = (() => {
         dna[k] = pickValue(k, settings.category, null, used[k] || []);
       }
     });
+
+    if (settings.customTags && settings.customTags.trim()) {
+      dna.customTags = settings.customTags.trim();
+    }
 
     if (settings.orientation && settings.orientation !== 'Auto') {
       dna.orientation = settings.orientation;
@@ -138,7 +147,7 @@ window.DiversityEngine = (() => {
   }
 
   // Generate commercial prompt text
-  function buildPrompt(dna, settings) {
+  function buildPrompt(dna, settings = {}) {
     const cat = settings.category || dna.category || 'Abstract Background';
     const subCatPrefix = dna.subcategory ? `${dna.subcategory} ` : '';
     const traitsText = dna.promptTraits ? `${dna.promptTraits}, ` : '';
@@ -153,9 +162,12 @@ window.DiversityEngine = (() => {
       ? 'commercial stock vector illustration quality, clean SVG-ready contour aesthetic, '
       : 'commercial stock photography quality, professional studio finish, ';
 
+    const customTagsStr = (settings.customTags || dna.customTags || '').trim();
+    const customTagsInject = customTagsStr ? `${customTagsStr}, ` : '';
+
     const orientationStr = (dna.orientation || 'Landscape').replace(/[\(\)]/g, ' ');
 
-    return `${subCatPrefix}${cat}, ${traitsText}${dna.style.toLowerCase()} aesthetic, ${dna.composition.toLowerCase()}, featuring ${dna.shape.toLowerCase()} elements, ${dna.color.toLowerCase()} palette, ${dna.background.toLowerCase()}, ${dna.lighting.toLowerCase()}, ${dna.texture.toLowerCase()}, ${dna.density.toLowerCase()}, subject positioned ${dna.position.toLowerCase()}, ${copyText}${orientationStr.toLowerCase().trim()} aspect framing, ${styleTrait}${qualityText}clean visual hierarchy, impeccable spacing, commercial stock asset quality, 8k resolution, no watermark, no signatures, no trademarks, no copyrighted characters, no distorted artifacts.`;
+    return `${subCatPrefix}${cat}, ${traitsText}${dna.style.toLowerCase()} aesthetic, ${dna.composition.toLowerCase()}, featuring ${dna.shape.toLowerCase()} elements, ${dna.color.toLowerCase()} palette, ${dna.background.toLowerCase()}, ${dna.lighting.toLowerCase()}, ${dna.texture.toLowerCase()}, ${dna.density.toLowerCase()}, subject positioned ${dna.position.toLowerCase()}, ${copyText}${orientationStr.toLowerCase().trim()} aspect framing, ${styleTrait}${qualityText}${customTagsInject}clean visual hierarchy, impeccable spacing, commercial stock asset quality, 8k resolution, no watermark, no signatures, no trademarks, no copyrighted characters, no distorted artifacts.`;
   }
 
   // Batch generation with diversity filtering

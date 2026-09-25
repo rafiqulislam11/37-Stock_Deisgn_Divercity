@@ -122,6 +122,14 @@ window.MetadataEngine = (() => {
     addKeyword(style);
     extractWords(style).forEach(addKeyword);
 
+    // Add signature / custom user tags with top priority
+    if (dna.customTags) {
+      dna.customTags.split(/[,;]+/).forEach(tag => {
+        addKeyword(tag);
+        extractWords(tag).forEach(addKeyword);
+      });
+    }
+
     // Add taxonomy-specific keywords
     if (absCat && absCat.keywords) {
       absCat.keywords.forEach(kw => {

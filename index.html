@@ -22,6 +22,9 @@
     </div>
     <div class="top-actions">
       <span id="saveState" class="save-state">● LOCAL STORAGE</span>
+      <button id="surpriseBtn" class="ghost top-btn" title="Surprise Me - Pick Random Concept">
+        <span class="top-btn-icon">🎲</span><span class="top-btn-text">Randomize</span>
+      </button>
       <button id="themeBtn" class="icon-btn" title="Toggle Light/Dark Theme" aria-label="Toggle theme">☾</button>
       <button id="importBtn" class="ghost top-btn" title="Import JSON project">
         <span class="top-btn-icon">📥</span><span class="top-btn-text">Import</span>
@@ -117,6 +120,10 @@
           <div class="category-pills-header">
             <span>Quick Category Selector</span>
             <small id="activeCatHint">80 Categories Available</small>
+          </div>
+          <div class="cat-search-box">
+            <input type="text" id="catFilterInput" placeholder="Quick search 80 categories (e.g. neon, marble, liquid, cyber, fire)...">
+            <span class="cat-search-icon">🔍</span>
           </div>
           <div class="category-pills-bar" id="categoryPillsBar"></div>
         </div>
@@ -217,6 +224,55 @@
             <input type="checkbox" id="vector" checked>
             <span>Vector / Clean Geometry Style</span>
           </label>
+        </div>
+
+        <!-- Custom DNA Parameters (Full Customization) -->
+        <div class="section-label">Custom DNA Controls (Full Tuning)</div>
+        <div class="grid-2-col">
+          <div class="form-group">
+            <label for="customColor">Color Harmony</label>
+            <select id="customColor">
+              <option value="Auto">✦ Auto Diversity</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="customLighting">Lighting Model</label>
+            <select id="customLighting">
+              <option value="Auto">✦ Auto Diversity</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2-col">
+          <div class="form-group">
+            <label for="customTexture">Surface Texture</label>
+            <select id="customTexture">
+              <option value="Auto">✦ Auto Diversity</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="customComposition">Composition Flow</label>
+            <select id="customComposition">
+              <option value="Auto">✦ Auto Diversity</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="customTags">Signature / Custom Tags Injector
+            <span class="tooltip-hint" title="Inject your own keywords into generated prompts and metadata">ⓘ</span>
+          </label>
+          <input type="text" id="customTags" placeholder="e.g. 4k render, luxury branding, editorial, ultra sharp...">
+        </div>
+
+        <!-- Live Concept Real-Time Previewer -->
+        <div class="live-concept-card">
+          <div class="live-concept-head">
+            <div class="live-concept-badge">
+              <span class="pulse-dot"></span> LIVE CONCEPT PREVIEW
+            </div>
+            <button type="button" id="copyLivePrompt" class="mini-copy-btn">Copy Prompt</button>
+          </div>
+          <p id="livePromptPreview" class="live-prompt-text">Select options above to see real-time prompt synthesis...</p>
+          <div id="liveTagsPreview" class="live-tags-strip"></div>
         </div>
 
         <div class="control-buttons">
@@ -386,7 +442,10 @@
         <div class="meta-section">
           <div class="section-title-row">
             <h4>Description (Shutterstock & Contributor Ready)</h4>
-            <button id="copyDescOnlyBtn" class="mini-copy-btn">Copy Description</button>
+            <div class="desc-actions-row">
+              <span id="modalDescCharCount" class="char-count-pill">0 / 195 chars</span>
+              <button id="copyDescOnlyBtn" class="mini-copy-btn">Copy Description</button>
+            </div>
           </div>
           <textarea id="modalInputDesc" class="modal-textarea" rows="3" placeholder="Description..."></textarea>
         </div>
@@ -451,6 +510,7 @@
       </div>
 
       <div class="modal-footer">
+        <button id="modalDownloadSingleBtn" class="ghost small">📥 Download Package (.txt)</button>
         <button id="modalSaveEditsBtn" class="primary small">Save Changes to Design</button>
         <button id="modalDoneBtn" class="ghost small">Done</button>
       </div>

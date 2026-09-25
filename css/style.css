@@ -254,6 +254,28 @@ a {
   font-size: 16px;
 }
 
+.top-btn {
+  font-size: 11.5px;
+  padding: 6px 12px;
+  gap: 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.top-btn:hover {
+  background: var(--bg-subtle);
+  border-color: var(--border-focus);
+  color: var(--accent-primary);
+}
+
+.top-btn-icon {
+  font-size: 13px;
+}
+
 .danger {
   color: var(--danger-color) !important;
 }
@@ -634,6 +656,38 @@ body.dark .mode-btn.active {
   font-weight: 600;
 }
 
+.cat-search-box {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.cat-search-box input {
+  width: 100%;
+  padding: 6px 28px 6px 10px;
+  font-size: 11px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.cat-search-box input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+.cat-search-icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 .category-pills-bar {
   display: flex;
   gap: 6px;
@@ -863,6 +917,97 @@ input[type="range"]::-webkit-slider-thumb:hover {
   width: 14px;
   height: 14px;
   cursor: pointer;
+}
+
+/* Live Concept Real-Time Previewer */
+.live-concept-card {
+  margin-top: 14px;
+  margin-bottom: 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: border-color var(--transition-normal);
+}
+
+.live-concept-card:hover {
+  border-color: var(--border-focus);
+}
+
+.live-concept-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.live-concept-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: var(--accent-primary);
+  background: var(--accent-light);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 6px #22c55e;
+  animation: livePulse 1.8s infinite;
+}
+
+@keyframes livePulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.live-prompt-text {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  max-height: 110px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  word-break: break-word;
+}
+
+.live-tags-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+  max-height: 60px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.live-tag-pill {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--accent-text);
+  background: var(--accent-light);
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.live-tag-pill:hover {
+  background: var(--accent-primary);
+  color: #fff;
 }
 
 /* Control Buttons */
@@ -1566,6 +1711,41 @@ input[type="range"]::-webkit-slider-thumb:hover {
   line-height: 1.5;
 }
 
+.desc-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.char-count-pill {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-fast);
+}
+
+.char-count-pill.valid {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border-color: var(--success-border);
+}
+
+.char-count-pill.warning {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border-color: var(--warning-border);
+}
+
+.char-count-pill.exceeded {
+  background: var(--danger-bg);
+  color: var(--danger-color);
+  border-color: var(--danger-border);
+}
+
 /* Marketplace Taxonomies */
 .meta-taxonomy-row {
   display: flex;
@@ -1680,9 +1860,14 @@ body.dark .keyword-chip.is-top5 {
   padding: 14px 24px;
   border-top: 1px solid var(--border-color);
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: 8px;
   background: var(--bg-elevated);
+}
+
+#modalDownloadSingleBtn {
+  margin-right: auto;
 }
 
 /* ==========================================================================

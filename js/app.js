@@ -75,17 +75,30 @@
     setupMetadataModal();
 
     // 10. Setup category event listeners
-    $('category').addEventListener('input', () => updateSubcategories(false));
-    $('category').addEventListener('change', () => updateSubcategories(false));
+    $('category').addEventListener('input', () => {
+      updateSubcategories(false);
+      updateLiveConceptPreview();
+    });
+    $('category').addEventListener('change', () => {
+      updateSubcategories(false);
+      updateLiveConceptPreview();
+    });
 
     // 11. Populate filter category dropdown
     populateCategoryFilter();
 
-    // 12. Load initial view
+    // 12. Setup custom DNA controls, search, surprise randomize & live preview
+    populateCustomDNADropdowns();
+    setupLiveConceptPreview();
+    setupCategorySearch();
+    setupSurpriseButton();
+
+    // 13. Load initial view
     if (history.length) {
       current = history.slice(0, 12);
     }
     renderAll();
+    updateLiveConceptPreview();
   }
 
   // Engine Mode & Category Management
@@ -148,6 +161,7 @@
         $('category').value = 'Abstract Background';
       }
     }
+    updateLiveConceptPreview();
   }
 
   // Render Horizontal Category Pills for Quick 1-Click Access
@@ -178,6 +192,7 @@
         const catKey = btn.dataset.cat;
         $('category').value = catKey;
         updateSubcategories();
+        updateLiveConceptPreview();
 
         bar.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
         btn.classList.add('active');
@@ -186,6 +201,17 @@
         btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       };
     });
+
+    // Re-apply search filter if present
+    const catSearch = $('catFilterInput');
+    if (catSearch && catSearch.value.trim()) {
+      const q = catSearch.value.toLowerCase().trim();
+      bar.querySelectorAll('.category-pill').forEach(p => {
+        const catText = (p.dataset.cat || '').toLowerCase();
+        const code = (p.dataset.code || '').toLowerCase();
+        p.style.display = (!q || catText.includes(q) || code.includes(q)) ? 'inline-flex' : 'none';
+      });
+    }
   }
 
   // Dynamic Cascading Subcategories Dropdown
@@ -247,6 +273,174 @@
         ${STOCK_DATA.generalCategories.map(c => `<option value="${UI.esc(c)}">${UI.esc(c)}</option>`).join('')}
       </optgroup>
     `;
+  }
+
+  // Populate Custom DNA Controls
+  function populateCustomDNADropdowns() {
+    const configs = [
+      { id: 'customColor', pool: STOCK_DATA.color },
+      { id: 'customLighting', pool: STOCK_DATA.lighting },
+      { id: 'customTexture', pool: STOCK_DATA.texture },
+      { id: 'customComposition', pool: STOCK_DATA.composition }
+    ];
+
+    configs.forEach(({ id, pool }) => {
+      const el = $(id);
+      if (!el || !Array.isArray(pool)) return;
+      el.innerHTML = '<option value="Auto">✦ Auto Diversity</option>';
+      pool.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        opt.textContent = item;
+        el.appendChild(opt);
+      });
+    });
+  }
+
+  // Setup Category Search Input Listener
+  function setupCategorySearch() {
+    const catSearch = $('catFilterInput');
+    if (!catSearch) return;
+
+    catSearch.addEventListener('input', () => {
+      const query = catSearch.value.toLowerCase().trim();
+      const pills = document.querySelectorAll('.category-pill');
+      let matchCount = 0;
+      pills.forEach(p => {
+        const catText = (p.dataset.cat || '').toLowerCase();
+        const code = (p.dataset.code || '').toLowerCase();
+        const matches = !query || catText.includes(query) || code.includes(query);
+        p.style.display = matches ? 'inline-flex' : 'none';
+        if (matches) matchCount++;
+      });
+      const hint = $('activeCatHint');
+      if (hint) {
+        hint.textContent = query ? `${matchCount} / 80 matching` : '80 Categories Available';
+      }
+    });
+
+    catSearch.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const visiblePills = [...document.querySelectorAll('.category-pill')].filter(p => p.style.display !== 'none');
+        if (visiblePills.length) {
+          visiblePills[0].click();
+        }
+      }
+    });
+  }
+
+  // Setup Surprise Me Randomize Button
+  function setupSurpriseButton() {
+    const btn = $('surpriseBtn');
+    if (!btn) return;
+
+    btn.onclick = () => {
+      if (currentEngineMode === 'abstract') {
+        const keys = Object.keys(STOCK_DATA.abstractTaxonomy);
+        const randomKey = keys[Math.floor(Math.random() * keys.length)];
+        $('category').value = randomKey;
+        updateSubcategories(false);
+
+        const absCat = STOCK_DATA.findAbstractCategory(randomKey);
+        if (absCat && absCat.subcategories && absCat.subcategories.length && $('subcategory')) {
+          const randomSub = absCat.subcategories[Math.floor(Math.random() * absCat.subcategories.length)];
+          $('subcategory').value = randomSub;
+        }
+      } else {
+        const randomGen = STOCK_DATA.generalCategories[Math.floor(Math.random() * STOCK_DATA.generalCategories.length)];
+        $('category').value = randomGen;
+        updateSubcategories(false);
+      }
+
+      // Randomize style
+      const randomStyle = STOCK_DATA.styles[Math.floor(Math.random() * STOCK_DATA.styles.length)];
+      $('style').value = randomStyle;
+
+      // Randomize custom DNA
+      if ($('customColor') && STOCK_DATA.color) {
+        const randCol = Math.random() < 0.25 ? 'Auto' : STOCK_DATA.color[Math.floor(Math.random() * STOCK_DATA.color.length)];
+        $('customColor').value = randCol;
+      }
+      if ($('customLighting') && STOCK_DATA.lighting) {
+        const randLit = Math.random() < 0.25 ? 'Auto' : STOCK_DATA.lighting[Math.floor(Math.random() * STOCK_DATA.lighting.length)];
+        $('customLighting').value = randLit;
+      }
+      if ($('customTexture') && STOCK_DATA.texture) {
+        const randTex = Math.random() < 0.25 ? 'Auto' : STOCK_DATA.texture[Math.floor(Math.random() * STOCK_DATA.texture.length)];
+        $('customTexture').value = randTex;
+      }
+      if ($('customComposition') && STOCK_DATA.composition) {
+        const randComp = Math.random() < 0.25 ? 'Auto' : STOCK_DATA.composition[Math.floor(Math.random() * STOCK_DATA.composition.length)];
+        $('customComposition').value = randComp;
+      }
+
+      updateLiveConceptPreview();
+
+      const catName = $('category').value;
+      const subName = ($('subcategory') && $('subcategory').value !== 'Auto Diversity') ? ` • ${$('subcategory').value}` : '';
+      Toast.show(`🎲 Concept Randomized: ${catName}${subName}!`, 'success', 2500);
+    };
+  }
+
+  // Setup Live Concept Preview Event Wiring
+  function setupLiveConceptPreview() {
+    ['subcategory', 'style', 'orientation', 'marketplace', 'customColor', 'customLighting', 'customTexture', 'customComposition'].forEach(id => {
+      const el = $(id);
+      if (el) {
+        el.addEventListener('change', updateLiveConceptPreview);
+        el.addEventListener('input', updateLiveConceptPreview);
+      }
+    });
+
+    ['copySpace', 'vector'].forEach(id => {
+      const el = $(id);
+      if (el) el.addEventListener('change', updateLiveConceptPreview);
+    });
+
+    if ($('customTags')) {
+      $('customTags').addEventListener('input', updateLiveConceptPreview);
+    }
+
+    if ($('copyLivePrompt')) {
+      $('copyLivePrompt').onclick = () => {
+        const text = $('livePromptPreview') ? $('livePromptPreview').textContent : '';
+        if (text && !text.startsWith('Select options')) {
+          UI.copyToClipboard(text, 'Copied live concept prompt!');
+        } else {
+          Toast.show('No prompt available to copy yet.', 'info');
+        }
+      };
+    }
+  }
+
+  // Update Live Concept Real-Time Synthesis
+  function updateLiveConceptPreview() {
+    const previewEl = $('livePromptPreview');
+    const tagsStrip = $('liveTagsPreview');
+    if (!previewEl) return;
+
+    try {
+      const s = getSettings();
+      const mockDna = DiversityEngine.createDNA(s);
+      const prompt = DiversityEngine.buildPrompt(mockDna, s);
+      previewEl.textContent = prompt;
+
+      if (tagsStrip) {
+        const sampleMeta = MetadataEngine.build(mockDna, mockDna.category);
+        const topTags = sampleMeta.keywords.slice(0, 10);
+        tagsStrip.innerHTML = topTags.map(t => `
+          <span class="live-tag-pill" title="Click to copy tag">${UI.esc(t)}</span>
+        `).join('');
+
+        tagsStrip.querySelectorAll('.live-tag-pill').forEach(pill => {
+          pill.onclick = () => {
+            UI.copyToClipboard(pill.textContent, `Copied tag: "${pill.textContent}"`);
+          };
+        });
+      }
+    } catch (e) {
+      console.warn('Live preview update:', e);
+    }
   }
 
   // Mobile Tabs Management
@@ -348,6 +542,14 @@
       lockValues[k] = current[0]?.[k] || base[k] || null;
     });
 
+    const customDNA = {
+      color: $('customColor') ? $('customColor').value : 'Auto',
+      lighting: $('customLighting') ? $('customLighting').value : 'Auto',
+      texture: $('customTexture') ? $('customTexture').value : 'Auto',
+      composition: $('customComposition') ? $('customComposition').value : 'Auto'
+    };
+    const customTags = $('customTags') ? $('customTags').value.trim() : '';
+
     return {
       category,
       subcategory,
@@ -358,6 +560,8 @@
       locks,
       lockValues,
       base,
+      customDNA,
+      customTags,
       orientation: $('orientation').value,
       marketplace: $('marketplace').value,
       copySpace: $('copySpace').checked,
@@ -530,6 +734,66 @@
       }
     };
 
+    // Download Single Design Asset Package (.txt)
+    if ($('modalDownloadSingleBtn')) {
+      $('modalDownloadSingleBtn').onclick = () => {
+        if (!activeModalDesign) return;
+        const d = activeModalDesign;
+        const meta = d.metadata || MetadataEngine.build(d, d.category);
+        const pkgText = [
+          '=================================================================',
+          `STOCK DESIGN COMMERCIAL ASSET PACKAGE - ${d.id}`,
+          '=================================================================',
+          `Generated: ${new Date().toISOString()}`,
+          `Category: ${d.category}`,
+          `Subcategory: ${d.subcategory || 'N/A'}`,
+          `Style: ${d.style}`,
+          `Orientation: ${d.orientation || 'Landscape'}`,
+          `Uniqueness Score: ${d.uniqueness || 100}%`,
+          `Marketplace: ${d.marketplace || 'Generic Stock'}`,
+          '',
+          '-----------------------------------------------------------------',
+          'COMMERCIAL AI GENERATION PROMPT (RAW)',
+          '-----------------------------------------------------------------',
+          d.prompt,
+          '',
+          '-----------------------------------------------------------------',
+          'STOCK METADATA (READY FOR CONTRIBUTOR UPLOAD)',
+          '-----------------------------------------------------------------',
+          `Title: ${meta.title}`,
+          `Description (${meta.description.length} chars): ${meta.description}`,
+          `Adobe Stock Category: ${meta.adobeCategory || 'Graphic Resources'}`,
+          `Shutterstock Category: ${meta.shutterstockCategory || 'Abstract'}`,
+          `Top 5 Priority Tags: ${meta.top5.join(', ')}`,
+          '',
+          '-----------------------------------------------------------------',
+          `ALL 49 SEARCH KEYWORDS (${meta.keywords.length} TAGS - CSV FORMAT)`,
+          '-----------------------------------------------------------------',
+          meta.keywords.join(', '),
+          '',
+          '-----------------------------------------------------------------',
+          'KEYWORD LIST (INDIVIDUAL)',
+          '-----------------------------------------------------------------',
+          meta.keywords.map((kw, idx) => `${String(idx + 1).padStart(2, '0')}. ${kw}`).join('\n'),
+          '',
+          '=================================================================',
+          'Generated by Stock Design Diversity Studio Pro (Single Page Engine)',
+          '================================================================='
+        ].join('\n');
+
+        const blob = new Blob([pkgText], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${d.id.toLowerCase()}-stock-package.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        Toast.show(`Downloaded package for ${d.id}!`, 'success');
+      };
+    }
+
     // Save Edits back to design
     saveEditsBtn.onclick = () => {
       if (!activeModalDesign) return;
@@ -581,6 +845,26 @@
 
     $('modalInputTitle').value = meta.title;
     $('modalInputDesc').value = meta.description;
+
+    // Real-time Description Character Counter (<= 195 chars for Shutterstock)
+    const updateDescCounter = () => {
+      const countEl = $('modalDescCharCount');
+      const descInput = $('modalInputDesc');
+      if (!countEl || !descInput) return;
+      const len = descInput.value.length;
+      countEl.textContent = `${len} / 195 chars`;
+      countEl.classList.remove('valid', 'warning', 'exceeded');
+      if (len <= 195) {
+        countEl.classList.add('valid');
+      } else if (len <= 200) {
+        countEl.classList.add('warning');
+      } else {
+        countEl.classList.add('exceeded');
+      }
+    };
+    $('modalInputDesc').oninput = updateDescCounter;
+    updateDescCounter();
+
     if ($('modalInputKeywords')) {
       $('modalInputKeywords').value = meta.keywords.join(', ');
     }
