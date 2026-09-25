@@ -97,9 +97,9 @@ window.DiversityEngine = (() => {
     const used = {};
 
     D.variation.forEach(k => {
-      const isLocked = settings.locks && settings.locks.includes(k);
+      const isLocked = Array.isArray(settings.locks) ? settings.locks.includes(k) : (settings.locks && settings.locks[k]);
       const lockedVal = settings.lockValues ? settings.lockValues[k] : null;
-      const isVaried = settings.variations && settings.variations.includes(k);
+      const isVaried = Array.isArray(settings.variations) ? settings.variations.includes(k) : (!settings.variations || settings.variations[k]);
       const customVal = settings.customDNA && settings.customDNA[k] && settings.customDNA[k] !== 'Auto'
         ? settings.customDNA[k]
         : null;
