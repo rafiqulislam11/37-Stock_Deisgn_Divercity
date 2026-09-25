@@ -1,56 +1,441 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stock Design Diversity Engine</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>Stock Design Diversity Studio Pro - Smart Prompt & Metadata Workspace</title>
+  <meta name="description" content="Commercial stock prompt & 49-keyword metadata generator with anti-repetition engine, marketplace presets, and multi-format CSV export.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="brand"><span class="logo">RD</span><div><b>Stock Design Diversity</b><small>Anti-Repetition Engine</small></div></div>
-  <div class="top-actions"><button id="themeBtn" class="icon-btn">☾</button><button id="clearHistory" class="ghost">Clear History</button></div>
-</header>
-
-<main class="app">
-  <section class="hero">
-    <div>
-      <span class="badge">AI STOCK WORKFLOW</span>
-      <h1>Create <span>genuinely different</span> stock design concepts.</h1>
-      <p>Build diverse Design DNA combinations for Adobe Stock, Shutterstock, Creative Fabrica and passive-income workflows.</p>
-    </div>
-    <div class="hero-card"><strong id="uniqueCount">0</strong><span>Designs in history</span><div class="mini-bar"><i id="diversityBar"></i></div></div>
-  </section>
-
-  <div class="grid">
-    <aside class="panel controls">
-      <div class="panel-title"><h2>Design Generator</h2><span class="live">LOCAL</span></div>
-      <label>Category<input id="category" value="Abstract Background"></label>
-      <label>Style<select id="style"><option>Auto Diversity</option><option>Minimal</option><option>Modern</option><option>Geometric</option><option>Organic</option><option>Futuristic</option><option>3D</option><option>Line Art</option><option>Luxury</option><option>Editorial</option><option>Retro</option></select></label>
-      <label>Orientation<select id="orientation"><option>Auto</option><option>Square</option><option>Portrait</option><option>Landscape</option><option>Wide Banner</option></select></label>
-      <label>Batch Size<input id="batch" type="number" min="1" max="50" value="10"></label>
-      <label>Similarity Threshold <output id="thresholdOut">50%</output><input id="threshold" type="range" min="20" max="80" value="50"></label>
-      <div class="checks">
-        <label class="check"><input type="checkbox" id="copySpace" checked> Copy-space friendly</label>
-        <label class="check"><input type="checkbox" id="vector" checked> Vector/EPS-friendly</label>
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">SD</span>
+      <div class="brand-text">
+        <span class="brand-title">Stock Design Diversity Studio <span class="pro-tag">PRO</span></span>
+        <small class="brand-subtitle">Smart Prompt & 49-Keyword Metadata Engine</small>
       </div>
-      <button id="generate" class="primary">✦ Generate Diverse Batch</button>
-      <button id="promptBtn" class="secondary">Generate Prompt Pack</button>
-      <p class="note">Runs entirely in your browser. No API key required.</p>
-    </aside>
+    </div>
+    <div class="top-actions">
+      <span id="saveState" class="save-state">● LOCAL STORAGE</span>
+      <button id="themeBtn" class="icon-btn" title="Toggle Light/Dark Theme" aria-label="Toggle theme">☾</button>
+      <button id="importBtn" class="ghost top-btn" title="Import JSON project">
+        <span class="top-btn-icon">📥</span><span class="top-btn-text">Import</span>
+      </button>
+      <button id="exportProject" class="ghost top-btn" title="Export full JSON project">
+        <span class="top-btn-icon">💾</span><span class="top-btn-text">Export JSON</span>
+      </button>
+      <button id="clearHistory" class="ghost danger top-btn" title="Clear all saved history">
+        <span class="top-btn-icon">🗑</span><span class="top-btn-text">Clear All</span>
+      </button>
+      <input id="importFile" type="file" accept="application/json" hidden>
+    </div>
+  </header>
 
-    <section class="panel output">
-      <div class="panel-title"><h2>Generated Design DNA</h2><div><button id="exportCsv" class="small">Export CSV</button><button id="copyAll" class="small">Copy Prompts</button></div></div>
-      <div id="empty" class="empty"><div>✦</div><h3>No designs generated yet</h3><p>Choose your settings and generate a diverse batch.</p></div>
-      <div id="results" class="results"></div>
+  <!-- Mobile View Switcher Tabs -->
+  <nav class="mobile-tabs" id="mobileTabs" aria-label="Mobile Navigation Tabs">
+    <button class="mobile-tab active" data-tab="generator">⚙ Settings</button>
+    <button class="mobile-tab" data-tab="results">✦ Results <span id="mobileBadgeResults" class="tab-badge">0</span></button>
+    <button class="mobile-tab" data-tab="history">📋 History <span id="mobileBadgeHistory" class="tab-badge">0</span></button>
+  </nav>
+
+  <main class="app">
+    <!-- Hero Banner -->
+    <section class="hero">
+      <div class="hero-content">
+        <span class="badge">COMMERCIAL STOCK CONTENT SUITE</span>
+        <h1>Create <span>Meaningfully Different</span> Stock Concepts</h1>
+        <p>Controlled Design DNA engine, intelligent anti-repetition scoring, guaranteed 49-keyword metadata with Adobe Stock & Shutterstock compliance — 100% private in your browser.</p>
+      </div>
+      <div class="hero-card">
+        <div class="metric">
+          <strong id="totalCount">0</strong>
+          <span>Total In History</span>
+        </div>
+        <div class="metric">
+          <strong id="uniqueCount">0%</strong>
+          <span>Avg Uniqueness</span>
+        </div>
+        <div class="mini-bar">
+          <i id="diversityBar" style="width: 0%"></i>
+        </div>
+        <div class="hero-card-footer">
+          <span>Anti-Repetition Engine</span>
+          <span class="live-pill">ACTIVE</span>
+        </div>
+      </div>
     </section>
+
+    <!-- Quick Stats Grid -->
+    <section class="stats">
+      <div class="stat-box">
+        <span class="stat-label">Unique Assets (≥70%)</span>
+        <b id="statUnique" class="stat-val">0</b>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Favorites Starred</span>
+        <b id="statFav" class="stat-val">0</b>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">49-Keywords Ready</span>
+        <b id="statMeta" class="stat-val">0</b>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Avg Similarity Risk</span>
+        <b id="statRisk" class="stat-val">0%</b>
+      </div>
+    </section>
+
+    <!-- Main Workspace -->
+    <div class="workspace tab-mode-generator" id="workspace">
+      <!-- Left Panel: Controls -->
+      <aside class="panel controls" id="controlsPanel">
+        <div class="panel-title">
+          <div class="panel-heading">
+            <span class="panel-icon">⚡</span>
+            <h2>Generation Engine</h2>
+          </div>
+          <span class="live">READY</span>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Stock Category
+            <span class="tooltip-hint" title="Choose or type any commercial stock category">ⓘ</span>
+          </label>
+          <input id="category" value="Abstract Background" list="categoryList" placeholder="Select or type category...">
+          <datalist id="categoryList"></datalist>
+        </div>
+
+        <div class="grid-2-col">
+          <div class="form-group">
+            <label for="style">Design Style</label>
+            <select id="style">
+              <option value="Auto Diversity">✦ Auto Diversity</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="orientation">Aspect Framing</label>
+            <select id="orientation">
+              <option value="Auto">Auto Balance</option>
+              <option value="Square (1:1)">Square (1:1)</option>
+              <option value="Portrait (3:4)">Portrait (3:4)</option>
+              <option value="Vertical Poster (9:16)">Vertical Poster (9:16)</option>
+              <option value="Landscape (4:3)">Landscape (4:3)</option>
+              <option value="Wide Banner (16:9)">Wide Banner (16:9)</option>
+              <option value="Ultra-wide Panoramic (21:9)">Ultra-wide (21:9)</option>
+              <option value="Social Post (4:5)">Social Post (4:5)</option>
+              <option value="Website Hero (1920x1080)">Website Hero</option>
+              <option value="Presentation Slide (16:9)">Presentation Slide</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2-col">
+          <div class="form-group">
+            <label for="marketplace">Target Marketplace</label>
+            <select id="marketplace">
+              <option value="Generic Stock">Generic Stock (Universal)</option>
+              <option value="Adobe Stock">Adobe Stock (49 Tags, Top 5)</option>
+              <option value="Shutterstock">Shutterstock (200 Chars)</option>
+              <option value="Freepik">Freepik (Vector/Photo)</option>
+              <option value="Creative Fabrica">Creative Fabrica</option>
+              <option value="Vecteezy">Vecteezy</option>
+              <option value="Dreamstime">Dreamstime</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="batch">Batch Count (1-250)</label>
+            <input id="batch" type="number" min="1" max="250" value="10">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="range-header">
+            <label for="threshold">Max Similarity Threshold</label>
+            <output id="thresholdOut" class="badge-output">32%</output>
+          </div>
+          <input id="threshold" type="range" min="10" max="70" value="32">
+          <div class="range-labels">
+            <span>High Diversity (10%)</span>
+            <span>Balanced (32%)</span>
+            <span>Tight Variation (70%)</span>
+          </div>
+        </div>
+
+        <div class="section-label">Active Variation Strategies</div>
+        <div class="variation-actions">
+          <button type="button" id="selectAllVars" class="mini-text-btn">Select All</button>
+          <button type="button" id="clearAllVars" class="mini-text-btn">Reset</button>
+        </div>
+        <div id="variationChecks" class="checks-grid"></div>
+
+        <div class="section-label">Attribute Locks (Keep Constant)</div>
+        <div id="lockChecks" class="checks-grid"></div>
+
+        <div class="section-label">Commercial Features</div>
+        <div class="checks-grid commercial-checks">
+          <label class="check">
+            <input type="checkbox" id="copySpace" checked>
+            <span>Copy-Space Friendly (Text placement)</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="vector" checked>
+            <span>Vector / Clean Geometry Style</span>
+          </label>
+        </div>
+
+        <div class="control-buttons">
+          <button id="generate" class="primary">
+            <span class="btn-sparkle">✦</span> Generate Diverse Batch
+          </button>
+          <button id="promptBtn" class="secondary">
+            📋 Generate & Jump To Prompts
+          </button>
+        </div>
+        <p class="note">Local generation engine — zero API keys required, runs instantly in your browser.</p>
+      </aside>
+
+      <!-- Right Panel: Generated Results -->
+      <section class="panel output" id="resultsPanel">
+        <div class="panel-title flex-wrap-mobile">
+          <div>
+            <div class="panel-heading">
+              <span class="panel-icon">✦</span>
+              <h2>Generated Concepts</h2>
+            </div>
+            <span id="resultInfo" class="subtle">0 visible designs</span>
+          </div>
+          <!-- Action Toolbar with Multi-Marketplace Export -->
+          <div class="toolbar">
+            <div class="export-dropdown-wrapper">
+              <button id="exportDropdownBtn" class="small btn-export">
+                📥 Export CSV ▾
+              </button>
+              <div id="exportMenu" class="export-menu hidden">
+                <button id="exportAdobeCsv" class="export-menu-item">
+                  <b>Adobe Stock CSV</b> (Title, 49 Keywords, Category)
+                </button>
+                <button id="exportShutterCsv" class="export-menu-item">
+                  <b>Shutterstock CSV</b> (Description, 50 Keywords, Categories)
+                </button>
+                <button id="exportCsv" class="export-menu-item">
+                  <b>Full Dataset CSV</b> (All DNA + Metadata + Prompts)
+                </button>
+                <button id="exportMetaCsv" class="export-menu-item">
+                  <b>Metadata Only CSV</b> (49 Keywords + Titles)
+                </button>
+              </div>
+            </div>
+            <button id="copyAll" class="small ghost-btn" title="Copy all visible prompts to clipboard">
+              📋 Copy Prompts
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="filters">
+          <div class="search-wrap">
+            <input id="search" placeholder="Search prompts, styles, colors, keywords...">
+            <span class="search-icon">🔍</span>
+          </div>
+          <select id="filterStyle" aria-label="Filter by style">
+            <option value="">All Styles</option>
+          </select>
+          <select id="filterStatus" aria-label="Filter by status">
+            <option value="">All Status</option>
+            <option value="favorite">★ Favorites Only</option>
+            <option value="locked">🔒 Locked Only</option>
+            <option value="unique">💎 High Uniqueness (≥70%)</option>
+          </select>
+          <select id="sortBy" aria-label="Sort designs">
+            <option value="newest">Newest First</option>
+            <option value="unique">Most Unique First</option>
+            <option value="similar">Lowest Similarity</option>
+          </select>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty" class="empty">
+          <div class="empty-icon">✦</div>
+          <h3>No designs generated yet</h3>
+          <p>Choose your category and click <b>Generate Diverse Batch</b> to produce unique commercial concepts.</p>
+        </div>
+
+        <!-- Results Grid -->
+        <div id="results" class="results"></div>
+      </section>
+    </div>
+
+    <!-- History Table Section -->
+    <section class="panel history" id="historyPanel">
+      <div class="panel-title flex-wrap-mobile">
+        <div>
+          <div class="panel-heading">
+            <span class="panel-icon">📋</span>
+            <h2>Project History</h2>
+          </div>
+          <span id="historyInfo" class="subtle">0 saved records</span>
+        </div>
+        <div class="toolbar">
+          <button id="selectAllFav" class="small ghost-btn">★ Star Visible</button>
+          <button id="deleteVisible" class="small danger ghost-btn">🗑 Delete Visible</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Category</th>
+              <th>Style</th>
+              <th>Composition</th>
+              <th>Color</th>
+              <th>Uniqueness</th>
+              <th>Metadata</th>
+              <th>Fav</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Sticky Mobile Action Button -->
+  <div class="mobile-sticky-bar">
+    <button id="mobileGenerateBtn" class="mobile-cta-btn">
+      ✦ Generate Batch
+    </button>
   </div>
 
-  <section class="panel history">
-    <div class="panel-title"><h2>Design History & Diversity Matrix</h2><span id="historyInfo">0 records</span></div>
-    <div class="table-wrap"><table><thead><tr><th>#</th><th>Category</th><th>Style</th><th>Composition</th><th>Shape</th><th>Color</th><th>Background</th><th>Density</th><th>Similarity</th></tr></thead><tbody id="historyBody"></tbody></table></div>
-  </section>
-</main>
-<script src="js/app.js"></script>
+  <!-- Metadata Inspector Modal / Slide-over Drawer -->
+  <div id="metaModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div>
+          <span id="modalIdBadge" class="modal-id-badge">SD-001</span>
+          <h3 id="modalTitle">Stock Metadata Inspector</h3>
+          <small id="modalSubtitle" class="modal-subtitle">49 Guaranteed Keywords & Commercial Licensing Package</small>
+        </div>
+        <button id="metaModalClose" class="modal-close-btn" aria-label="Close dialog">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Quick Copy Actions Bar -->
+        <div class="modal-quick-actions">
+          <button id="copyAllKeywordsBtn" class="small primary-pill-btn">
+            🏷 Copy All 49 Keywords (Comma-Separated)
+          </button>
+          <button id="copyTop5Btn" class="small ghost-pill-btn">
+            ⭐ Copy Top 5 Priority Tags
+          </button>
+          <button id="copyTitleDescBtn" class="small ghost-pill-btn">
+            📝 Copy Title & Description
+          </button>
+        </div>
+
+        <!-- Title & Description Section -->
+        <div class="meta-section">
+          <div class="section-title-row">
+            <h4>Commercial Stock Title</h4>
+            <button id="copyTitleOnlyBtn" class="mini-copy-btn">Copy Title</button>
+          </div>
+          <input type="text" id="modalInputTitle" class="modal-input" placeholder="Title...">
+        </div>
+
+        <div class="meta-section">
+          <div class="section-title-row">
+            <h4>Description (Shutterstock & Contributor Ready)</h4>
+            <button id="copyDescOnlyBtn" class="mini-copy-btn">Copy Description</button>
+          </div>
+          <textarea id="modalInputDesc" class="modal-textarea" rows="3" placeholder="Description..."></textarea>
+        </div>
+
+        <!-- Marketplace Taxonomy Badges -->
+        <div class="meta-taxonomy-row">
+          <div class="tax-item">
+            <span class="tax-label">Adobe Stock Category:</span>
+            <span id="modalAdobeCategory" class="tax-value">Graphic Resources</span>
+          </div>
+          <div class="tax-item">
+            <span class="tax-label">Shutterstock Category:</span>
+            <span id="modalShutterCategory" class="tax-value">Abstract</span>
+          </div>
+          <div class="tax-item">
+            <span class="tax-label">AI Content Flag:</span>
+            <span class="tax-value ai-pill">Generative AI Concept</span>
+          </div>
+        </div>
+
+        <!-- 49 Keywords Visual Chip Cloud -->
+        <div class="meta-section">
+          <div class="section-title-row">
+            <h4>
+              49 Keywords Cloud
+              <span id="modalKeywordCountBadge" class="count-badge">49 / 49</span>
+            </h4>
+            <small class="chip-hint">Click any tag to copy individually</small>
+          </div>
+          <div class="top5-note">
+            <span class="star-icon">⭐</span>
+            <span>First 5 tags highlighted — carry 80% search weight on Adobe Stock & Shutterstock</span>
+          </div>
+          <div id="modalKeywordChips" class="keyword-chips-grid"></div>
+        </div>
+
+        <!-- Editable Keywords Textarea -->
+        <div class="meta-section">
+          <div class="section-title-row">
+            <h4>Edit Keywords (Comma-Separated)</h4>
+            <button id="copyKeywordsTextBtn" class="mini-copy-btn">Copy Text</button>
+          </div>
+          <textarea id="modalInputKeywords" class="modal-textarea" rows="3" placeholder="Comma-separated keywords..."></textarea>
+        </div>
+
+        <!-- Prompt Preview -->
+        <div class="meta-section">
+          <div class="section-title-row">
+            <h4>Full Generation Prompt</h4>
+            <button id="modalCopyPromptBtn" class="mini-copy-btn">Copy Prompt</button>
+          </div>
+          <div id="modalPromptText" class="modal-prompt-box"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="modalSaveEditsBtn" class="primary small">Save Changes to Design</button>
+        <button id="modalDoneBtn" class="ghost small">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Action Modal -->
+  <div id="confirmModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="confirm-box">
+      <h3 id="confirmTitle">Are you sure?</h3>
+      <p id="confirmMsg">This action cannot be undone.</p>
+      <div class="confirm-actions">
+        <button id="confirmCancelBtn" class="ghost small">Cancel</button>
+        <button id="confirmOkBtn" class="primary small danger-btn">Proceed</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Application Scripts (Loaded in strict dependency order) -->
+  <script src="js/data.js"></script>
+  <script src="js/metadata.js"></script>
+  <script src="js/generator.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/csv.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
