@@ -124,7 +124,10 @@ window.UI = {
         <div class="card-head">
           <div class="id-badge-wrap">
             <span class="id">${this.esc(d.id)}</span>
-            <span class="card-category-tag">${this.esc(d.category)}</span>
+            <div class="card-category-tags">
+              <span class="card-category-tag">${this.esc(d.category)}</span>
+              ${d.subcategory ? `<span class="card-subcategory-tag">${this.esc(d.subcategory)}</span>` : ''}
+            </div>
           </div>
           <div class="card-actions">
             <button class="mini ${d.favorite ? 'fav-active' : ''}" data-action="favorite" data-id="${d.id}" title="${d.favorite ? 'Starred Favorite' : 'Star as Favorite'}">
@@ -152,6 +155,7 @@ window.UI = {
         </div>
 
         <div class="dna">
+          ${d.subcategory ? `<span><b>Sub-Theme:</b> ${this.esc(d.subcategory)}</span>` : ''}
           <span><b>Style:</b> ${this.esc(d.style)}</span>
           <span><b>Comp:</b> ${this.esc(d.composition)}</span>
           <span><b>Shape:</b> ${this.esc(d.shape)}</span>
@@ -203,7 +207,7 @@ window.UI = {
     if (!body) return;
 
     if (!arr.length) {
-      body.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:32px 16px; color:var(--text-muted); font-size:12px;">✦ No history records saved yet. Generated designs will appear here automatically.</td></tr>';
+      body.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:32px 16px; color:var(--text-muted); font-size:12px;">✦ No history records saved yet. Generated designs will appear here automatically.</td></tr>';
       return;
     }
 
@@ -213,6 +217,7 @@ window.UI = {
         <tr>
           <td><b style="color:var(--accent-primary)">${this.esc(d.id)}</b></td>
           <td>${this.esc(d.category)}</td>
+          <td><span class="card-subcategory-tag">${this.esc(d.subcategory || d.style || '—')}</span></td>
           <td>${this.esc(d.style)}</td>
           <td>${this.esc(d.composition)}</td>
           <td>${this.esc(d.color)}</td>

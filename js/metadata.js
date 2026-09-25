@@ -81,6 +81,7 @@ window.MetadataEngine = (() => {
 
   function build(dna, categoryName) {
     const category = categoryName || dna.category || 'Abstract Background';
+    const subcategory = dna.subcategory || '';
     const style = dna.style || 'Modern';
     const comp = dna.composition || 'Balanced composition';
     const shape = dna.shape || 'Geometric shapes';
@@ -107,12 +108,29 @@ window.MetadataEngine = (() => {
     }
 
     // Top primary keywords: Category & core style (highest priority for search ranking)
-    addKeyword(category);
-    extractWords(category).forEach(addKeyword);
+    const absCat = D.findAbstractCategory ? D.findAbstractCategory(category) : null;
+    const cleanCategoryName = absCat ? absCat.name : category;
+
+    if (subcategory) {
+      addKeyword(subcategory);
+      extractWords(subcategory).forEach(addKeyword);
+    }
+
+    addKeyword(cleanCategoryName);
+    extractWords(cleanCategoryName).forEach(addKeyword);
+
     addKeyword(style);
     extractWords(style).forEach(addKeyword);
 
-    // Category hints
+    // Add taxonomy-specific keywords
+    if (absCat && absCat.keywords) {
+      absCat.keywords.forEach(kw => {
+        addKeyword(kw);
+        extractWords(kw).forEach(addKeyword);
+      });
+    }
+
+    // Category hints for general categories
     const hints = D.categoryHints && D.categoryHints[category] ? D.categoryHints[category] : [];
     hints.forEach(hint => {
       addKeyword(hint);
@@ -135,10 +153,10 @@ window.MetadataEngine = (() => {
       }
     });
 
-    // Add common marketplace terms
+    // Add common high-ranking stock terms
     ['wallpaper', 'backdrop', 'graphic design', 'commercial use', 'copyspace', 'vector'].forEach(addKeyword);
 
-    // Guaranteed completion up to exactly 49 keywords using our rich pool
+    // Guaranteed completion up to exactly 49 keywords using universal pool
     let poolIndex = 0;
     while (keywordsSet.size < 49 && poolIndex < universalStockPool.length) {
       const poolItem = universalStockPool[poolIndex++];
@@ -148,7 +166,7 @@ window.MetadataEngine = (() => {
       }
     }
 
-    // If still under 49 (in rare cases), synthesize clean variations safely
+    // If still under 49 (rare fallback), synthesize clean variations safely
     let extraIndex = 1;
     while (keywordsSet.size < 49) {
       addKeyword(`creative asset ${extraIndex++}`);
@@ -161,17 +179,28 @@ window.MetadataEngine = (() => {
     const top5 = finalKeywords.slice(0, 5);
 
     // Natural commercial title generation
-    const titleCategory = category.replace(/background$/i, '').trim() || category;
+    const titleCategory = cleanCategoryName.replace(/background$/i, '').trim() || cleanCategoryName;
     const cleanStyle = style.replace(/^(3D|Ultra)\s*/i, '').trim();
     const cleanColor = color.split(' and ')[0].replace(/gradient|metallic|monochrome/gi, '').trim();
     const cleanShape = shape.split('&')[0].replace(/shapes|forms/gi, '').trim();
 
-    const titleTemplates = [
-      `${style} ${titleCategory} Background with ${color} and ${shape}`,
-      `${cleanColor} ${style} ${titleCategory} Concept with ${comp}`,
-      `${titleCategory} Design in ${style} Style with ${color} Palette`,
-      `Modern ${titleCategory} Background with ${shape} and ${texture} Finish`
-    ];
+    let titleTemplates;
+    if (subcategory) {
+      titleTemplates = [
+        `${subcategory} ${titleCategory} Background with ${color}`,
+        `${cleanColor} ${subcategory} ${titleCategory} Concept with ${comp}`,
+        `${subcategory} Background in ${style} Style with ${color} Palette`,
+        `Modern ${subcategory} ${titleCategory} with ${texture} Finish`
+      ];
+    } else {
+      titleTemplates = [
+        `${style} ${titleCategory} Background with ${color} and ${shape}`,
+        `${cleanColor} ${style} ${titleCategory} Concept with ${comp}`,
+        `${titleCategory} Design in ${style} Style with ${color} Palette`,
+        `Modern ${titleCategory} Background with ${shape} and ${texture} Finish`
+      ];
+    }
+
     // Deterministic selection based on ID or length
     const hash = (dna.id ? dna.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) : 0);
     let title = titleTemplates[hash % titleTemplates.length]
@@ -181,7 +210,12 @@ window.MetadataEngine = (() => {
 
     // Natural commercial description generation (STRICTLY <= 200 chars for Shutterstock compatibility)
     const cleanShapeShort = cleanShape.replace(/\b(circle|sphere|rectangle|square|cube)s?\b/i, '$1');
-    let desc = `Commercial ${style.toLowerCase()} ${category.toLowerCase()} with ${cleanShapeShort.toLowerCase()} and ${cleanColor.toLowerCase()} colors. ${comp} with ${texture.toLowerCase()} finish.`;
+    let desc;
+    if (subcategory) {
+      desc = `Commercial ${subcategory.toLowerCase()} ${cleanCategoryName.toLowerCase()} featuring ${cleanShapeShort.toLowerCase()} and ${cleanColor.toLowerCase()} colors. ${comp} with ${texture.toLowerCase()} finish.`;
+    } else {
+      desc = `Commercial ${style.toLowerCase()} ${cleanCategoryName.toLowerCase()} with ${cleanShapeShort.toLowerCase()} and ${cleanColor.toLowerCase()} colors. ${comp} with ${texture.toLowerCase()} finish.`;
+    }
     desc = desc.replace(/\s+/g, ' ').trim();
     
     // Safety clamp: Shutterstock strict ceiling is 200 chars
@@ -192,13 +226,19 @@ window.MetadataEngine = (() => {
     }
 
     // Adobe Stock category mapping
-    const adobePreset = D.marketplacePresets && D.marketplacePresets['Adobe Stock'];
-    const adobeCategory = (adobePreset && adobePreset.categoryMap && adobePreset.categoryMap[category]) || 'Graphic Resources';
+    let adobeCategory = 'Graphic Resources';
+    const catLower = cleanCategoryName.toLowerCase();
+    if (catLower.includes('technology') || catLower.includes('cyber') || catLower.includes('data') || catLower.includes('wireframe')) {
+      adobeCategory = 'Technology';
+    } else if (catLower.includes('luxury')) {
+      adobeCategory = 'Lifestyle';
+    }
 
     // Shutterstock category mapping
-    const shCategory = (category.toLowerCase().includes('business') || category.toLowerCase().includes('finance'))
-      ? 'Business/Finance'
-      : (category.toLowerCase().includes('technology') ? 'Technology' : 'Abstract');
+    let shCategory = 'Abstract';
+    if (catLower.includes('technology') || catLower.includes('cyber') || catLower.includes('data')) {
+      shCategory = 'Technology';
+    }
 
     return {
       title,
@@ -206,8 +246,8 @@ window.MetadataEngine = (() => {
       keywords: finalKeywords,
       keywordsString: finalKeywords.join(', '),
       top5,
-      category,
-      subcategory: style,
+      category: cleanCategoryName,
+      subcategory: subcategory || style,
       adobeCategory,
       shutterstockCategory: shCategory,
       secondaryCategory: 'Backgrounds/Textures',

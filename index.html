@@ -102,12 +102,43 @@
           <span class="live">READY</span>
         </div>
 
+        <!-- Engine Mode Switcher -->
+        <div class="engine-mode-switcher" role="tablist" aria-label="Taxonomy Engine Mode">
+          <button type="button" class="mode-btn active" id="modeAbstract" data-mode="abstract" role="tab" aria-selected="true">
+            <span class="mode-btn-icon">✦</span> Abstract Backgrounds (80)
+          </button>
+          <button type="button" class="mode-btn" id="modeGeneral" data-mode="general" role="tab" aria-selected="false">
+            <span class="mode-btn-icon">🏢</span> General Stock (21)
+          </button>
+        </div>
+
+        <!-- Quick Category Selector Pills Strip -->
+        <div class="category-pills-wrap" id="categoryPillsWrap">
+          <div class="category-pills-header">
+            <span>Quick Category Selector</span>
+            <small id="activeCatHint">80 Categories Available</small>
+          </div>
+          <div class="category-pills-bar" id="categoryPillsBar"></div>
+        </div>
+
         <div class="form-group">
-          <label for="category">Stock Category
-            <span class="tooltip-hint" title="Choose or type any commercial stock category">ⓘ</span>
+          <label for="category" id="categoryLabel">Abstract Category
+            <span class="badge-count" id="categoryCountBadge">80 Categories</span>
+            <span class="tooltip-hint" title="Choose or type any category from the 80 Abstract categories">ⓘ</span>
           </label>
-          <input id="category" value="Abstract Background" list="categoryList" placeholder="Select or type category...">
+          <input id="category" value="01. Gradient Abstract" list="categoryList" placeholder="Select or type category...">
           <datalist id="categoryList"></datalist>
+        </div>
+
+        <!-- Subcategory / Specific Theme Group (Cascading) -->
+        <div class="form-group" id="subcategoryGroup">
+          <label for="subcategory">Abstract Sub-Theme / Style
+            <span class="badge-count" id="subcategoryCountBadge">15 Styles</span>
+            <span class="tooltip-hint" title="Pick a specific sub-type or keep on Auto Diversity">ⓘ</span>
+          </label>
+          <select id="subcategory">
+            <option value="Auto Diversity">✦ Auto Diversity (All Sub-types)</option>
+          </select>
         </div>
 
         <div class="grid-2-col">
@@ -242,6 +273,9 @@
             <input id="search" placeholder="Search prompts, styles, colors, keywords...">
             <span class="search-icon">🔍</span>
           </div>
+          <select id="filterCategory" aria-label="Filter by category">
+            <option value="">All Categories</option>
+          </select>
           <select id="filterStyle" aria-label="Filter by style">
             <option value="">All Styles</option>
           </select>
@@ -291,6 +325,7 @@
             <tr>
               <th>ID</th>
               <th>Category</th>
+              <th>Subcategory</th>
               <th>Style</th>
               <th>Composition</th>
               <th>Color</th>
@@ -358,6 +393,14 @@
 
         <!-- Marketplace Taxonomy Badges -->
         <div class="meta-taxonomy-row">
+          <div class="tax-item">
+            <span class="tax-label">Category:</span>
+            <span id="modalCategoryBadge" class="tax-value">Gradient Abstract</span>
+          </div>
+          <div class="tax-item">
+            <span class="tax-label">Sub-Theme:</span>
+            <span id="modalSubcategoryBadge" class="tax-value">Smooth Gradient</span>
+          </div>
           <div class="tax-item">
             <span class="tax-label">Adobe Stock Category:</span>
             <span id="modalAdobeCategory" class="tax-value">Graphic Resources</span>

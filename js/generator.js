@@ -29,8 +29,11 @@ window.DiversityEngine = (() => {
     if (!Array.isArray(pool) || !pool.length) return forced || key;
 
     // Check category affinity
-    if (Math.random() < 0.35 && D.categoryHints && D.categoryHints[category]) {
-      const hintWords = D.categoryHints[category].map(h => h.toLowerCase());
+    const absCat = D.findAbstractCategory ? D.findAbstractCategory(category) : null;
+    const hints = absCat ? absCat.keywords : (D.categoryHints && D.categoryHints[category] ? D.categoryHints[category] : []);
+
+    if (Math.random() < 0.38 && hints && hints.length) {
+      const hintWords = hints.map(h => String(h).toLowerCase());
       const matching = pool.filter(item => {
         const itemLower = item.toLowerCase();
         return hintWords.some(hw => itemLower.includes(hw));
@@ -70,6 +73,14 @@ window.DiversityEngine = (() => {
       }
     });
 
+    // Check subcategory match weight
+    if (a.subcategory && b.subcategory) {
+      totalWeight += 1.5;
+      if (a.subcategory === b.subcategory) {
+        matchedWeight += 1.5;
+      }
+    }
+
     return Math.round((matchedWeight / totalWeight) * 100);
   }
 
@@ -103,12 +114,35 @@ window.DiversityEngine = (() => {
       dna.orientation = settings.orientation;
     }
 
+    // Abstract Background Taxonomy Resolution
+    const absCat = D.findAbstractCategory ? D.findAbstractCategory(settings.category) : null;
+    if (absCat) {
+      dna.category = absCat.fullName || absCat.name;
+      dna.categoryCode = absCat.code;
+      dna.promptTraits = absCat.promptTraits;
+
+      // Subcategory selection
+      const chosenSub = settings.subcategory;
+      if (chosenSub && chosenSub !== 'Auto Diversity' && chosenSub !== 'Auto') {
+        dna.subcategory = chosenSub;
+      } else if (absCat.subcategories && absCat.subcategories.length) {
+        const usedSubs = localBatch.map(b => b.subcategory).filter(Boolean);
+        dna.subcategory = weightedPick(absCat.subcategories, usedSubs);
+      }
+    } else {
+      dna.category = settings.category || 'Abstract Background';
+      dna.subcategory = settings.subcategory && settings.subcategory !== 'Auto Diversity' ? settings.subcategory : null;
+    }
+
     return dna;
   }
 
   // Generate commercial prompt text
   function buildPrompt(dna, settings) {
     const cat = settings.category || dna.category || 'Abstract Background';
+    const subCatPrefix = dna.subcategory ? `${dna.subcategory} ` : '';
+    const traitsText = dna.promptTraits ? `${dna.promptTraits}, ` : '';
+
     const copyText = settings.copySpace
       ? getContextualCopySpace(dna.composition, dna.orientation) + ', '
       : 'balanced full composition, ';
@@ -121,7 +155,7 @@ window.DiversityEngine = (() => {
 
     const orientationStr = (dna.orientation || 'Landscape').replace(/[\(\)]/g, ' ');
 
-    return `${cat}, ${dna.style.toLowerCase()} aesthetic, ${dna.composition.toLowerCase()}, featuring ${dna.shape.toLowerCase()} elements, ${dna.color.toLowerCase()} palette, ${dna.background.toLowerCase()}, ${dna.lighting.toLowerCase()}, ${dna.texture.toLowerCase()}, ${dna.density.toLowerCase()}, subject positioned ${dna.position.toLowerCase()}, ${copyText}${orientationStr.toLowerCase().trim()} aspect framing, ${styleTrait}${qualityText}clean visual hierarchy, impeccable spacing, 8k resolution render, no watermark, no signatures, no trademarks, no copyrighted characters, no distorted artifacts.`;
+    return `${subCatPrefix}${cat}, ${traitsText}${dna.style.toLowerCase()} aesthetic, ${dna.composition.toLowerCase()}, featuring ${dna.shape.toLowerCase()} elements, ${dna.color.toLowerCase()} palette, ${dna.background.toLowerCase()}, ${dna.lighting.toLowerCase()}, ${dna.texture.toLowerCase()}, ${dna.density.toLowerCase()}, subject positioned ${dna.position.toLowerCase()}, ${copyText}${orientationStr.toLowerCase().trim()} aspect framing, ${styleTrait}${qualityText}clean visual hierarchy, impeccable spacing, commercial stock asset quality, 8k resolution, no watermark, no signatures, no trademarks, no copyrighted characters, no distorted artifacts.`;
   }
 
   // Batch generation with diversity filtering
@@ -144,11 +178,10 @@ window.DiversityEngine = (() => {
         dna.similarity = maxSim;
         dna.uniqueness = diversityScore(dna, comparePool);
         dna.id = 'SD-' + Date.now().toString(36).slice(-4).toUpperCase() + '-' + String(out.length + 1).padStart(3, '0');
-        dna.category = settings.category || 'Abstract Background';
         dna.marketplace = settings.marketplace || 'Generic Stock';
         dna.prompt = buildPrompt(dna, settings);
 
-        // Pre-build metadata package
+        // Pre-build metadata package with full 49-keyword engine
         dna.metadata = window.MetadataEngine.build(dna, dna.category);
 
         out.push(dna);

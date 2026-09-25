@@ -8,16 +8,13 @@
   let history = Store.load();
   let current = [];
   let activeModalDesign = null;
+  let currentEngineMode = localStorage.getItem('stockTaxonomyMode') || 'abstract';
 
   const variations = STOCK_DATA.variation;
 
   function init() {
-    // 1. Populate category datalist
-    STOCK_DATA.categories.forEach(cat => {
-      const opt = document.createElement('option');
-      opt.value = cat;
-      $('categoryList').appendChild(opt);
-    });
+    // 1. Setup Taxonomy Mode & Categories
+    setupEngineMode();
 
     // 2. Populate style dropdowns
     STOCK_DATA.styles.forEach(style => {
@@ -77,11 +74,179 @@
     // 9. Setup metadata modal
     setupMetadataModal();
 
-    // 10. Load initial view
+    // 10. Setup category event listeners
+    $('category').addEventListener('input', () => updateSubcategories(false));
+    $('category').addEventListener('change', () => updateSubcategories(false));
+
+    // 11. Populate filter category dropdown
+    populateCategoryFilter();
+
+    // 12. Load initial view
     if (history.length) {
       current = history.slice(0, 12);
     }
     renderAll();
+  }
+
+  // Engine Mode & Category Management
+  function setupEngineMode() {
+    $('modeAbstract').onclick = () => setEngineMode('abstract');
+    $('modeGeneral').onclick = () => setEngineMode('general');
+
+    setEngineMode(currentEngineMode);
+  }
+
+  function setEngineMode(mode) {
+    currentEngineMode = mode;
+    localStorage.setItem('stockTaxonomyMode', mode);
+
+    const isAbstract = mode === 'abstract';
+    $('modeAbstract').classList.toggle('active', isAbstract);
+    $('modeGeneral').classList.toggle('active', !isAbstract);
+
+    const categoryList = $('categoryList');
+    categoryList.innerHTML = '';
+
+    const labelEl = $('categoryLabel');
+    const badgeEl = $('categoryCountBadge');
+    const pillsWrap = $('categoryPillsWrap');
+    const subcatGroup = $('subcategoryGroup');
+
+    if (isAbstract) {
+      if (labelEl) labelEl.childNodes[0].nodeValue = 'Abstract Category ';
+      if (badgeEl) badgeEl.textContent = `${STOCK_DATA.abstractCategories.length} Categories`;
+      if (pillsWrap) pillsWrap.style.display = 'block';
+      if (subcatGroup) subcatGroup.style.display = 'block';
+
+      STOCK_DATA.abstractCategories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        categoryList.appendChild(opt);
+      });
+
+      const curVal = $('category').value;
+      if (!STOCK_DATA.findAbstractCategory(curVal)) {
+        $('category').value = '01. Gradient Abstract';
+      }
+
+      renderCategoryPills();
+      updateSubcategories();
+    } else {
+      if (labelEl) labelEl.childNodes[0].nodeValue = 'Commercial Category ';
+      if (badgeEl) badgeEl.textContent = '21 Categories';
+      if (pillsWrap) pillsWrap.style.display = 'none';
+      if (subcatGroup) subcatGroup.style.display = 'none';
+
+      STOCK_DATA.generalCategories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        categoryList.appendChild(opt);
+      });
+
+      const curVal = $('category').value;
+      if (STOCK_DATA.findAbstractCategory(curVal)) {
+        $('category').value = 'Abstract Background';
+      }
+    }
+  }
+
+  // Render Horizontal Category Pills for Quick 1-Click Access
+  function renderCategoryPills() {
+    const bar = $('categoryPillsBar');
+    if (!bar) return;
+
+    const currentVal = $('category').value.trim();
+    const currentAbs = STOCK_DATA.findAbstractCategory(currentVal);
+    const activeKey = currentAbs ? currentAbs.code : '01';
+
+    const pillHTML = Object.keys(STOCK_DATA.abstractTaxonomy).map(key => {
+      const entry = STOCK_DATA.abstractTaxonomy[key];
+      const isActive = entry.code === activeKey;
+      return `
+        <button type="button" class="category-pill ${isActive ? 'active' : ''}" data-cat="${UI.esc(key)}" data-code="${entry.code}" title="${UI.esc(key)} (${entry.subcategories.length} sub-styles)">
+          <span class="category-pill-num">${entry.code}</span>
+          <span>${UI.esc(entry.shortName)}</span>
+        </button>
+      `;
+    }).join('');
+
+    bar.innerHTML = pillHTML;
+
+    // Attach click events
+    bar.querySelectorAll('.category-pill').forEach(btn => {
+      btn.onclick = () => {
+        const catKey = btn.dataset.cat;
+        $('category').value = catKey;
+        updateSubcategories();
+
+        bar.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Scroll into view smoothly
+        btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      };
+    });
+  }
+
+  // Dynamic Cascading Subcategories Dropdown
+  function updateSubcategories(preserveSelection = false) {
+    const catVal = $('category').value.trim();
+    const absCat = STOCK_DATA.findAbstractCategory(catVal);
+    const subcatSelect = $('subcategory');
+    const subcatGroup = $('subcategoryGroup');
+    const badge = $('subcategoryCountBadge');
+    const hint = $('activeCatHint');
+
+    if (!subcatSelect) return;
+
+    if (absCat) {
+      if (subcatGroup) subcatGroup.style.display = 'block';
+      if (badge) badge.textContent = `${absCat.subcategories.length} Styles`;
+      if (hint) hint.textContent = `${absCat.fullName || absCat.name} (${absCat.subcategories.length} styles)`;
+
+      const prevSelected = preserveSelection ? subcatSelect.value : null;
+
+      let optionsHTML = '<option value="Auto Diversity">✦ Auto Diversity (All Sub-types)</option>';
+      absCat.subcategories.forEach(sub => {
+        optionsHTML += `<option value="${UI.esc(sub)}">${UI.esc(sub)}</option>`;
+      });
+      subcatSelect.innerHTML = optionsHTML;
+
+      if (prevSelected && absCat.subcategories.includes(prevSelected)) {
+        subcatSelect.value = prevSelected;
+      } else {
+        subcatSelect.value = 'Auto Diversity';
+      }
+
+      // Update pills active highlight
+      const bar = $('categoryPillsBar');
+      if (bar) {
+        bar.querySelectorAll('.category-pill').forEach(p => {
+          p.classList.toggle('active', p.dataset.code === absCat.code);
+        });
+      }
+    } else {
+      if (currentEngineMode === 'general' && subcatGroup) {
+        subcatGroup.style.display = 'none';
+      }
+      if (hint) hint.textContent = catVal;
+    }
+  }
+
+  // Populate Filter Category Dropdown in Results
+  function populateCategoryFilter() {
+    const filterCat = $('filterCategory');
+    if (!filterCat) return;
+
+    filterCat.innerHTML = `
+      <option value="">All Categories</option>
+      <optgroup label="${STOCK_DATA.abstractCategories.length} Abstract Categories">
+        ${STOCK_DATA.abstractCategories.map(c => `<option value="${UI.esc(c)}">${UI.esc(c)}</option>`).join('')}
+      </optgroup>
+      <optgroup label="21 General Stock Categories">
+        ${STOCK_DATA.generalCategories.map(c => `<option value="${UI.esc(c)}">${UI.esc(c)}</option>`).join('')}
+      </optgroup>
+    `;
   }
 
   // Mobile Tabs Management
@@ -149,6 +314,7 @@
           'Description': meta.description,
           'Keywords': meta.keywords.join(', '),
           'Category': d.category,
+          'Subcategory': d.subcategory || '',
           'Style': d.style,
           'Marketplace': d.marketplace
         };
@@ -164,7 +330,11 @@
 
   // Collect Current Settings
   function getSettings() {
-    const category = $('category').value.trim() || 'Abstract Background';
+    const category = $('category').value.trim() || '01. Gradient Abstract';
+    const subcategory = ($('subcategory') && $('subcategoryGroup').style.display !== 'none')
+      ? $('subcategory').value
+      : null;
+
     const locks = [...document.querySelectorAll('[data-lock]:checked')].map(x => x.dataset.lock);
     const variationsSelected = [...document.querySelectorAll('[data-var]:checked')].map(x => x.dataset.var);
 
@@ -180,6 +350,8 @@
 
     return {
       category,
+      subcategory,
+      mode: currentEngineMode,
       batch: Math.min(250, Math.max(1, +$('batch').value || 10)),
       threshold: +$('threshold').value,
       variations: variationsSelected,
@@ -230,8 +402,17 @@
     if (q) {
       list = list.filter(d => {
         const metaStr = (d.metadata?.keywords || []).join(' ') + ' ' + (d.metadata?.title || '');
-        const full = `${d.id} ${d.prompt} ${d.style} ${d.color} ${d.category} ${metaStr}`.toLowerCase();
+        const full = `${d.id} ${d.prompt} ${d.style} ${d.color} ${d.category} ${d.subcategory || ''} ${metaStr}`.toLowerCase();
         return full.includes(q);
+      });
+    }
+
+    const fc = $('filterCategory') ? $('filterCategory').value.toLowerCase().trim() : '';
+    if (fc) {
+      list = list.filter(d => {
+        const catStr = (d.category || '').toLowerCase();
+        const subStr = (d.subcategory || '').toLowerCase();
+        return catStr.includes(fc) || fc.includes(catStr) || subStr.includes(fc);
       });
     }
 
@@ -393,12 +574,20 @@
     document.body.classList.add('modal-open');
 
     $('modalIdBadge').textContent = design.id;
-    $('modalSubtitle').textContent = `${design.category} • ${design.style} • ${design.orientation}`;
+    const subTitleText = design.subcategory
+      ? `${design.category} • ${design.subcategory} • ${design.style}`
+      : `${design.category} • ${design.style} • ${design.orientation}`;
+    $('modalSubtitle').textContent = subTitleText;
+
     $('modalInputTitle').value = meta.title;
     $('modalInputDesc').value = meta.description;
     if ($('modalInputKeywords')) {
       $('modalInputKeywords').value = meta.keywords.join(', ');
     }
+
+    if ($('modalCategoryBadge')) $('modalCategoryBadge').textContent = design.category;
+    if ($('modalSubcategoryBadge')) $('modalSubcategoryBadge').textContent = design.subcategory || design.style || 'None';
+
     $('modalAdobeCategory').textContent = meta.adobeCategory || 'Graphic Resources';
     $('modalShutterCategory').textContent = meta.shutterstockCategory || 'Abstract';
     $('modalKeywordCountBadge').textContent = `${meta.keywords.length} / 49`;
@@ -437,8 +626,9 @@
     }, 100);
   };
 
-  ['search', 'filterStyle', 'filterStatus', 'sortBy'].forEach(id => {
-    $(id).oninput = renderAll;
+  ['search', 'filterCategory', 'filterStyle', 'filterStatus', 'sortBy'].forEach(id => {
+    const el = $(id);
+    if (el) el.oninput = renderAll;
   });
 
   // Select / Clear all variations
@@ -476,7 +666,19 @@
 
     if (action === 'seed') {
       // Use this card's DNA as Generator Seed
-      if (d.category) $('category').value = d.category;
+      if (d.category) {
+        if (STOCK_DATA.findAbstractCategory(d.category)) {
+          setEngineMode('abstract');
+        } else {
+          setEngineMode('general');
+        }
+        $('category').value = d.category;
+        updateSubcategories(false);
+
+        if (d.subcategory && $('subcategory')) {
+          $('subcategory').value = d.subcategory;
+        }
+      }
       if (d.style && d.style !== 'Auto Diversity') $('style').value = d.style;
       if (d.orientation && d.orientation !== 'Auto') $('orientation').value = d.orientation;
       Toast.show(`DNA from ${d.id} set as Generator Seed!`, 'success');
@@ -574,7 +776,10 @@
       Toast.show('No designs currently visible to copy.', 'warning');
       return;
     }
-    const text = list.map((d, i) => `[${i + 1}] ${d.id} (${d.category}):\n${d.prompt}`).join('\n\n');
+    const text = list.map((d, i) => {
+      const subInfo = d.subcategory ? ` • ${d.subcategory}` : '';
+      return `[${i + 1}] ${d.id} (${d.category}${subInfo}):\n${d.prompt}`;
+    }).join('\n\n');
     UI.copyToClipboard(text, `Copied ${list.length} prompts to clipboard!`);
   };
 

@@ -78,6 +78,7 @@ window.CSV = {
       return {
         'ID': d.id,
         'Category': d.category,
+        'Subcategory': d.subcategory || '',
         'Style': d.style,
         'Composition': d.composition,
         'Shape': d.shape,
