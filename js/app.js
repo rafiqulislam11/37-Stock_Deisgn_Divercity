@@ -75,13 +75,22 @@
     setupMetadataModal();
 
     // 10. Setup category event listeners
-    $('category').addEventListener('input', () => {
-      updateSubcategories(false);
-      updateLiveConceptPreview();
-    });
     $('category').addEventListener('change', () => {
       updateSubcategories(false);
       updateLiveConceptPreview();
+      const val = $('category').value;
+      const absCat = STOCK_DATA.findAbstractCategory(val);
+      const code = absCat ? absCat.code : '';
+      const bar = $('categoryPillsBar');
+      if (bar) {
+        bar.querySelectorAll('.category-pill').forEach(p => {
+          const isActive = (p.dataset.code === code || p.dataset.cat === val);
+          p.classList.toggle('active', isActive);
+          if (isActive) {
+            p.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          }
+        });
+      }
     });
 
     // 11. Populate filter category dropdown
@@ -117,8 +126,8 @@
     $('modeAbstract').classList.toggle('active', isAbstract);
     $('modeGeneral').classList.toggle('active', !isAbstract);
 
-    const categoryList = $('categoryList');
-    categoryList.innerHTML = '';
+    const categorySelect = $('category');
+    if (categorySelect) categorySelect.innerHTML = '';
 
     const labelEl = $('categoryLabel');
     const badgeEl = $('categoryCountBadge');
@@ -134,13 +143,11 @@
       STOCK_DATA.abstractCategories.forEach(cat => {
         const opt = document.createElement('option');
         opt.value = cat;
-        categoryList.appendChild(opt);
+        opt.textContent = cat;
+        if (categorySelect) categorySelect.appendChild(opt);
       });
 
-      const curVal = $('category').value;
-      if (!STOCK_DATA.findAbstractCategory(curVal)) {
-        $('category').value = '01. Gradient Abstract';
-      }
+      if (categorySelect) categorySelect.value = '01. Gradient Abstract';
 
       renderCategoryPills();
       updateSubcategories();
@@ -153,13 +160,11 @@
       STOCK_DATA.generalCategories.forEach(cat => {
         const opt = document.createElement('option');
         opt.value = cat;
-        categoryList.appendChild(opt);
+        opt.textContent = cat;
+        if (categorySelect) categorySelect.appendChild(opt);
       });
 
-      const curVal = $('category').value;
-      if (STOCK_DATA.findAbstractCategory(curVal)) {
-        $('category').value = 'Abstract Background';
-      }
+      if (categorySelect) categorySelect.value = 'Abstract Background';
     }
     updateLiveConceptPreview();
   }
@@ -306,13 +311,35 @@
       const query = catSearch.value.toLowerCase().trim();
       const pills = document.querySelectorAll('.category-pill');
       let matchCount = 0;
+      let firstMatchCat = null;
+
       pills.forEach(p => {
         const catText = (p.dataset.cat || '').toLowerCase();
         const code = (p.dataset.code || '').toLowerCase();
         const matches = !query || catText.includes(query) || code.includes(query);
         p.style.display = matches ? 'inline-flex' : 'none';
-        if (matches) matchCount++;
+        if (matches) {
+          matchCount++;
+          if (!firstMatchCat) firstMatchCat = p.dataset.cat;
+        }
       });
+
+      // Filter select dropdown options too
+      const catSelect = $('category');
+      if (catSelect) {
+        Array.from(catSelect.options).forEach(opt => {
+          const optText = opt.value.toLowerCase();
+          const matches = !query || optText.includes(query);
+          opt.hidden = !matches;
+        });
+
+        if (query && firstMatchCat) {
+          catSelect.value = firstMatchCat;
+          updateSubcategories(false);
+          updateLiveConceptPreview();
+        }
+      }
+
       const hint = $('activeCatHint');
       if (hint) {
         hint.textContent = query ? `${matchCount} / 80 matching` : '80 Categories Available';
