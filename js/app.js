@@ -95,6 +95,7 @@
     populateCustomDNADropdowns();
     setupLiveConceptPreview();
     setupCategorySearch();
+    setupCollapsibleCards();
     setupSubcategoryPills();
     setupCatalogModal();
     setupSurpriseButton();
@@ -562,6 +563,32 @@
         el.appendChild(opt);
       });
     });
+  }
+
+
+  // Setup Collapsible Control Cards with Drop Arrow & Toggle All
+  function setupCollapsibleCards() {
+    const toggleAllBtn = $('toggleAllCardsBtn');
+    const cards = document.querySelectorAll('#controlsPanel details.control-card');
+    if (!cards.length) return;
+
+    if (toggleAllBtn) {
+      toggleAllBtn.onclick = () => {
+        const anyOpen = Array.from(cards).some(c => c.open);
+        cards.forEach(c => {
+          c.open = !anyOpen;
+        });
+        toggleAllBtn.textContent = anyOpen ? '▸ Expand All' : '▾ Collapse All';
+      };
+
+      // Listen to individual card toggle events to sync toggleAllBtn label
+      cards.forEach(card => {
+        card.addEventListener('toggle', () => {
+          const anyOpen = Array.from(cards).some(c => c.open);
+          toggleAllBtn.textContent = anyOpen ? '▾ Collapse All' : '▸ Expand All';
+        });
+      });
+    }
   }
 
   // Setup Category Search Input & Grid Toggle
