@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
   <link rel="apple-touch-icon" href="assets/logo.jpg">
-  <link rel="stylesheet" href="css/style.css?v=3.6.0">
+  <link rel="stylesheet" href="css/style.css?v=3.6.1">
 </head>
 <body>
   <!-- Ambient Gradient Background Mesh Elements -->
@@ -24,8 +24,9 @@
   </div>
 
   <!-- Top Navigation Bar -->
-  <header class="topbar" id="appHeader">
-    <!-- Brand / Identity -->
+  <header class="topbar" id="appHeader" role="banner">
+
+    <!-- LEFT: Brand Identity -->
     <div class="brand">
       <div class="logo-wrapper">
         <div class="logo" title="Stock Design Diversity Studio Pro">
@@ -39,23 +40,23 @@
           <span class="brand-title-short">SD <span class="brand-gradient-text">Pro</span></span>
           <span class="pro-tag">PRO v2.5</span>
         </div>
-        <small class="brand-subtitle">Smart Commercial Prompt & 49-Keyword Engine</small>
+        <small class="brand-subtitle">Smart Commercial Prompt &amp; 49-Keyword Engine</small>
       </div>
     </div>
 
-    <!-- Center Active Filter Pill & Live App Background Switcher -->
+    <!-- CENTER: Context Pill & Quick Actions Hub (Desktop & Large Screens) -->
     <div class="header-center">
-      <div class="nav-context-bar">
-        <div class="nav-context-pill" title="Current Active Category & Sub-style">
-          <span class="pulse-indicator"></span>
+      <nav class="nav-context-bar" aria-label="Quick Actions">
+        <div class="nav-context-pill" title="Current Active Category &amp; Sub-style">
+          <span class="pulse-indicator" aria-hidden="true"></span>
           <span id="activeSelectionTag" class="active-selection-tag">Active: Auto Diversity</span>
         </div>
-        <div class="nav-center-divider"></div>
+        <div class="nav-center-divider" aria-hidden="true"></div>
         <button type="button" id="applyAppBgBtn" class="nav-btn-subtle" title="Apply active gradient as ambient app backdrop">
           <span class="nav-btn-icon">🎨</span>
           <span class="nav-btn-text">Backdrop</span>
         </button>
-        <button type="button" id="topOnlineGenBtn" class="nav-btn-subtle nav-btn-online" title="Generate with Online AI Model (Gemini / Cloud)">
+        <button type="button" id="topOnlineGenBtn" class="nav-btn-subtle nav-btn-online" title="Generate with Online AI Model (Google Gemini)">
           <span class="nav-btn-icon">🌐</span>
           <span class="nav-btn-text">Online AI</span>
         </button>
@@ -65,19 +66,19 @@
         </button>
         <button type="button" id="topGenPromptsBtn" class="nav-btn-highlight" title="⚡ Instant 1-Click Generate 10 Commercial Prompts">
           <span class="btn-sparkle">⚡</span>
-          <b>Generate Prompts</b>
+          <span class="nav-btn-text"><b>Generate</b></span>
         </button>
-        <button type="button" id="surpriseBtn" class="nav-btn-subtle nav-btn-surprise" title="Surprise Me - Instant Random Concept & Batch">
-          <span class="nav-btn-icon">⚡</span>
-          <span class="nav-btn-text">Randomize</span>
+        <button type="button" id="surpriseBtn" class="nav-btn-subtle nav-btn-surprise" title="Surprise Me - Instant Random Concept &amp; Batch">
+          <span class="nav-btn-icon">🎲</span>
+          <span class="nav-btn-text">Random</span>
         </button>
-      </div>
+      </nav>
     </div>
 
-    <!-- Right Actions & System Controls -->
+    <!-- RIGHT: System Status & Action Controls -->
     <div class="top-actions">
-      <!-- Mobile Quick Actions (Visible on Mobile & Tablet) -->
-      <button type="button" id="mobileTopApiKeyBtn" class="nav-tool-btn mobile-only-nav-btn nav-btn-key-mobile" title="AI API Key (Google Gemini / OpenAI)">
+      <!-- Mobile Quick Actions (Visible on Mobile & Tablet <= 900px) -->
+      <button type="button" id="mobileTopApiKeyBtn" class="nav-tool-btn mobile-only-nav-btn nav-btn-key-mobile" title="AI API Key (Google Gemini)">
         <span class="nav-tool-icon">🔑</span>
         <span class="nav-tool-text">API</span>
       </button>
@@ -85,38 +86,39 @@
         <span class="nav-tool-icon">⚡</span>
         <span class="nav-tool-text">Gen</span>
       </button>
+
       <!-- Autosave / Sync Status Badge -->
       <div class="nav-status-badge" title="Real-time browser local storage sync">
-        <span class="sync-dot"></span>
+        <span class="sync-dot" aria-hidden="true"></span>
         <span id="saveState" class="save-state">● LOCAL STORAGE</span>
       </div>
 
       <!-- Project Workspace Action Group -->
       <div class="nav-btn-group" role="group" aria-label="Project Workspace Actions">
-        <button id="importBtn" class="nav-tool-btn" title="Import JSON project workspace">
+        <button type="button" id="importBtn" class="nav-tool-btn" title="Import JSON project workspace">
           <span class="nav-tool-icon">📥</span>
           <span class="nav-tool-text">Import</span>
         </button>
-        <button id="exportProject" class="nav-tool-btn" title="Export full JSON project file">
+        <button type="button" id="exportProject" class="nav-tool-btn" title="Export full JSON project file">
           <span class="nav-tool-icon">💾</span>
           <span class="nav-tool-text">Export</span>
         </button>
       </div>
 
       <!-- Clear / Reset Action -->
-      <button id="clearHistory" class="nav-tool-btn nav-danger-btn" title="Clear all saved history">
+      <button type="button" id="clearHistory" class="nav-tool-btn nav-danger-btn" title="Clear all saved history">
         <span class="nav-tool-icon">🗑</span>
         <span class="nav-tool-text">Clear All</span>
       </button>
 
       <!-- Theme Switcher -->
-      <button id="themeBtn" class="nav-theme-btn" title="Toggle Light/Dark Theme" aria-label="Toggle theme">☾</button>
+      <button type="button" id="themeBtn" class="nav-theme-btn" title="Toggle Light/Dark Theme" aria-label="Toggle theme">☾</button>
       <input id="importFile" type="file" accept="application/json" hidden>
     </div>
   </header>
 
-  <!-- Mobile View Switcher Tabs -->
-  <nav class="mobile-tabs" id="mobileTabs" aria-label="Mobile Navigation Tabs" role="tablist">
+  <!-- Mobile Tab Bar (shown below topbar on mobile/tablet) -->
+  <nav class="mobile-tabs" id="mobileTabs" aria-label="Mobile Navigation" role="tablist">
     <button type="button" class="mobile-tab active" data-tab="generator" role="tab" aria-selected="true">⚙ Settings</button>
     <button type="button" class="mobile-tab" data-tab="results" role="tab" aria-selected="false">✦ Results <span id="mobileBadgeResults" class="tab-badge">0</span></button>
     <button type="button" class="mobile-tab" data-tab="history" role="tab" aria-selected="false">📋 History <span id="mobileBadgeHistory" class="tab-badge">0</span></button>
@@ -1148,6 +1150,6 @@
   <script src="js/csv.js?v=3.6.0"></script>
   <script src="js/promptDoctor.js?v=3.6.0"></script>
   <script src="js/ui.js?v=3.6.0"></script>
-  <script src="js/app.js?v=3.6.0"></script>
+  <script src="js/app.js?v=3.6.1"></script>
 </body>
 </html>

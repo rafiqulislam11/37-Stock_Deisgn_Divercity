@@ -1386,19 +1386,34 @@
     $('metaModal').classList.remove('hidden');
   }
 
-  // Workspace Event Listeners
-  $('generate').onclick = generate;
-  $('mobileGenerateBtn').onclick = generate;
-
-  // Mobile topbar generate button (shown on mobile/tablet only)
-  if ($('mobileTopGenBtn')) $('mobileTopGenBtn').onclick = generate;
-
-  $('promptBtn').onclick = () => {
+  // Workspace Event Listeners - Generation Buttons Across All Devices
+  const handleGenerateWithScroll = () => {
     generate();
     setTimeout(() => {
-      $('resultsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const results = $('resultsPanel');
+      if (results) {
+        if (isMobileLayout()) {
+          switchMobileTab('results');
+        } else {
+          results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
     }, 100);
   };
+
+  $('generate').onclick = generate;
+  $('mobileGenerateBtn').onclick = handleGenerateWithScroll;
+
+  // Topbar Desktop generate button
+  if ($('topGenPromptsBtn')) $('topGenPromptsBtn').onclick = handleGenerateWithScroll;
+
+  // Hero section generate button
+  if ($('heroGenerateBtn')) $('heroGenerateBtn').onclick = handleGenerateWithScroll;
+
+  // Mobile topbar generate button (shown on mobile/tablet only)
+  if ($('mobileTopGenBtn')) $('mobileTopGenBtn').onclick = handleGenerateWithScroll;
+
+  $('promptBtn').onclick = handleGenerateWithScroll;
 
   ['search', 'filterCategory', 'filterStyle', 'filterStatus', 'sortBy'].forEach(id => {
     const el = $(id);
@@ -1790,17 +1805,26 @@
   }
 
   function applyAppBackdrop(gradientCss) {
+    const btn = $('applyAppBgBtn');
     if (!isAppBgCustom && gradientCss) {
       document.body.style.setProperty('--custom-app-bg', gradientCss);
       document.body.classList.add('custom-gradient-bg');
       isAppBgCustom = true;
-      if ($('applyAppBgBtn')) $('applyAppBgBtn').textContent = '↺ Reset BG';
+      if (btn) {
+        btn.innerHTML = '<span class="nav-btn-icon">↺</span><span class="nav-btn-text">Reset BG</span>';
+        btn.classList.add('active');
+        btn.title = 'Revert to default ambient background';
+      }
       Toast.show('🎨 Applied background to studio backdrop!', 'success');
     } else {
       document.body.classList.remove('custom-gradient-bg');
       document.body.style.removeProperty('--custom-app-bg');
       isAppBgCustom = false;
-      if ($('applyAppBgBtn')) $('applyAppBgBtn').textContent = '🎨 Apply to App';
+      if (btn) {
+        btn.innerHTML = '<span class="nav-btn-icon">🎨</span><span class="nav-btn-text">Backdrop</span>';
+        btn.classList.remove('active');
+        btn.title = 'Apply active gradient as ambient app backdrop';
+      }
       Toast.show('↺ Reverted app background to default.', 'info');
     }
   }

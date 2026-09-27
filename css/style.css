@@ -417,6 +417,13 @@ body:not(.dark) .nav-btn-surprise {
   line-height: 1;
 }
 
+.nav-btn-text {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 /* --- Right: System Status & Action Controls --- */
 .top-actions {
   display: flex;
@@ -3153,13 +3160,25 @@ button, input, select, textarea, .category-pill, .preset-chip, .texture-chip, .e
   }
 
   .header-center {
-    max-width: 220px;
+    max-width: 620px;
+    margin: 0 8px;
+  }
+
+  .nav-context-pill {
+    max-width: 150px;
   }
 
   .active-selection-tag {
-    max-width: 120px;
+    max-width: 110px;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .nav-btn-subtle,
+  .nav-btn-highlight {
+    padding: 4px 8px;
+    font-size: 11px;
+    gap: 4px;
   }
 
   .filters {
@@ -5285,14 +5304,20 @@ html, body {
   overflow-wrap: anywhere;
 }
 
-/* ── Topbar: prevent overflow ── */
+/* ── Topbar: layout & flex alignment ── */
 .topbar {
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 .brand { flex-shrink: 0; min-width: 0; }
 .top-actions { flex-shrink: 0; min-width: 0; }
-.header-center { min-width: 0; flex: 1; overflow: hidden; }
+.header-center {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* ── Mobile-only nav buttons: hidden on desktop ── */
 .mobile-only-nav-btn {
@@ -5365,6 +5390,11 @@ html, body {
 
 /* ── Tablet & Mobile (≤900px) ── */
 @media (max-width: 900px) {
+  /* Center context bar hidden on tablet/mobile */
+  .header-center {
+    display: none !important;
+  }
+
   /* App top padding: clear topbar + mobile tabs */
   .app {
     padding-top: calc(var(--topbar-height, 60px) + var(--mobile-tabs-height, 48px) + 8px) !important;
@@ -5417,12 +5447,42 @@ html, body {
     padding-top: calc(var(--topbar-height, 54px) + var(--mobile-tabs-height, 44px) + 6px) !important;
   }
   .mobile-cta-btn { font-size: 12px; padding: 8px 6px; }
+
+  /* Compact Navbar tools on phone screens */
+  .nav-status-badge .save-state {
+    display: none !important;
+  }
+  .nav-status-badge {
+    padding: 6px !important;
+    min-width: 26px !important;
+    height: 26px !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+  }
+  .nav-tool-btn .nav-tool-text {
+    display: none !important;
+  }
+  .nav-tool-btn,
+  .nav-danger-btn {
+    padding: 0 6px !important;
+    min-width: 32px !important;
+    height: 32px !important;
+    justify-content: center !important;
+  }
+  .brand-title-compact {
+    display: none !important;
+  }
+  .brand-title-short {
+    display: inline !important;
+  }
 }
 
 /* ── Small Phone (≤390px) ── */
 @media (max-width: 390px) {
   .mobile-sticky-bar { gap: 6px; padding: 8px 10px max(10px, env(safe-area-inset-bottom, 10px)); }
   .mobile-cta-btn span:first-child { font-size: 0; }
+  .topbar { padding: 0 8px !important; }
+  .top-actions { gap: 4px !important; }
 }
 
 /* ── Very Small Phone (≤360px) ── */
