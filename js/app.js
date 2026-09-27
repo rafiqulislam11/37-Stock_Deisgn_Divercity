@@ -2037,8 +2037,46 @@
 
           Toast.show(`✓ Prompt enhanced with ${res.modelUsed || activeModelName}!`, 'success', 3500);
 
-          // Scroll to result box if needed
-          doctorResultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          // Automatically add this enhanced prompt to Generated Concepts list!
+          const cat = $('category')?.value || '01. Gradient Abstract';
+          const sub = $('subcategory')?.value || 'Smooth Gradient';
+          const newItem = {
+            id: 'SD-AI-' + Math.random().toString(36).substring(2, 6).toUpperCase(),
+            category: cat,
+            subcategory: sub,
+            style: $('style')?.value || 'Auto Diversity',
+            color: $('customColor')?.value || 'Vibrant',
+            lighting: $('customLighting')?.value || 'Studio Softbox',
+            texture: $('customTexture')?.value || 'Film Grain',
+            composition: $('customComposition')?.value || 'Balanced',
+            background: 'Clean commercial backdrop',
+            mood: 'Commercial',
+            prompt: res.correctedPrompt,
+            originalPrompt: text,
+            aiCorrected: true,
+            aiDoctorModel: res.modelUsed || activeModelName,
+            aiImprovements: res.improvements || [],
+            uniquenessScore: 94,
+            isFavorite: false,
+            isLocked: false,
+            aspect: $('orientation')?.value || 'Square (1:1)',
+            resolution: '8K Ultra',
+            timestamp: Date.now()
+          };
+          newItem.metadata = MetadataEngine.build(newItem, cat);
+          newItem.cssGradient = DiversityEngine.generateCssGradient(newItem.color, sub, newItem.style, newItem.background);
+
+          current.unshift(newItem);
+          history.unshift(newItem);
+          Store.save(history);
+          renderAll();
+
+          // Scroll to results or result box
+          if (isMobileLayout()) {
+            switchMobileTab('results');
+          } else {
+            $('resultsPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
         } catch (err) {
           doctorRunBtn.disabled = false;
           doctorRunBtn.innerHTML = '<span class="btn-sparkle">✨</span> Polish with AI';
