@@ -5525,3 +5525,98 @@ html, body {
     display: none !important;
   }
 }
+
+/* ==========================================================================
+   BACKDROP / TOPBAR CLEARANCE FIX (v3.5.3)
+   Problem: Sticky topbar (glassmorphism backdrop-filter) was covering content.
+   Fix: Use CSS variables to always offset .app and .controls correctly.
+   ========================================================================== */
+
+/* Desktop: .app top padding = topbar height + 8px breathing room */
+.app {
+  padding-top: calc(var(--topbar-height, 68px) + 8px);
+}
+
+/* Desktop: sticky sidebar .controls must clear the topbar */
+.controls {
+  top: calc(var(--topbar-height, 68px) + 16px);
+  max-height: calc(100vh - var(--topbar-height, 68px) - 24px);
+}
+
+/* Mobile (≤900px): app top padding = topbar + mobile tabs height */
+@media (max-width: 900px) {
+  .app {
+    padding-top: calc(var(--topbar-height, 60px) + var(--mobile-tabs-height, 48px) + 8px) !important;
+  }
+
+  /* On mobile, controls is not sticky — no top override needed */
+  .controls {
+    top: auto !important;
+    max-height: none !important;
+  }
+}
+
+/* Tablet (768px) */
+@media (max-width: 768px) {
+  .app {
+    padding-top: calc(var(--topbar-height, 56px) + var(--mobile-tabs-height, 46px) + 6px) !important;
+  }
+}
+
+/* Small Phone (480px) */
+@media (max-width: 480px) {
+  .app {
+    padding-top: calc(var(--topbar-height, 54px) + var(--mobile-tabs-height, 44px) + 6px) !important;
+  }
+}
+
+/* Very Small Phone (360px) */
+@media (max-width: 360px) {
+  .app {
+    padding-top: calc(var(--topbar-height, 50px) + var(--mobile-tabs-height, 42px) + 4px) !important;
+  }
+}
+
+/* Landscape phone */
+@media (max-height: 520px) and (orientation: landscape) {
+  .app {
+    padding-top: calc(var(--topbar-height, 44px) + var(--mobile-tabs-height, 38px) + 4px) !important;
+  }
+}
+
+/* Large screens — controls clearance */
+@media (min-width: 1600px) {
+  .controls {
+    top: calc(var(--topbar-height, 68px) + 20px);
+    max-height: calc(100vh - var(--topbar-height, 68px) - 32px);
+  }
+}
+
+/* ── Mobile Tabs must always sit right below the topbar ── */
+.mobile-tabs {
+  top: var(--topbar-height, 68px);
+}
+
+@media (max-width: 900px) {
+  .mobile-tabs {
+    top: var(--topbar-height, 60px);
+  }
+}
+
+@media (max-width: 768px) {
+  .mobile-tabs {
+    top: var(--topbar-height, 56px);
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-tabs {
+    top: var(--topbar-height, 54px);
+  }
+}
+
+@media (max-width: 360px) {
+  .mobile-tabs {
+    top: var(--topbar-height, 50px);
+  }
+}
