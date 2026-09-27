@@ -126,7 +126,7 @@ window.DiversityEngine = (() => {
     // Abstract Background Taxonomy Resolution
     const absCat = D.findAbstractCategory ? D.findAbstractCategory(settings.category) : null;
     if (absCat) {
-      dna.category = absCat.fullName || absCat.name;
+      dna.category = absCat.fullName || (absCat.code ? `${absCat.code}. ${absCat.name}` : absCat.name);
       dna.categoryCode = absCat.code;
       dna.promptTraits = absCat.promptTraits;
 
@@ -251,13 +251,14 @@ window.DiversityEngine = (() => {
   }
 
   // Batch generation with diversity filtering
-  function generate(settings) {
+  function generate(settings = {}) {
     const out = [];
     let attempts = 0;
-    const maxAttempts = (settings.batch || 10) * 150;
+    const targetCount = Math.max(1, settings.batch || settings.count || 10);
+    const maxAttempts = targetCount * 150;
     const threshold = typeof settings.threshold === 'number' ? settings.threshold : 32;
 
-    while (out.length < settings.batch && attempts++ < maxAttempts) {
+    while (out.length < targetCount && attempts++ < maxAttempts) {
       const dna = createDNA(settings, settings.history, out);
       const comparePool = [...out, ...(settings.history || []).slice(0, 200)];
 

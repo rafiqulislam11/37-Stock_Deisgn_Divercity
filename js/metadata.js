@@ -79,7 +79,8 @@ window.MetadataEngine = (() => {
     'digital rendering', 'visual canvas', 'graphic backdrop', 'creative media'
   ];
 
-  function build(dna, categoryName) {
+  function build(dna = {}, categoryName) {
+    if (!dna) dna = {};
     const category = categoryName || dna.category || 'Abstract Background';
     const subcategory = dna.subcategory || '';
     const style = dna.style || 'Modern';

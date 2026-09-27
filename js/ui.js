@@ -128,7 +128,7 @@ window.UI = {
     const burstClass = isBurst ? 'has-burst' : '';
 
     return `
-      <article class="card ${d.favorite ? 'is-fav' : ''} ${d.locked ? 'is-locked' : ''}" data-card-id="${d.id}">
+      <article class="card ${d.favorite ? 'is-fav' : ''} ${d.locked ? 'is-locked' : ''}" data-id="${d.id}" data-card-id="${d.id}">
         <!-- Live Visual CSS Gradient Banner with Real-time Texture Overlay -->
         <div class="gradient-banner ${burstClass} ${grainClass}" style="background: ${gradient};" data-action="metadata" data-id="${d.id}" title="Click to Inspect Fullscreen Mockup & 49 Keywords">
           <span class="gradient-banner-badge">${this.esc(d.subcategory || d.category)}</span>
@@ -219,6 +219,42 @@ window.UI = {
     container.innerHTML = arr.map(d => this.card(d)).join('');
   },
 
+  historyRow(d) {
+    const meta = d.metadata || window.MetadataEngine.build(d, d.category);
+    const gradient = d.cssGradient || (window.DiversityEngine && window.DiversityEngine.generateCssGradient(d.color, d.subcategory || d.category, d.style, d.background)) || '';
+    const grainKey = d.grainEffect || 'grain';
+    const grainClass = window.STOCK_DATA?.grainEffectMap?.[grainKey]?.class || '';
+    const testStr = String((d.category || '') + ' ' + (d.subcategory || '') + ' ' + (d.background || '')).toLowerCase();
+    const isBurst = testStr.includes('burst') || testStr.includes('zoom') || testStr.includes('rays') || testStr.includes('warp');
+    const burstClass = isBurst ? 'has-burst' : '';
+
+    return `
+      <tr>
+        <td><b style="color:var(--accent-primary)">${this.esc(d.id)}</b></td>
+        <td>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="history-thumb ${burstClass} ${grainClass}" style="background:${gradient};" data-action="metadata" data-id="${d.id}" title="Inspect Mockup"></span>
+            <span>${this.esc(d.category)}</span>
+          </div>
+        </td>
+        <td><span class="card-subcategory-tag">${this.esc(d.subcategory || d.style || '—')}</span></td>
+        <td>${this.esc(d.style)}</td>
+        <td>${this.esc(d.composition)}</td>
+        <td>${this.esc(d.color)}</td>
+        <td><span class="score">${d.uniqueness || 100}%</span></td>
+        <td><span class="meta-preview-badge">${meta.keywordCount || 49}/49</span></td>
+        <td style="color:${d.favorite ? 'var(--star-gold)' : 'var(--text-muted)'}">${d.favorite ? '★' : '—'}</td>
+        <td>
+          <div class="table-action-btns">
+            <button class="mini-copy-btn" data-action="metadata" data-id="${d.id}" title="View Metadata & Mockup">Mockup</button>
+            <button class="mini-copy-btn" data-action="copy" data-id="${d.id}" title="Copy Prompt">Prompt</button>
+            <button class="mini-copy-btn danger" data-action="delete" data-id="${d.id}" title="Delete">✕</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  },
+
   renderHistory(arr) {
     const info = document.getElementById('historyInfo');
     const body = document.getElementById('historyBody');
@@ -230,40 +266,6 @@ window.UI = {
       return;
     }
 
-    body.innerHTML = arr.slice(0, 150).map(d => {
-      const meta = d.metadata || window.MetadataEngine.build(d, d.category);
-      const gradient = d.cssGradient || (window.DiversityEngine && window.DiversityEngine.generateCssGradient(d.color, d.subcategory || d.category, d.style, d.background)) || '';
-      const grainKey = d.grainEffect || 'grain';
-      const grainClass = window.STOCK_DATA?.grainEffectMap?.[grainKey]?.class || '';
-      const testStr = String((d.category || '') + ' ' + (d.subcategory || '') + ' ' + (d.background || '')).toLowerCase();
-      const isBurst = testStr.includes('burst') || testStr.includes('zoom') || testStr.includes('rays') || testStr.includes('warp');
-      const burstClass = isBurst ? 'has-burst' : '';
-
-      return `
-        <tr>
-          <td><b style="color:var(--accent-primary)">${this.esc(d.id)}</b></td>
-          <td>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="history-thumb ${burstClass} ${grainClass}" style="background:${gradient};" data-action="metadata" data-id="${d.id}" title="Inspect Mockup"></span>
-              <span>${this.esc(d.category)}</span>
-            </div>
-          </td>
-          <td><span class="card-subcategory-tag">${this.esc(d.subcategory || d.style || '—')}</span></td>
-          <td>${this.esc(d.style)}</td>
-          <td>${this.esc(d.composition)}</td>
-          <td>${this.esc(d.color)}</td>
-          <td><span class="score">${d.uniqueness || 100}%</span></td>
-          <td><span class="meta-preview-badge">${meta.keywordCount || 49}/49</span></td>
-          <td style="color:${d.favorite ? 'var(--star-gold)' : 'var(--text-muted)'}">${d.favorite ? '★' : '—'}</td>
-          <td>
-            <div class="table-action-btns">
-              <button class="mini-copy-btn" data-action="metadata" data-id="${d.id}" title="View Metadata & Mockup">Mockup</button>
-              <button class="mini-copy-btn" data-action="copy" data-id="${d.id}" title="Copy Prompt">Prompt</button>
-              <button class="mini-copy-btn danger" data-action="delete" data-id="${d.id}" title="Delete">✕</button>
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
+    body.innerHTML = arr.slice(0, 150).map(d => this.historyRow(d)).join('');
   }
 };

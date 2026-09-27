@@ -1305,7 +1305,7 @@
     const subcatTag = e.target.closest('.card-subcategory-tag');
     if (subcatTag) {
       const card = subcatTag.closest('.card');
-      const cardId = card ? card.dataset.id : null;
+      const cardId = card ? (card.dataset.id || card.dataset.cardId) : null;
       const d = cardId ? findDesign(cardId) : null;
       if (d) {
         if (d.category) selectCategory(d.category, false, d.subcategory || null);
