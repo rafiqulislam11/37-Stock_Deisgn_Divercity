@@ -3,54 +3,356 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stock Design Diversity Engine</title>
+  <title>Stock Design Diversity Engine - AI & Vector DNA Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="brand"><span class="logo">RD</span><div><b>Stock Design Diversity</b><small>Anti-Repetition Engine</small></div></div>
-  <div class="top-actions"><button id="themeBtn" class="icon-btn">☾</button><button id="clearHistory" class="ghost">Clear History</button></div>
-</header>
-
-<main class="app">
-  <section class="hero">
-    <div>
-      <span class="badge">AI STOCK WORKFLOW</span>
-      <h1>Create <span>genuinely different</span> stock design concepts.</h1>
-      <p>Build diverse Design DNA combinations for Adobe Stock, Shutterstock, Creative Fabrica and passive-income workflows.</p>
-    </div>
-    <div class="hero-card"><strong id="uniqueCount">0</strong><span>Designs in history</span><div class="mini-bar"><i id="diversityBar"></i></div></div>
-  </section>
-
-  <div class="grid">
-    <aside class="panel controls">
-      <div class="panel-title"><h2>Design Generator</h2><span class="live">LOCAL</span></div>
-      <label>Category<input id="category" value="Abstract Background"></label>
-      <label>Style<select id="style"><option>Auto Diversity</option><option>Minimal</option><option>Modern</option><option>Geometric</option><option>Organic</option><option>Futuristic</option><option>3D</option><option>Line Art</option><option>Luxury</option><option>Editorial</option><option>Retro</option></select></label>
-      <label>Orientation<select id="orientation"><option>Auto</option><option>Square</option><option>Portrait</option><option>Landscape</option><option>Wide Banner</option></select></label>
-      <label>Batch Size<input id="batch" type="number" min="1" max="50" value="10"></label>
-      <label>Similarity Threshold <output id="thresholdOut">50%</output><input id="threshold" type="range" min="20" max="80" value="50"></label>
-      <div class="checks">
-        <label class="check"><input type="checkbox" id="copySpace" checked> Copy-space friendly</label>
-        <label class="check"><input type="checkbox" id="vector" checked> Vector/EPS-friendly</label>
-      </div>
-      <button id="generate" class="primary">✦ Generate Diverse Batch</button>
-      <button id="promptBtn" class="secondary">Generate Prompt Pack</button>
-      <p class="note">Runs entirely in your browser. No API key required.</p>
-    </aside>
-
-    <section class="panel output">
-      <div class="panel-title"><h2>Generated Design DNA</h2><div><button id="exportCsv" class="small">Export CSV</button><button id="copyAll" class="small">Copy Prompts</button></div></div>
-      <div id="empty" class="empty"><div>✦</div><h3>No designs generated yet</h3><p>Choose your settings and generate a diverse batch.</p></div>
-      <div id="results" class="results"></div>
-    </section>
+  <!-- Ambient Gradient Background Elements -->
+  <div id="ambientWrap" class="ambient-glow-wrap" aria-hidden="true">
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
   </div>
 
-  <section class="panel history">
-    <div class="panel-title"><h2>Design History & Diversity Matrix</h2><span id="historyInfo">0 records</span></div>
-    <div class="table-wrap"><table><thead><tr><th>#</th><th>Category</th><th>Style</th><th>Composition</th><th>Shape</th><th>Color</th><th>Background</th><th>Density</th><th>Similarity</th></tr></thead><tbody id="historyBody"></tbody></table></div>
-  </section>
-</main>
-<script src="js/app.js"></script>
+  <!-- Integrated Compact Top Navigation -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">RD</span>
+      <div>
+        <b>Stock Design Diversity</b>
+        <small>Anti-Repetition DNA Engine</small>
+      </div>
+    </div>
+
+    <!-- Center Active Filter Pill -->
+    <div class="header-center">
+      <span id="activeSelectionTag" class="active-selection-tag">Active: Auto Diversity</span>
+      <button type="button" id="resetGradientFilter" class="micro-btn" title="Reset all filters">Reset</button>
+    </div>
+
+    <div class="top-actions">
+      <div class="mini-stat-pill">
+        <span class="stat-dot"></span>
+        <strong id="uniqueCount">0</strong>
+        <span>in History</span>
+        <div class="header-mini-bar"><i id="diversityBar"></i></div>
+      </div>
+      <button id="applyAppBgBtn" class="icon-btn-text" title="Apply active background as page backdrop">🎨 Apply to App</button>
+      <button id="themeBtn" class="icon-btn" title="Toggle Light/Dark Theme">☾</button>
+      <button id="clearHistory" class="ghost" title="Clear design history">Clear</button>
+    </div>
+  </header>
+
+  <!-- Single-Page Unified Studio Dashboard Layout -->
+  <main class="dashboard-layout">
+    <!-- LEFT SIDEBAR: Studio Controls & Button Matrix -->
+    <aside class="sidebar-panel">
+      <!-- Category & Quick Presets -->
+      <div class="sidebar-section">
+        <div class="section-header">
+          <label for="category">Category / Subject</label>
+        </div>
+        <input id="category" value="Grainy Gradient Wallpaper" placeholder="e.g. Grainy Gradient, 3D Abstract...">
+        <div class="preset-chips">
+          <button type="button" class="preset-chip active" data-cat="Grainy Gradient Wallpaper" data-style="Modern" data-grain="grain">✦ Grainy Gradient</button>
+          <button type="button" class="preset-chip" data-cat="Prismatic Radial Zoom Burst" data-style="Futuristic" data-grain="none">💥 Zoom Rays Burst</button>
+          <button type="button" class="preset-chip" data-cat="Geometric Gradient Pattern" data-style="Geometric" data-grain="none">🎨 Pattern Gradient</button>
+          <button type="button" class="preset-chip" data-cat="Aesthetic Aura Blur Gradient" data-style="Organic" data-grain="blur">Aura Blur</button>
+          <button type="button" class="preset-chip" data-cat="Lo-Fi Retro Noise Gradient" data-style="Retro" data-grain="noise">Lo-Fi Grain</button>
+          <button type="button" class="preset-chip" data-cat="Frosted Glassmorphism Blur" data-style="Glassmorphism" data-grain="frosted">Frosted Blur</button>
+          <button type="button" class="preset-chip" data-cat="3D Studio Mockup Stage" data-style="3D" data-grain="none">3D Studio</button>
+          <button type="button" class="preset-chip" data-cat="Luxury Marble Surface" data-style="Luxury" data-grain="none">Marble</button>
+        </div>
+      </div>
+
+      <!-- Blur - Noise - Grain Texture Effect Selector -->
+      <div class="sidebar-section">
+        <div class="section-header">
+          <span class="section-label">Grain & Blur Texture Effect</span>
+          <output id="grainLabel" class="res-badge">Film Grain</output>
+        </div>
+        <div class="texture-chips">
+          <button type="button" class="texture-chip" data-grain="none">None</button>
+          <button type="button" class="texture-chip" data-grain="blur">Soft Blur</button>
+          <button type="button" class="texture-chip active" data-grain="grain">Film Grain</button>
+          <button type="button" class="texture-chip" data-grain="noise">Heavy Noise</button>
+          <button type="button" class="texture-chip" data-grain="frosted">Frosted Blur</button>
+        </div>
+        <input type="hidden" id="grainEffect" value="grain">
+      </div>
+
+      <!-- AI Engine Mode Switcher -->
+      <div class="sidebar-section">
+        <div class="section-header">
+          <span class="section-label">AI Target Engine</span>
+          <span id="aiEngineLabel" class="res-badge">Midjourney v6.1</span>
+        </div>
+        <div class="engine-chips">
+          <button type="button" class="engine-chip active" data-engine="midjourney">Midjourney v6.1</button>
+          <button type="button" class="engine-chip" data-engine="flux">Flux.1 / SDXL</button>
+          <button type="button" class="engine-chip" data-engine="standard">Standard</button>
+        </div>
+      </div>
+
+      <!-- Size / Resolution Selector (2K to 8K Buttons) -->
+      <div class="sidebar-section">
+        <div class="section-header">
+          <span class="section-label">Resolution / Size (2K – 8K)</span>
+          <output id="resLabel" class="res-badge">8K UHD</output>
+        </div>
+        <div class="resolution-chips">
+          <button type="button" class="res-chip" data-res="2K">2K QHD</button>
+          <button type="button" class="res-chip" data-res="3K">3K</button>
+          <button type="button" class="res-chip" data-res="4K">4K UHD</button>
+          <button type="button" class="res-chip" data-res="6K">6K</button>
+          <button type="button" class="res-chip active" data-res="8K">8K Ultra</button>
+        </div>
+        <input type="hidden" id="resolution" value="8K">
+      </div>
+
+      <!-- Comprehensive Background Matrix (All Categories as Buttons) -->
+      <div class="sidebar-section">
+        <div class="section-header">
+          <span class="section-label">Background Types (All Styles)</span>
+          <span id="bgCountBadge" class="tab-count">42 Types</span>
+        </div>
+
+        <!-- Filter Sub-Tabs for Background Categories -->
+        <div class="bg-filter-bar">
+          <button type="button" class="bg-filter-tab active" data-group="all">All</button>
+          <button type="button" class="bg-filter-tab" data-group="pattern">🎨 Pattern (50)</button>
+          <button type="button" class="bg-filter-tab" data-group="burst">💥 Zoom Burst</button>
+          <button type="button" class="bg-filter-tab" data-group="grain">Grain/Blur</button>
+          <button type="button" class="bg-filter-tab" data-group="gradient">Gradient</button>
+          <button type="button" class="bg-filter-tab" data-group="3d">3D Studio</button>
+          <button type="button" class="bg-filter-tab" data-group="texture">Texture</button>
+          <button type="button" class="bg-filter-tab" data-group="nature">Nature</button>
+        </div>
+
+        <div id="backgroundButtons" class="gradient-styles-chips">
+          <!-- Populated dynamically via JS with all background types -->
+        </div>
+      </div>
+
+      <!-- Visual Color Palette Swatches (Buttons) -->
+      <div class="sidebar-section">
+        <div class="section-header">
+          <span class="section-label">Color Palettes & Swatches</span>
+        </div>
+        <div id="gradientPaletteButtons" class="gradient-palettes-compact-grid">
+          <!-- Populated dynamically via JS with real CSS gradients -->
+        </div>
+      </div>
+
+      <!-- Compact Fine-Tuning Controls -->
+      <div class="sidebar-section controls-grid">
+        <div class="field-item">
+          <label for="style">Design Style</label>
+          <select id="style">
+            <option>Auto Diversity</option>
+            <option>Modern</option>
+            <option>Minimal</option>
+            <option>Retro</option>
+            <option>Liquid</option>
+            <option>Glassmorphism</option>
+            <option>Geometric</option>
+            <option>Organic</option>
+            <option>Futuristic</option>
+            <option>3D</option>
+            <option>Editorial</option>
+            <option>Neon</option>
+          </select>
+        </div>
+
+        <div class="field-item">
+          <label for="orientation">Orientation</label>
+          <select id="orientation">
+            <option>Auto</option>
+            <option>Square</option>
+            <option>Portrait</option>
+            <option>Landscape</option>
+            <option>Wide Banner</option>
+            <option>Ultra-wide</option>
+            <option>Website Hero</option>
+          </select>
+        </div>
+
+        <div class="field-item">
+          <label for="batch">Batch Size</label>
+          <input id="batch" type="number" min="1" max="50" value="10">
+        </div>
+
+        <div class="field-item">
+          <label for="threshold">Similarity <output id="thresholdOut">50%</output></label>
+          <input id="threshold" type="range" min="20" max="80" value="50">
+        </div>
+      </div>
+
+      <!-- Checkboxes & Generate CTA -->
+      <div class="sidebar-footer">
+        <div class="checks-row">
+          <label class="check"><input type="checkbox" id="copySpace" checked> Copy-space</label>
+          <label class="check"><input type="checkbox" id="vector" checked> Vector EPS</label>
+        </div>
+        <button id="generate" class="primary">✦ Generate Diverse Batch</button>
+        <button id="promptBtn" class="secondary">⚡ Quick Prompt Pack</button>
+      </div>
+    </aside>
+
+    <!-- RIGHT MAIN WORKSPACE: Tabbed Output (Cards vs History) -->
+    <section class="workspace-panel">
+      <!-- Workspace Navigation Tabs & Action Bar -->
+      <div class="workspace-tabs-bar">
+        <div class="tab-group">
+          <button type="button" id="tabCardsBtn" class="tab-btn active">
+            <span>✦ Generated Design DNA</span>
+            <span id="cardsCountBadge" class="tab-count">0</span>
+          </button>
+          <button type="button" id="tabHistoryBtn" class="tab-btn">
+            <span>📋 History & SEO Metadata</span>
+            <span id="historyInfo" class="tab-count">0</span>
+          </button>
+        </div>
+
+        <div class="workspace-actions">
+          <button id="exportCsv" class="small ghost" title="Export all metadata and 50 tags to CSV">Export CSV (with 50 SEO Tags)</button>
+          <button id="copyAll" class="small accent-btn">Copy All Prompts</button>
+        </div>
+      </div>
+
+      <!-- TAB 1: Generated Design Cards View -->
+      <div id="cardsView" class="tab-content active">
+        <div id="empty" class="empty">
+          <div class="empty-icon">✦</div>
+          <h3>No designs generated yet</h3>
+          <p>Choose your grain/blur texture and click any button on the left to generate fresh grain & gradient stock concepts.</p>
+        </div>
+        <div id="results" class="results"></div>
+      </div>
+
+      <!-- TAB 2: History & Matrix Table View -->
+      <div id="historyView" class="tab-content">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Preview</th>
+                <th>Stock Title</th>
+                <th>Resolution</th>
+                <th>Grain Effect</th>
+                <th>Background</th>
+                <th>Style</th>
+                <th>Color</th>
+                <th>SEO Tags (50)</th>
+                <th>Similarity</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Fullscreen Live Canvas & Mockup Inspector Modal -->
+  <div id="inspectorModal" class="inspector-modal" aria-hidden="true" role="dialog">
+    <div class="modal-backdrop" onclick="closeInspector()"></div>
+    <div class="modal-dialog">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span id="modalDesignId" class="id">D-00000-1</span>
+          <h3 id="modalStockTitle">Commercial Abstract Background</h3>
+        </div>
+        <div class="modal-header-actions">
+          <button type="button" class="icon-btn" onclick="closeInspector()" title="Close Inspector">✕</button>
+        </div>
+      </div>
+
+      <!-- Modal Body Split View -->
+      <div class="modal-body">
+        <!-- Left: Large Live Canvas Preview with Interactive Mockups -->
+        <div class="canvas-preview-column">
+          <!-- Mockup Switcher Toolbar -->
+          <div class="mockup-toolbar">
+            <span class="toolbar-label">Mockup View:</span>
+            <button type="button" class="mockup-btn active" data-mockup="clean">Clean Backdrop</button>
+            <button type="button" class="mockup-btn" data-mockup="typography">Editorial Text</button>
+            <button type="button" class="mockup-btn" data-mockup="mobile">Mobile Frame</button>
+            <button type="button" class="mockup-btn" data-mockup="card">Brand Card</button>
+          </div>
+
+          <!-- Canvas Display Area -->
+          <div id="modalCanvas" class="modal-canvas clean has-grain">
+            <!-- Dynamic Mockup Overlays -->
+            <div class="mockup-overlay overlay-typography">
+              <span class="mock-tag">GRAIN COLLECTION 2026</span>
+              <h2>CONTEMPORARY HORIZON</h2>
+              <p>Authentic tactile film grain & noise texture with usable commercial copy space.</p>
+              <button class="mock-cta">Discover More</button>
+            </div>
+
+            <div class="mockup-overlay overlay-mobile">
+              <div class="phone-frame">
+                <div class="phone-notch"></div>
+                <div class="phone-screen-content">
+                  <span class="phone-time">09:41</span>
+                  <div class="phone-card">Grain Gradient App</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mockup-overlay overlay-card">
+              <div class="brand-card">
+                <div class="brand-logo">RD</div>
+                <h4>CREATIVE STUDIO</h4>
+                <p>Textured Grain Gradient Assets</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Full Stock Metadata Inspector (Prompts & 50 SEO Tags) -->
+        <div class="metadata-column">
+          <!-- Commercial AI Prompt -->
+          <div class="meta-block">
+            <div class="meta-block-header">
+              <span class="meta-label">Commercial AI Prompt</span>
+              <button type="button" id="modalCopyPromptBtn" class="small ghost">Copy Prompt</button>
+            </div>
+            <div id="modalPromptText" class="meta-code-box"></div>
+          </div>
+
+          <!-- Commercial Rejection Shield / Negative Prompt -->
+          <div class="meta-block">
+            <div class="meta-block-header">
+              <span class="meta-label">Negative Prompt (Stock Rejection Shield)</span>
+              <button type="button" id="modalCopyNegBtn" class="small ghost">Copy Negative</button>
+            </div>
+            <div id="modalNegPromptText" class="meta-code-box negative"></div>
+          </div>
+
+          <!-- 50 SEO Stock Tags Cloud -->
+          <div class="meta-block">
+            <div class="meta-block-header">
+              <span class="meta-label">50 SEO Keywords (Adobe Stock / Shutterstock)</span>
+              <button type="button" id="modalCopyTagsBtn" class="small accent-btn">Copy 50 Tags</button>
+            </div>
+            <div id="modalTagsCloud" class="tags-cloud"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Toast Notification -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/app.js"></script>
 </body>
 </html>
