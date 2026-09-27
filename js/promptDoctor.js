@@ -35,6 +35,9 @@
 
   const AiPromptDoctor = {
     config: null,
+    quotaCooldownUntil: 0,
+    lastQuotaNoticeTime: 0,
+    lastNoticeTime: 0,
 
     init() {
       this.config = this.loadConfig();
@@ -71,9 +74,13 @@
       const cfg = Object.assign({}, this.config, options);
       const profile = cfg.profile || 'stock';
       const engine = cfg.targetEngine || 'midjourney';
+      const now = Date.now();
 
-      // 1. If configured for an external API model and API key is present
-      if (cfg.model !== 'builtin' && cfg.apiKey && cfg.apiKey.trim().length > 5) {
+      // Check if external API is in quota cooldown (e.g. 429 rate limit reached)
+      const inCooldown = now < (this.quotaCooldownUntil || 0);
+
+      // 1. If configured for an external API model and API key is present AND not in cooldown
+      if (!inCooldown && cfg.model !== 'builtin' && cfg.apiKey && cfg.apiKey.trim().length > 5) {
         try {
           if (cfg.model.startsWith('gemini')) {
             return await this.callGeminiApi(prompt, cfg.apiKey.trim(), cfg.model, profile, engine);
@@ -82,14 +89,47 @@
           }
         } catch (err) {
           console.warn('Live API enhancement failed, falling back to built-in neural doctor:', err);
-          if (window.Toast) {
-            window.Toast.show(`API notice: ${err.message}. Using built-in doctor.`, 'warning');
+          const rawErr = String(err && err.message ? err.message : err);
+          const isQuota = rawErr.includes('Quota exceeded') ||
+                          rawErr.includes('quota') ||
+                          rawErr.includes('429') ||
+                          rawErr.includes('rate-limit') ||
+                          rawErr.includes('ResourceExhausted');
+
+          if (isQuota) {
+            // Activate 45-second cooldown so subsequent calls won't fail or spam
+            this.quotaCooldownUntil = Date.now() + 45000;
+
+            // Notify user ONCE per 30 seconds with a polite, clean message (no ugly raw URLs or float dumps)
+            if (Date.now() - (this.lastQuotaNoticeTime || 0) > 30000) {
+              this.lastQuotaNoticeTime = Date.now();
+              if (window.Toast && !options.silent) {
+                window.Toast.show(
+                  '⚠️ Gemini Free Quota (20 RPM) সীমা অতিক্রম করেছে। বাকি প্রম্পটগুলো বিল্ট-ইন নিউরাল ডক্টর দিয়ে অপটিমাইজ করা হচ্ছে।',
+                  'warning',
+                  4500
+                );
+              }
+            }
+          } else {
+            // Non-quota error (e.g. network or key issue)
+            if (Date.now() - (this.lastNoticeTime || 0) > 10000) {
+              this.lastNoticeTime = Date.now();
+              const cleanMsg = rawErr.split('http')[0].replace(/[\*\_\`]/g, '').trim() || 'API temporary issue';
+              if (window.Toast && !options.silent) {
+                window.Toast.show(`API নোটিশ: ${cleanMsg} (বিল্ট-ইন ডক্টর চালু আছে)`, 'warning', 3500);
+              }
+            }
           }
         }
       }
 
-      // 2. Built-in Offline Neural Doctor (No Key Required, Instant)
-      return this.offlineCorrect(prompt, profile, engine);
+      // 2. Built-in Offline Neural Doctor (No Key Required, Instant, 100% Free)
+      const res = this.offlineCorrect(prompt, profile, engine);
+      if (inCooldown) {
+        res.modelUsed = 'Built-in Neural Doctor (Quota Auto-Fallback)';
+      }
+      return res;
     },
 
     // Built-in Neural Rules Engine

@@ -2297,10 +2297,23 @@
         btn.textContent = '⏳ Optimizing...';
         Toast.show(`✨ AI Doctor: Optimizing ${visible.length} prompts...`, 'info', 2000);
 
+        const isOnline = (AiPromptDoctor.config?.model !== 'builtin' && AiPromptDoctor.config?.apiKey);
         let count = 0;
-        for (const d of visible) {
+
+        for (let i = 0; i < visible.length; i++) {
+          const d = visible[i];
           try {
-            const res = await AiPromptDoctor.correct(d.prompt, { targetEngine: d.aiEngine || selectedAiEngine });
+            // In batch mode, apply live API to top concepts and seamlessly use built-in doctor for the rest to preserve 20 RPM quota
+            const inCooldown = Date.now() < (AiPromptDoctor.quotaCooldownUntil || 0);
+            const preferOffline = isOnline && (i >= 4 || inCooldown);
+
+            const res = preferOffline
+              ? AiPromptDoctor.offlineCorrect(d.prompt, AiPromptDoctor.config?.profile, d.aiEngine || selectedAiEngine)
+              : await AiPromptDoctor.correct(d.prompt, { 
+                  targetEngine: d.aiEngine || selectedAiEngine,
+                  silent: i > 0 // Only allow first notice if quota triggers
+                });
+
             d.originalPrompt = d.originalPrompt || d.prompt;
             d.prompt = res.correctedPrompt;
             d.aiCorrected = true;
@@ -2471,14 +2484,18 @@
 
         Toast.show(`✓ Generated ${generated.length} concepts! AI Doctor polishing prompts...`, 'info', 2000);
 
-        // 2. Enhance concepts with AI Doctor in background
+        // 2. Enhance concepts with AI Doctor in background (top 3 concepts to preserve 20 RPM quota)
         (async () => {
-          for (let i = 0; i < Math.min(generated.length, 5); i++) {
+          for (let i = 0; i < Math.min(generated.length, 3); i++) {
             const d = generated[i];
             try {
-              const res = await AiPromptDoctor.correct(d.prompt, {
-                targetEngine: d.aiEngine || selectedAiEngine
-              });
+              const inCooldown = Date.now() < (AiPromptDoctor.quotaCooldownUntil || 0);
+              const res = inCooldown
+                ? AiPromptDoctor.offlineCorrect(d.prompt, AiPromptDoctor.config?.profile, d.aiEngine || selectedAiEngine)
+                : await AiPromptDoctor.correct(d.prompt, {
+                    targetEngine: d.aiEngine || selectedAiEngine,
+                    silent: i > 0
+                  });
               d.originalPrompt = d.prompt;
               d.prompt = res.correctedPrompt;
               d.aiCorrected = true;

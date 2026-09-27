@@ -2,14 +2,51 @@
    Stock Design Diversity Studio Pro - UI Components & Interactions
    ========================================================================== */
 
-// Global Toast Notification System
+// Global Toast Notification System (Anti-Spam, Max Stack Cap & Tap-to-Dismiss)
 window.Toast = {
-  show(message, type = 'info', duration = 2600) {
-    const container = document.getElementById('toastContainer');
-    if (!container) return;
+  _recentMessages: new Map(),
+  _maxToasts: 2,
 
+  show(message, type = 'info', duration = 2800) {
+    const container = document.getElementById('toastContainer');
+    if (!container || !message) return;
+
+    const cleanMsg = String(message).trim();
+    const now = Date.now();
+
+    // 1. Anti-Spam: Ignore identical message within 3.5 seconds
+    if (this._recentMessages.has(cleanMsg)) {
+      const lastTime = this._recentMessages.get(cleanMsg);
+      if (now - lastTime < 3500) {
+        return; // Ignore duplicate spam
+      }
+    }
+    this._recentMessages.set(cleanMsg, now);
+
+    // Housekeeping: remove old keys
+    if (this._recentMessages.size > 25) {
+      for (const [k, t] of this._recentMessages.entries()) {
+        if (now - t > 12000) this._recentMessages.delete(k);
+      }
+    }
+
+    // 2. Strict Cap: Never allow more than 2 toasts at the same time
+    while (container.children.length >= this._maxToasts) {
+      const oldest = container.firstElementChild;
+      if (oldest) {
+        if (oldest._dismissTimer) clearTimeout(oldest._dismissTimer);
+        container.removeChild(oldest);
+      } else {
+        break;
+      }
+    }
+
+    // 3. Create toast with click-to-dismiss and clean styling
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
+    toast.setAttribute('role', 'alert');
+    toast.title = 'Click to dismiss';
+    toast.style.cursor = 'pointer';
 
     const icons = {
       success: '✓',
@@ -18,15 +55,21 @@ window.Toast = {
       info: 'ℹ'
     };
 
-    toast.innerHTML = `<span style="font-weight:800">${icons[type] || 'ℹ'}</span> <span>${this.esc(message)}</span>`;
-    container.appendChild(toast);
+    toast.innerHTML = `<span style="font-weight:800;flex-shrink:0;font-size:14px;">${icons[type] || 'ℹ'}</span> <span style="flex:1;word-break:break-word;line-height:1.35;">${this.esc(cleanMsg)}</span> <span style="font-size:11px;opacity:0.6;margin-left:6px;flex-shrink:0;" title="Dismiss">✕</span>`;
 
-    setTimeout(() => {
+    const dismiss = () => {
+      if (toast._dismissed) return;
+      toast._dismissed = true;
       toast.classList.add('toast-hide');
       setTimeout(() => {
         if (toast.parentNode) toast.parentNode.removeChild(toast);
-      }, 250);
-    }, duration);
+      }, 180);
+    };
+
+    toast.onclick = dismiss;
+    container.appendChild(toast);
+
+    toast._dismissTimer = setTimeout(dismiss, duration);
   },
 
   esc(s) {
