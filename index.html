@@ -94,6 +94,16 @@
         </div>
         <div class="studio-metric-sep"></div>
         <div class="studio-metric-item">
+          <span class="studio-metric-lbl">Diverse (≥70%)</span>
+          <b id="statUnique" class="studio-metric-val">0</b>
+        </div>
+        <div class="studio-metric-sep"></div>
+        <div class="studio-metric-item">
+          <span class="studio-metric-lbl">Similarity Risk</span>
+          <b id="statRisk" class="studio-metric-val">0%</b>
+        </div>
+        <div class="studio-metric-sep"></div>
+        <div class="studio-metric-item">
           <span class="studio-metric-lbl">49-Tags Ready</span>
           <b id="statMeta" class="studio-metric-val">0</b>
         </div>
@@ -102,9 +112,6 @@
           <span class="studio-metric-lbl">Favorites</span>
           <b id="statFav" class="studio-metric-val">0</b>
         </div>
-        <!-- Hidden accessible elements to preserve JS bindings -->
-        <span id="statUnique" class="visually-hidden">0</span>
-        <span id="statRisk" class="visually-hidden">0%</span>
       </div>
     </section>
 
@@ -120,279 +127,317 @@
           <span class="live">READY</span>
         </div>
 
-        <!-- Engine Mode Switcher -->
-        <div class="engine-mode-switcher" role="tablist" aria-label="Taxonomy Engine Mode">
-          <button type="button" class="mode-btn active" id="modeAbstract" data-mode="abstract" role="tab" aria-selected="true">
-            <span class="mode-btn-icon">✦</span> Abstract Backgrounds (80)
-          </button>
-          <button type="button" class="mode-btn" id="modeGeneral" data-mode="general" role="tab" aria-selected="false">
-            <span class="mode-btn-icon">🏢</span> General Stock (21)
-          </button>
-        </div>
-
-        <!-- Trending Quick Presets Strip -->
-        <div class="preset-section">
-          <div class="preset-section-header">
-            <span>⚡ Trending Style Presets</span>
-            <small>1-Click Setup</small>
+        <!-- Card 1: Taxonomy & Concept (80 Categories, 749 Sub-styles) -->
+        <div class="control-card">
+          <div class="control-card-header">
+            <div class="control-card-title-group">
+              <span class="control-card-icon">🎯</span>
+              <h3 class="control-card-title">Taxonomy & Concept</h3>
+            </div>
+            <span class="control-card-badge">80 Categories · 749 Styles</span>
           </div>
-          <div class="preset-chips">
-            <button type="button" class="preset-chip active" data-cat="Gradient Abstract" data-sub="Smooth Gradient" data-grain="grain">✦ Grainy Gradient</button>
-            <button type="button" class="preset-chip" data-cat="Light Waves" data-sub="Laser Light Waves" data-grain="none">💥 Laser Burst</button>
-            <button type="button" class="preset-chip" data-cat="Geometric Abstract" data-sub="Grids Abstract" data-grain="none">🎨 Pattern Grid</button>
-            <button type="button" class="preset-chip" data-cat="Blur" data-sub="Gaussian Blur" data-grain="blur">✨ Aura Blur</button>
-            <button type="button" class="preset-chip" data-cat="Grain & Noise" data-sub="Film Grain" data-grain="noise">📻 Lo-Fi Noise</button>
-            <button type="button" class="preset-chip" data-cat="Glassmorphism" data-sub="Frosted Glass" data-grain="frosted">🧊 Frosted Blur</button>
-            <button type="button" class="preset-chip" data-cat="3D Abstract" data-sub="3D Shapes" data-grain="none">🏛 3D Studio</button>
-            <button type="button" class="preset-chip" data-cat="Luxury Abstract" data-sub="Gold & Black" data-grain="none">👑 Luxury Gold</button>
-          </div>
-        </div>
 
-        <!-- Category Selection -->
-        <div class="form-group cat-select-group">
-          <div class="cat-label-row">
-            <label for="category" id="categoryLabel">Abstract Category
-              <span class="badge-count" id="categoryCountBadge">80 Categories</span>
-            </label>
-            <button type="button" id="togglePillsStripBtn" class="pill-toggle-btn" title="Toggle quick category search strip">
-              🔍 80 Category Pills
+          <!-- Engine Mode Switcher -->
+          <div class="engine-mode-switcher" role="tablist" aria-label="Taxonomy Engine Mode">
+            <button type="button" class="mode-btn active" id="modeAbstract" data-mode="abstract" role="tab" aria-selected="true">
+              <span class="mode-btn-icon">✦</span> Abstract Backgrounds (80)
+            </button>
+            <button type="button" class="mode-btn" id="modeGeneral" data-mode="general" role="tab" aria-selected="false">
+              <span class="mode-btn-icon">🏢</span> General Stock (21)
             </button>
           </div>
-          <select id="category" aria-label="Abstract Category Selector"></select>
-        </div>
 
-        <!-- Quick Category Selector Pills Strip (Collapsible drawer for zero clutter) -->
-        <div class="category-pills-wrap is-collapsed" id="categoryPillsWrap">
-          <div class="category-pills-header">
-            <span>Quick Category Selector</span>
-            <div class="cat-header-actions">
-              <button type="button" id="toggleCatGridBtn" class="mini-cat-btn" title="Toggle between single-row strip and expanded grid view">⊞ Grid View</button>
-              <small id="activeCatHint">80 Categories Available</small>
+          <!-- Trending Quick Presets Strip -->
+          <div class="preset-section">
+            <div class="preset-section-header">
+              <span>⚡ Trending Style Presets</span>
+              <small>1-Click Setup</small>
+            </div>
+            <div class="preset-chips">
+              <button type="button" class="preset-chip active" data-cat="Gradient Abstract" data-sub="Smooth Gradient" data-grain="grain">✦ Grainy Gradient</button>
+              <button type="button" class="preset-chip" data-cat="Light Waves" data-sub="Laser Light Waves" data-grain="none">💥 Laser Burst</button>
+              <button type="button" class="preset-chip" data-cat="Geometric Abstract" data-sub="Grids Abstract" data-grain="none">🎨 Pattern Grid</button>
+              <button type="button" class="preset-chip" data-cat="Blur" data-sub="Gaussian Blur" data-grain="blur">✨ Aura Blur</button>
+              <button type="button" class="preset-chip" data-cat="Grain & Noise" data-sub="Film Grain" data-grain="noise">📻 Lo-Fi Noise</button>
+              <button type="button" class="preset-chip" data-cat="Glassmorphism" data-sub="Frosted Glass" data-grain="frosted">🧊 Frosted Blur</button>
+              <button type="button" class="preset-chip" data-cat="3D Abstract" data-sub="3D Shapes" data-grain="none">🏛 3D Studio</button>
+              <button type="button" class="preset-chip" data-cat="Luxury Abstract" data-sub="Gold & Black" data-grain="none">👑 Luxury Gold</button>
             </div>
           </div>
-          <div class="cat-search-box">
-            <input type="text" id="catFilterInput" placeholder="Quick search 80 categories (e.g. neon, marble, liquid, cyber, fire)...">
-            <span class="cat-search-icon">🔍</span>
-          </div>
-          <div class="category-pills-bar" id="categoryPillsBar"></div>
-        </div>
 
-        <!-- Subcategory / Specific Theme Group -->
-        <div class="form-group" id="subcategoryGroup">
-          <div class="subcat-header">
-            <label for="subcategory">Abstract Sub-Theme / Style
-              <span class="badge-count" id="subcategoryCountBadge">15 Styles</span>
-            </label>
-            <button type="button" id="browseAll749Btn" class="mini-cat-btn" title="Browse full 749 Sub-Categories Catalog">
-              🔍 749 Catalog
-            </button>
+          <!-- Category Selection -->
+          <div class="form-group cat-select-group">
+            <div class="cat-label-row">
+              <label for="category" id="categoryLabel">Abstract Category
+                <span class="badge-count" id="categoryCountBadge">80 Categories</span>
+              </label>
+              <button type="button" id="togglePillsStripBtn" class="pill-toggle-btn" title="Toggle quick category search strip">
+                🔍 Quick Filter
+              </button>
+            </div>
+            <select id="category" aria-label="Abstract Category Selector"></select>
           </div>
-          <select id="subcategory">
-            <option value="Auto Diversity">✦ Auto Diversity (All Sub-types)</option>
-          </select>
-          <div class="subcategory-pills-bar" id="subcategoryPillsBar"></div>
-        </div>
 
-        <!-- Core Framing & Generation Setup -->
-        <div class="grid-2-col">
-          <div class="form-group">
-            <label for="orientation">Aspect Framing</label>
-            <select id="orientation">
-              <option value="Auto">Auto Balance</option>
-              <option value="Square (1:1)">Square (1:1)</option>
-              <option value="Portrait (3:4)">Portrait (3:4)</option>
-              <option value="Vertical Poster (9:16)">Vertical Poster (9:16)</option>
-              <option value="Landscape (4:3)">Landscape (4:3)</option>
-              <option value="Wide Banner (16:9)">Wide Banner (16:9)</option>
-              <option value="Ultra-wide Panoramic (21:9)">Ultra-wide (21:9)</option>
-              <option value="Social Post (4:5)">Social Post (4:5)</option>
-              <option value="Website Hero (1920x1080)">Website Hero</option>
-              <option value="Presentation Slide (16:9)">Presentation Slide</option>
+          <!-- Quick Category Selector Pills Strip (Always Visible & Accessible by Default) -->
+          <div class="category-pills-wrap" id="categoryPillsWrap">
+            <div class="category-pills-header">
+              <span>Quick Category Selector</span>
+              <div class="cat-header-actions">
+                <button type="button" id="toggleCatGridBtn" class="mini-cat-btn" title="Toggle between single-row strip and expanded grid view">⊞ Grid View</button>
+                <small id="activeCatHint">80 Categories Available</small>
+              </div>
+            </div>
+            <div class="cat-search-box">
+              <input type="text" id="catFilterInput" placeholder="Quick search 80 categories (e.g. neon, marble, liquid, cyber, fire)...">
+              <span class="cat-search-icon">🔍</span>
+            </div>
+            <div class="category-pills-bar" id="categoryPillsBar"></div>
+          </div>
+
+          <!-- Subcategory / Specific Theme Group -->
+          <div class="form-group" id="subcategoryGroup">
+            <div class="subcat-header">
+              <label for="subcategory">Abstract Sub-Theme / Style
+                <span class="badge-count" id="subcategoryCountBadge">15 Styles</span>
+              </label>
+              <button type="button" id="browseAll749Btn" class="mini-cat-btn" title="Browse full 749 Sub-Categories Catalog">
+                🔍 749 Catalog
+              </button>
+            </div>
+            <select id="subcategory">
+              <option value="Auto Diversity">✦ Auto Diversity (All Sub-types)</option>
             </select>
+            <div class="subcategory-pills-bar" id="subcategoryPillsBar"></div>
           </div>
+        </div>
+
+        <!-- Card 2: AI Engine & Commercial Specs -->
+        <div class="control-card">
+          <div class="control-card-header">
+            <div class="control-card-title-group">
+              <span class="control-card-icon">⚙</span>
+              <h3 class="control-card-title">AI Engine & Specs</h3>
+            </div>
+            <span class="control-card-badge">Commercial Ready</span>
+          </div>
+
+          <!-- Target AI Generator Chips -->
           <div class="form-group">
-            <label for="batch">Batch Count (1-250)</label>
-            <input id="batch" type="number" min="1" max="250" value="10">
+            <div class="subcat-header">
+              <label>Target AI Generator</label>
+              <output id="aiEngineLabel" class="res-badge">Midjourney v6.1</output>
+            </div>
+            <div class="engine-chips">
+              <button type="button" class="engine-chip active" data-engine="midjourney">Midjourney v6.1</button>
+              <button type="button" class="engine-chip" data-engine="dalle3">DALL-E 3</button>
+              <button type="button" class="engine-chip" data-engine="flux">Flux.1 Pro</button>
+              <button type="button" class="engine-chip" data-engine="sdxl">SDXL</button>
+              <button type="button" class="engine-chip" data-engine="firefly">Adobe Firefly 3</button>
+            </div>
           </div>
-        </div>
 
-        <!-- Primary Generation CTA Buttons -->
-        <div class="control-buttons primary-cta-block">
-          <button id="generate" class="primary">
-            <span class="btn-sparkle">✦</span> Generate Diverse Batch
-          </button>
-          <button id="promptBtn" class="secondary">
-            📋 Generate & Jump To Prompts
-          </button>
-        </div>
-
-        <!-- Live Concept Real-Time Previewer -->
-        <div class="live-concept-card">
-          <div class="live-concept-head">
-            <div class="live-concept-badge">
-              <span class="pulse-dot"></span> LIVE PROMPT SYNTHESIS
+          <!-- Texture Effect Chips (Grain, Noise, Blur, Frosted) -->
+          <div class="form-group">
+            <div class="subcat-header">
+              <label>Grain & Blur Texture Effect</label>
+              <output id="grainLabel" class="res-badge">Film Grain</output>
             </div>
-            <button type="button" id="copyLivePrompt" class="mini-copy-btn">Copy</button>
+            <div class="texture-chips">
+              <button type="button" class="texture-chip" data-grain="none">None</button>
+              <button type="button" class="texture-chip" data-grain="blur">Soft Blur</button>
+              <button type="button" class="texture-chip active" data-grain="grain">Film Grain</button>
+              <button type="button" class="texture-chip" data-grain="noise">Heavy Noise</button>
+              <button type="button" class="texture-chip" data-grain="frosted">Frosted Blur</button>
+            </div>
           </div>
-          <p id="livePromptPreview" class="live-prompt-text">Select options above to see real-time prompt synthesis...</p>
-          <div id="liveTagsPreview" class="live-tags-strip"></div>
-        </div>
 
-        <!-- Collapsible Advanced Diversity & DNA Accordion -->
-        <details class="advanced-accordion" id="advancedAccordion">
-          <summary class="advanced-summary">
-            <div class="summary-left">
-              <span class="summary-icon">⚙</span>
-              <span class="summary-title">Advanced Tuning & Design DNA</span>
+          <!-- Target Resolution Chips -->
+          <div class="form-group">
+            <div class="subcat-header">
+              <label>Export Resolution</label>
+              <output id="resLabel" class="res-badge">8K Ultra</output>
             </div>
-            <span class="summary-badge">Expand Tuning</span>
-          </summary>
-          <div class="advanced-content">
-            <!-- Target AI Engine Chips -->
+            <div class="res-chips">
+              <button type="button" class="res-chip" data-res="4K">4K UHD</button>
+              <button type="button" class="res-chip" data-res="6K">6K</button>
+              <button type="button" class="res-chip active" data-res="8K">8K Ultra</button>
+              <button type="button" class="res-chip" data-res="Vector SVG">Vector</button>
+            </div>
+          </div>
+
+          <!-- Aspect Framing & Batch Count -->
+          <div class="grid-2-col">
             <div class="form-group">
-              <div class="subcat-header">
-                <label>Target AI Generator</label>
-                <output id="aiEngineLabel" class="res-badge">Midjourney v6.1</output>
-              </div>
-              <div class="engine-chips">
-                <button type="button" class="engine-chip active" data-engine="midjourney">Midjourney v6.1</button>
-                <button type="button" class="engine-chip" data-engine="dalle3">DALL-E 3</button>
-                <button type="button" class="engine-chip" data-engine="flux">Flux.1 Pro</button>
-                <button type="button" class="engine-chip" data-engine="sdxl">SDXL</button>
-                <button type="button" class="engine-chip" data-engine="firefly">Adobe Firefly 3</button>
-              </div>
+              <label for="orientation">Aspect Framing</label>
+              <select id="orientation">
+                <option value="Auto">Auto Balance</option>
+                <option value="Square (1:1)">Square (1:1)</option>
+                <option value="Portrait (3:4)">Portrait (3:4)</option>
+                <option value="Vertical Poster (9:16)">Vertical Poster (9:16)</option>
+                <option value="Landscape (4:3)">Landscape (4:3)</option>
+                <option value="Wide Banner (16:9)">Wide Banner (16:9)</option>
+                <option value="Ultra-wide Panoramic (21:9)">Ultra-wide (21:9)</option>
+                <option value="Social Post (4:5)">Social Post (4:5)</option>
+                <option value="Website Hero (1920x1080)">Website Hero</option>
+                <option value="Presentation Slide (16:9)">Presentation Slide</option>
+              </select>
             </div>
-
-            <!-- Texture Effect Chips (Grain, Noise, Blur, Frosted) -->
             <div class="form-group">
-              <div class="subcat-header">
-                <label>Grain & Blur Texture Effect</label>
-                <output id="grainLabel" class="res-badge">Film Grain</output>
-              </div>
-              <div class="texture-chips">
-                <button type="button" class="texture-chip" data-grain="none">None</button>
-                <button type="button" class="texture-chip" data-grain="blur">Soft Blur</button>
-                <button type="button" class="texture-chip active" data-grain="grain">Film Grain</button>
-                <button type="button" class="texture-chip" data-grain="noise">Heavy Noise</button>
-                <button type="button" class="texture-chip" data-grain="frosted">Frosted Blur</button>
-              </div>
+              <label for="batch">Batch Count (1-250)</label>
+              <input id="batch" type="number" min="1" max="250" value="10">
             </div>
+          </div>
 
-            <!-- Target Resolution & Marketplace -->
-            <div class="grid-2-col">
-              <div class="form-group">
-                <div class="subcat-header">
-                  <label>Export Resolution</label>
-                  <output id="resLabel" class="res-badge">8K Ultra</output>
-                </div>
-                <div class="res-chips">
-                  <button type="button" class="res-chip" data-res="4K">4K UHD</button>
-                  <button type="button" class="res-chip" data-res="6K">6K</button>
-                  <button type="button" class="res-chip active" data-res="8K">8K Ultra</button>
-                  <button type="button" class="res-chip" data-res="Vector SVG">Vector</button>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="marketplace">Target Marketplace</label>
-                <select id="marketplace">
-                  <option value="Generic Stock">Generic Stock (Universal)</option>
-                  <option value="Adobe Stock">Adobe Stock (49 Tags, Top 5)</option>
-                  <option value="Shutterstock">Shutterstock (200 Chars)</option>
-                  <option value="Freepik">Freepik (Vector/Photo)</option>
-                  <option value="Creative Fabrica">Creative Fabrica</option>
-                  <option value="Vecteezy">Vecteezy</option>
-                  <option value="Dreamstime">Dreamstime</option>
-                </select>
-              </div>
+          <!-- Target Marketplace & Design Style -->
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="marketplace">Target Marketplace</label>
+              <select id="marketplace">
+                <option value="Generic Stock">Generic Stock (Universal)</option>
+                <option value="Adobe Stock">Adobe Stock (49 Tags, Top 5)</option>
+                <option value="Shutterstock">Shutterstock (200 Chars)</option>
+                <option value="Freepik">Freepik (Vector/Photo)</option>
+                <option value="Creative Fabrica">Creative Fabrica</option>
+                <option value="Vecteezy">Vecteezy</option>
+                <option value="Dreamstime">Dreamstime</option>
+              </select>
             </div>
-
-            <!-- Design Style -->
             <div class="form-group">
               <label for="style">Design Style</label>
               <select id="style">
                 <option value="Auto Diversity">✦ Auto Diversity</option>
               </select>
             </div>
+          </div>
+        </div>
 
-            <!-- Similarity Threshold Range Slider -->
-            <div class="form-group">
-              <div class="range-header">
-                <label for="threshold">Max Similarity Threshold</label>
-                <output id="thresholdOut" class="badge-output">32%</output>
-              </div>
-              <input id="threshold" type="range" min="10" max="70" value="32">
-              <div class="range-labels">
-                <span>High Diversity (10%)</span>
-                <span>Balanced (32%)</span>
-                <span>Tight Variation (70%)</span>
-              </div>
+        <!-- Card 3: Diversity Matrix & Locks -->
+        <div class="control-card">
+          <div class="control-card-header">
+            <div class="control-card-title-group">
+              <span class="control-card-icon">🧬</span>
+              <h3 class="control-card-title">Diversity Matrix & Locks</h3>
             </div>
+            <span class="control-card-badge">Controlled Variation</span>
+          </div>
 
-            <!-- Active Variation Strategies -->
-            <div class="section-label">Active Variation Strategies</div>
+          <!-- Similarity Threshold Range Slider -->
+          <div class="form-group">
+            <div class="range-header">
+              <label for="threshold">Max Similarity Threshold</label>
+              <output id="thresholdOut" class="badge-output">32%</output>
+            </div>
+            <input id="threshold" type="range" min="10" max="70" value="32">
+            <div class="range-labels">
+              <span>High Diversity (10%)</span>
+              <span>Balanced (32%)</span>
+              <span>Tight Variation (70%)</span>
+            </div>
+          </div>
+
+          <!-- Active Variation Strategies -->
+          <div class="section-label-row">
+            <span class="sub-section-title">Active Variation Strategies</span>
             <div class="variation-actions">
               <button type="button" id="selectAllVars" class="mini-text-btn">Select All</button>
               <button type="button" id="clearAllVars" class="mini-text-btn">Reset</button>
             </div>
-            <div id="variationChecks" class="checks-grid"></div>
+          </div>
+          <div id="variationChecks" class="checks-grid"></div>
 
-            <!-- Attribute Locks -->
-            <div class="section-label">Attribute Locks (Keep Constant)</div>
-            <div id="lockChecks" class="checks-grid"></div>
+          <!-- Attribute Locks -->
+          <div class="sub-section-title">Attribute Locks (Keep Constant)</div>
+          <div id="lockChecks" class="checks-grid"></div>
 
-            <!-- Commercial Features -->
-            <div class="section-label">Commercial Features</div>
-            <div class="checks-grid commercial-checks">
-              <label class="check">
-                <input type="checkbox" id="copySpace" checked>
-                <span>Copy-Space Friendly (Text placement)</span>
-              </label>
-              <label class="check">
-                <input type="checkbox" id="vector" checked>
-                <span>Vector / Clean Geometry Style</span>
-              </label>
+          <!-- Commercial Features -->
+          <div class="sub-section-title">Commercial Features</div>
+          <div class="checks-grid commercial-checks">
+            <label class="check">
+              <input type="checkbox" id="copySpace" checked>
+              <span>Copy-Space Friendly (Text placement)</span>
+            </label>
+            <label class="check">
+              <input type="checkbox" id="vector" checked>
+              <span>Vector / Clean Geometry Style</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Card 4: Custom DNA Fine-Tuning -->
+        <div class="control-card">
+          <div class="control-card-header">
+            <div class="control-card-title-group">
+              <span class="control-card-icon">🎛</span>
+              <h3 class="control-card-title">Custom DNA Tuning</h3>
             </div>
+            <span class="control-card-badge">Full Tuning</span>
+          </div>
 
-            <!-- Custom DNA Parameters -->
-            <div class="section-label">Custom DNA Controls (Full Tuning)</div>
-            <div class="grid-2-col">
-              <div class="form-group">
-                <label for="customColor">Color Harmony</label>
-                <select id="customColor">
-                  <option value="Auto">✦ Auto Diversity</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="customLighting">Lighting Model</label>
-                <select id="customLighting">
-                  <option value="Auto">✦ Auto Diversity</option>
-                </select>
-              </div>
-            </div>
-            <div class="grid-2-col">
-              <div class="form-group">
-                <label for="customTexture">Surface Texture</label>
-                <select id="customTexture">
-                  <option value="Auto">✦ Auto Diversity</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="customComposition">Composition Flow</label>
-                <select id="customComposition">
-                  <option value="Auto">✦ Auto Diversity</option>
-                </select>
-              </div>
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="customColor">Color Harmony</label>
+              <select id="customColor">
+                <option value="Auto">✦ Auto Diversity</option>
+              </select>
             </div>
             <div class="form-group">
-              <label for="customTags">Signature / Custom Tags Injector
-                <span class="tooltip-hint" title="Inject your own keywords into generated prompts and metadata">ⓘ</span>
-              </label>
-              <input type="text" id="customTags" placeholder="e.g. 4k render, luxury branding, editorial, ultra sharp...">
+              <label for="customLighting">Lighting Model</label>
+              <select id="customLighting">
+                <option value="Auto">✦ Auto Diversity</option>
+              </select>
             </div>
           </div>
-        </details>
 
-        <p class="note">Local generation engine — zero API keys required, runs instantly in your browser.</p>
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label for="customTexture">Surface Texture</label>
+              <select id="customTexture">
+                <option value="Auto">✦ Auto Diversity</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="customComposition">Composition Flow</label>
+              <select id="customComposition">
+                <option value="Auto">✦ Auto Diversity</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="customTags">Signature / Custom Tags Injector
+              <span class="tooltip-hint" title="Inject your own keywords into generated prompts and metadata">ⓘ</span>
+            </label>
+            <input type="text" id="customTags" placeholder="e.g. 4k render, luxury branding, editorial, ultra sharp...">
+          </div>
+        </div>
+
+        <!-- Card 5: Live Synthesis & Generation CTA -->
+        <div class="control-card action-card">
+          <div class="control-card-header">
+            <div class="control-card-title-group">
+              <span class="control-card-icon">✦</span>
+              <h3 class="control-card-title">Live Prompt Synthesis</h3>
+            </div>
+            <button type="button" id="copyLivePrompt" class="mini-copy-btn">Copy</button>
+          </div>
+
+          <div class="live-concept-card-body">
+            <p id="livePromptPreview" class="live-prompt-text">Select options above to see real-time prompt synthesis...</p>
+            <div id="liveTagsPreview" class="live-tags-strip"></div>
+          </div>
+
+          <!-- Primary Generation CTA Buttons -->
+          <div class="control-buttons primary-cta-block">
+            <button id="generate" class="primary">
+              <span class="btn-sparkle">✦</span> Generate Diverse Batch
+            </button>
+            <button id="promptBtn" class="secondary">
+              📋 Generate & Jump To Prompts
+            </button>
+          </div>
+
+          <p class="note">Local generation engine — zero API keys required, runs instantly in your browser.</p>
+        </div>
       </aside>
 
       <!-- Right Panel: Generated Results -->

@@ -572,15 +572,19 @@
     const toggleStripBtn = $('togglePillsStripBtn');
     const pillsWrap = $('categoryPillsWrap');
 
-    // Toggle 80 Pills Drawer (Clean progressive disclosure)
+    // Toggle 80 Pills Filter Bar
     if (toggleStripBtn && pillsWrap) {
+      const isCollapsed = pillsWrap.classList.contains('is-collapsed');
+      toggleStripBtn.textContent = isCollapsed ? '🔍 Quick Filter' : '✕ Hide Filter';
+      toggleStripBtn.classList.toggle('active', !isCollapsed);
+
       toggleStripBtn.onclick = () => {
         pillsWrap.classList.toggle('is-collapsed');
-        const isCollapsed = pillsWrap.classList.contains('is-collapsed');
-        pillsWrap.style.display = isCollapsed ? 'none' : 'block';
-        toggleStripBtn.classList.toggle('active', !isCollapsed);
-        toggleStripBtn.textContent = isCollapsed ? '🔍 80 Category Pills' : '✕ Close Pills';
-        if (!isCollapsed && catSearch) {
+        const collapsed = pillsWrap.classList.contains('is-collapsed');
+        pillsWrap.style.display = collapsed ? 'none' : 'block';
+        toggleStripBtn.classList.toggle('active', !collapsed);
+        toggleStripBtn.textContent = collapsed ? '🔍 Quick Filter' : '✕ Hide Filter';
+        if (!collapsed && catSearch) {
           setTimeout(() => catSearch.focus(), 80);
         }
       };
