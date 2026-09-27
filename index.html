@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+  <link rel="apple-touch-icon" href="assets/logo.jpg">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -21,9 +23,16 @@
   <!-- Top Navigation Bar -->
   <header class="topbar">
     <div class="brand">
-      <span class="logo">SD</span>
+      <div class="logo" title="Stock Design Diversity Studio Pro">
+        <img src="assets/logo.jpg" alt="Stock Design Diversity Studio Logo" class="brand-logo-img" width="40" height="40">
+      </div>
       <div class="brand-text">
-        <span class="brand-title">Stock Design Diversity Studio <span class="pro-tag">PRO</span></span>
+        <span class="brand-title">
+          <span class="brand-title-full">Stock Design Diversity Studio</span>
+          <span class="brand-title-compact">Diversity Studio</span>
+          <span class="brand-title-short">SD Studio</span>
+          <span class="pro-tag">PRO</span>
+        </span>
         <small class="brand-subtitle">Smart Prompt & 49-Keyword Metadata Engine</small>
       </div>
     </div>
@@ -54,10 +63,10 @@
   </header>
 
   <!-- Mobile View Switcher Tabs -->
-  <nav class="mobile-tabs" id="mobileTabs" aria-label="Mobile Navigation Tabs">
-    <button class="mobile-tab active" data-tab="generator">⚙ Settings</button>
-    <button class="mobile-tab" data-tab="results">✦ Results <span id="mobileBadgeResults" class="tab-badge">0</span></button>
-    <button class="mobile-tab" data-tab="history">📋 History <span id="mobileBadgeHistory" class="tab-badge">0</span></button>
+  <nav class="mobile-tabs" id="mobileTabs" aria-label="Mobile Navigation Tabs" role="tablist">
+    <button type="button" class="mobile-tab active" data-tab="generator" role="tab" aria-selected="true">⚙ Settings</button>
+    <button type="button" class="mobile-tab" data-tab="results" role="tab" aria-selected="false">✦ Results <span id="mobileBadgeResults" class="tab-badge">0</span></button>
+    <button type="button" class="mobile-tab" data-tab="history" role="tab" aria-selected="false">📋 History <span id="mobileBadgeHistory" class="tab-badge">0</span></button>
   </nav>
 
   <main class="app">
@@ -536,7 +545,7 @@
 
               <div class="mockup-overlay overlay-card">
                 <div class="brand-card">
-                  <div class="brand-logo">SD</div>
+                  <img src="assets/logo.jpg" alt="Stock Design Studio Logo" class="brand-card-logo-img" width="44" height="44">
                   <h4>CREATIVE STUDIO</h4>
                   <p>Curated Design Diversity Asset</p>
                 </div>

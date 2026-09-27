@@ -166,14 +166,35 @@ a {
   height: 40px;
   border-radius: var(--radius-md);
   background: var(--accent-gradient);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-family: var(--font-heading);
-  font-weight: 800;
-  font-size: 16px;
-  letter-spacing: -0.5px;
-  box-shadow: 0 4px 12px rgba(89, 99, 232, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(89, 99, 232, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.logo:hover {
+  transform: scale(1.06) rotate(-2deg);
+  box-shadow: 0 6px 20px rgba(89, 99, 232, 0.55), 0 0 0 2px var(--accent-primary);
+}
+
+.brand-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.brand-card-logo-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  margin: 0 auto 10px;
+  display: block;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  object-fit: cover;
 }
 
 .brand-text {
@@ -189,6 +210,16 @@ a {
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
+}
+
+.brand-title-compact,
+.brand-title-short {
+  display: none;
+}
+
+.brand-title-full {
+  display: inline;
 }
 
 .pro-tag {
@@ -1271,7 +1302,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   padding: 6px;
-  min-width: 260px;
+  min-width: min(260px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
   z-index: 50;
   display: flex;
   flex-direction: column;
@@ -2228,8 +2260,8 @@ body.dark .keyword-chip.is-top5 {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 240px;
-  max-width: 380px;
+  min-width: min(240px, calc(100vw - 28px));
+  max-width: min(380px, calc(100vw - 28px));
   animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
@@ -2297,18 +2329,89 @@ body.dark .keyword-chip.is-top5 {
 }
 
 /* ==========================================================================
-   Responsive Media Queries Across All Devices (Mobile, Tablet, Desktop, 4K)
+   Responsive Architecture Across All Devices
+   (4K Ultra-Wide, Desktop, Small Laptops, Tablets, Foldables & Mobile)
    ========================================================================== */
 
-/* Large Tablets & Small Laptops (<= 1120px) */
-@media (max-width: 1120px) {
+/* Universal Layout & Touch Safety */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+button, input, select, textarea, .category-pill, .preset-chip, .texture-chip, .engine-chip, .res-chip, .mockup-btn {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.table-wrap, .category-pills-bar, .subcategory-pills-bar, .modal-body, .catalog-body {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* --------------------------------------------------------------------------
+   1. Ultra-Wide & 4K Monitors (min-width: 1600px)
+   -------------------------------------------------------------------------- */
+@media (min-width: 1600px) {
+  .app {
+    max-width: 1680px;
+    padding: 32px clamp(24px, 4vw, 56px) 100px;
+  }
+
+  .workspace {
+    grid-template-columns: 390px 1fr;
+    gap: 28px;
+  }
+
+  .results {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+  }
+
+  .controls {
+    max-height: calc(100vh - 120px);
+  }
+
+  .inspector-modal-container {
+    max-width: 1220px !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. Small Laptops, Surface & Tablets in Landscape (901px to 1199px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1199px) and (min-width: 901px) {
   .workspace {
     grid-template-columns: 320px 1fr;
-    gap: 16px;
+    gap: 18px;
+  }
+
+  .topbar {
+    padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right));
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .header-center {
+    max-width: 220px;
+  }
+
+  .active-selection-tag {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .filters {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .results {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
   }
 
   .hero {
@@ -2316,89 +2419,71 @@ body.dark .keyword-chip.is-top5 {
   }
 
   .hero-card {
-    min-width: 250px;
+    min-width: 260px;
   }
 }
 
-/* Medium Tablets & Foldables (<= 920px) */
-@media (max-width: 920px) {
-  .workspace {
-    grid-template-columns: 1fr;
-  }
-
-  .controls {
-    position: relative;
-    top: 0;
-    max-height: none;
-  }
-
-  .hero {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .hero-card {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* Small Tablets & Large Mobiles (<= 768px) */
-@media (max-width: 768px) {
+/* --------------------------------------------------------------------------
+   3. Medium & Small Tablets, iPads, Foldables (max-width: 900px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
   :root {
-    --topbar-height: 58px;
-    --mobile-tabs-height: 46px;
+    --topbar-height: 60px;
+    --mobile-tabs-height: 48px;
   }
 
   .topbar {
     height: var(--topbar-height);
-    min-height: var(--topbar-height);
-    padding: 0 14px;
+    padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right));
   }
 
-  .brand {
-    gap: 8px;
+  .brand-subtitle,
+  .save-state,
+  .header-center {
+    display: none !important;
   }
 
-  .logo {
-    width: 34px;
-    height: 34px;
-    font-size: 14px;
-  }
-
-  .brand-title {
-    font-size: 13.5px;
-  }
-
-  .brand-subtitle {
+  .brand-title-full {
     display: none;
   }
 
-  .save-state {
-    display: none;
+  .brand-title-compact {
+    display: inline;
   }
 
-  .top-actions {
-    gap: 6px;
-  }
-
-  .top-btn {
-    padding: 6px 10px;
-    font-size: 11px;
-    min-height: 34px;
-  }
-
+  /* Mobile Tabs Activation */
   .mobile-tabs {
     display: flex;
     top: var(--topbar-height);
     height: var(--mobile-tabs-height);
+    padding: 6px max(14px, env(safe-area-inset-left)) 6px max(14px, env(safe-area-inset-right));
+    background: var(--bg-surface);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
 
-  /* When tabs are active on mobile, hide inactive panels cleanly */
+  /* Single Panel Display Mode Under Tabs */
+  .workspace {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .controls {
+    position: static;
+    top: auto;
+    max-height: none;
+    overflow-y: visible;
+    padding: 18px 16px;
+  }
+
+  .output {
+    padding: 18px 16px;
+  }
+
+  .history {
+    padding: 18px 16px;
+  }
+
   .workspace.tab-mode-generator #resultsPanel,
   .workspace.tab-mode-generator ~ #historyPanel {
     display: none !important;
@@ -2409,25 +2494,164 @@ body.dark .keyword-chip.is-top5 {
     display: none !important;
   }
 
-  .workspace.tab-mode-history #controlsPanel,
-  .workspace.tab-mode-history #resultsPanel {
+  .workspace.tab-mode-history {
     display: none !important;
   }
 
-  /* Compact hero section on mobile screens */
+  .workspace.tab-mode-history ~ #historyPanel {
+    display: block !important;
+  }
+
+  /* Mobile Sticky Generator CTA Bar */
+  .mobile-sticky-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-color);
+    padding: 10px 16px max(12px, env(safe-area-inset-bottom, 12px));
+    z-index: 90;
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.12);
+  }
+
+  body:has(.tab-mode-generator) .mobile-sticky-bar {
+    display: block;
+  }
+
+  body:has(.tab-mode-results) .mobile-sticky-bar,
+  body:has(.tab-mode-history) .mobile-sticky-bar,
+  body.modal-open .mobile-sticky-bar {
+    display: none !important;
+  }
+
+  .app {
+    padding: 16px max(14px, env(safe-area-inset-left)) calc(85px + env(safe-area-inset-bottom, 12px));
+  }
+
+  /* Hero Section Stack */
   .hero {
-    margin-bottom: 14px;
-    gap: 14px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .hero-card {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .filters {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .search-wrap {
+    grid-column: 1 / -1;
+  }
+
+  .results {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  /* Modal Adjustments */
+  .modal-split-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .canvas-preview-column {
+    position: static;
+    top: auto;
+  }
+
+  .modal-canvas {
+    height: clamp(220px, 32vh, 320px);
+  }
+
+  .phone-frame {
+    transform: scale(0.85);
+    transform-origin: center;
+  }
+
+  .toast-container {
+    bottom: calc(75px + env(safe-area-inset-bottom, 12px));
+    right: 14px;
+    left: 14px;
+    max-width: calc(100% - 28px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. Small Tablets & Large Mobiles (max-width: 768px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  :root {
+    --topbar-height: 56px;
+    --mobile-tabs-height: 46px;
+  }
+
+  .topbar {
+    padding: 0 max(12px, env(safe-area-inset-left)) 0 max(12px, env(safe-area-inset-right));
+  }
+
+  .brand {
+    gap: 8px;
+  }
+
+  .logo {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+    border-radius: var(--radius-sm);
+  }
+
+  .brand-title {
+    font-size: 13.5px;
+  }
+
+  .top-actions {
+    gap: 5px;
+  }
+
+  .top-btn {
+    padding: 6px 9px;
+    font-size: 11px;
+    min-height: 34px;
+  }
+
+  .top-btn-icon {
+    font-size: 13px;
+  }
+
+  .top-btn-text {
+    display: none;
+  }
+
+  .icon-btn {
+    width: 34px;
+    height: 34px;
   }
 
   .hero h1 {
-    font-size: 24px;
+    font-size: clamp(22px, 5vw, 28px);
     line-height: 1.2;
     margin-bottom: 6px;
   }
 
   .hero p {
-    font-size: 12px;
+    font-size: 12.5px;
+    line-height: 1.5;
   }
 
   .hero-card {
@@ -2452,24 +2676,24 @@ body.dark .keyword-chip.is-top5 {
     font-size: 20px;
   }
 
-  .mobile-sticky-bar {
-    display: block;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  /* Form Elements Prevent iOS Zoom (>=16px) */
+  input:not([type="checkbox"]):not([type="range"]), select, textarea {
+    font-size: 15px;
+    min-height: 42px;
   }
 
-  .app {
-    padding-top: 14px;
-    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  .grid-2-col {
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 
-  .toast-container {
-    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
-    right: 14px;
-    left: 14px;
+  .checks-grid {
+    grid-template-columns: 1fr;
   }
 
-  .toast {
-    max-width: 100%;
+  .category-pills-bar.is-grid {
+    grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+    gap: 5px;
   }
 
   .results {
@@ -2478,14 +2702,14 @@ body.dark .keyword-chip.is-top5 {
   }
 
   .card-head .card-category-tag {
-    max-width: 125px;
+    max-width: 140px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   .table-wrap {
-    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-sm);
   }
 
   .history th:first-child,
@@ -2502,13 +2726,16 @@ body.dark .keyword-chip.is-top5 {
     z-index: 3;
   }
 
+  /* Modal Bottom-Sheet on Mobile */
   .modal-backdrop {
     padding: 0;
     align-items: flex-end;
   }
 
   .modal-container {
-    max-height: 94vh;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    max-height: 94dvh;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
@@ -2528,36 +2755,65 @@ body.dark .keyword-chip.is-top5 {
     max-width: calc(100vw - 28px);
     right: 0;
   }
+
+  .modal-footer {
+    padding: 12px 16px;
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .modal-footer button {
+    width: 100%;
+    justify-content: center;
+    margin-right: 0 !important;
+  }
+
+  #modalDownloadSingleBtn {
+    margin-right: 0 !important;
+  }
+
+  .catalog-modal-container {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 94dvh;
+    max-height: 94dvh;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
 }
 
-/* Standard & Small Mobile Phones (<= 480px) */
+/* --------------------------------------------------------------------------
+   5. Standard & Small Mobile Phones (max-width: 480px)
+   -------------------------------------------------------------------------- */
 @media (max-width: 480px) {
-  .top-btn-text {
+  :root {
+    --topbar-height: 54px;
+    --mobile-tabs-height: 44px;
+  }
+
+  .brand-title-compact {
     display: none;
   }
 
+  .brand-title-short {
+    display: inline;
+  }
+
   .top-btn {
-    padding: 7px;
-    width: 34px;
-    height: 34px;
+    padding: 0;
+    width: 32px;
+    height: 32px;
     justify-content: center;
   }
 
-  .top-btn-icon {
+  .icon-btn {
+    width: 32px;
+    height: 32px;
     font-size: 14px;
   }
 
   .hero h1 {
-    font-size: 22px;
-  }
-
-  .grid-2-col {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
-  .checks-grid {
-    grid-template-columns: 1fr;
+    font-size: 21px;
   }
 
   .filters {
@@ -2567,6 +2823,8 @@ body.dark .keyword-chip.is-top5 {
 
   .toolbar {
     width: 100%;
+    display: flex;
+    gap: 6px;
     justify-content: space-between;
   }
 
@@ -2580,13 +2838,9 @@ body.dark .keyword-chip.is-top5 {
     padding: 12px;
   }
 
-  .dna {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-
   .card-footer {
     flex-direction: row;
+    flex-wrap: wrap;
     gap: 5px;
   }
 
@@ -2594,6 +2848,26 @@ body.dark .keyword-chip.is-top5 {
     padding: 8px 4px;
     font-size: 11px;
     min-height: 36px;
+    flex: 1 1 calc(50% - 6px);
+  }
+
+  .card-footer .btn-keywords {
+    flex: 1 1 100%;
+  }
+
+  .dna {
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+
+  .phone-frame {
+    transform: scale(0.75);
+    transform-origin: center;
+  }
+
+  .brand-card {
+    width: 220px;
+    padding: 16px 14px;
   }
 
   .modal-header {
@@ -2604,18 +2878,10 @@ body.dark .keyword-chip.is-top5 {
     padding: 12px 14px;
   }
 
-  .modal-footer {
-    padding: 10px 14px;
-    flex-direction: column-reverse;
-  }
-
-  .modal-footer button {
-    width: 100%;
-    justify-content: center;
-  }
-
   .confirm-box {
-    padding: 18px 16px;
+    padding: 18px 14px;
+    width: calc(100vw - 28px);
+    max-width: 360px;
   }
 
   .confirm-actions {
@@ -2628,18 +2894,60 @@ body.dark .keyword-chip.is-top5 {
   }
 }
 
-/* Extra Small Phones (<= 360px - e.g., Galaxy Fold outer, small Androids) */
+/* --------------------------------------------------------------------------
+   6. Ultra-Compact Phones & Narrow Foldable Outer Displays (max-width: 360px)
+   -------------------------------------------------------------------------- */
 @media (max-width: 360px) {
-  .brand-title {
+  :root {
+    --topbar-height: 50px;
+    --mobile-tabs-height: 42px;
+  }
+
+  .topbar {
+    padding: 0 6px;
+  }
+
+  .logo {
+    width: 28px;
+    height: 28px;
     font-size: 12px;
+  }
+
+  .brand {
+    gap: 5px;
+  }
+
+  .brand-title {
+    font-size: 11.5px;
+    gap: 4px;
   }
 
   .pro-tag {
     display: none;
   }
 
+  .top-actions {
+    gap: 3px;
+  }
+
+  .top-btn, .icon-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .app {
+    padding: 10px 6px calc(75px + env(safe-area-inset-bottom, 10px));
+  }
+
+  .mobile-tab {
+    font-size: 11px;
+    padding: 6px 3px;
+  }
+
   .stats {
     grid-template-columns: 1fr;
+    gap: 6px;
   }
 
   .stat-val {
@@ -2647,7 +2955,84 @@ body.dark .keyword-chip.is-top5 {
   }
 
   .card-head .card-category-tag {
-    max-width: 90px;
+    max-width: 80px;
+  }
+
+  .dna {
+    grid-template-columns: 1fr;
+  }
+
+  .category-pills-bar.is-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+
+  .phone-frame {
+    transform: scale(0.68);
+    transform-origin: center;
+  }
+
+  .brand-card {
+    width: 190px;
+    padding: 12px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   7. Mobile Landscape & Short Viewports (max-height: 520px and landscape)
+   -------------------------------------------------------------------------- */
+@media (max-height: 520px) and (orientation: landscape) {
+  :root {
+    --topbar-height: 44px;
+    --mobile-tabs-height: 38px;
+  }
+
+  .topbar {
+    height: var(--topbar-height);
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .modal-container {
+    max-height: 98vh;
+  }
+
+  .canvas-preview-column .modal-canvas {
+    height: 180px;
+  }
+
+  .hero {
+    margin-bottom: 10px;
+  }
+
+  .hero h1 {
+    font-size: 20px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   8. Print Stylesheet
+   -------------------------------------------------------------------------- */
+@media print {
+  .topbar, .mobile-tabs, .mobile-sticky-bar, .ambient-glow-wrap, .controls, .toolbar, .filters, .card-actions, .card-footer {
+    display: none !important;
+  }
+
+  .workspace {
+    display: block !important;
+  }
+
+  .results {
+    display: block !important;
+  }
+
+  .card {
+    break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    margin-bottom: 14px;
   }
 }
 
@@ -2989,11 +3374,6 @@ body.custom-gradient-bg .ambient-glow-wrap {
   gap: 24px;
   align-items: start;
 }
-@media (max-width: 860px) {
-  .modal-split-layout {
-    grid-template-columns: 1fr;
-  }
-}
 
 .canvas-preview-column {
   display: flex;
@@ -3001,6 +3381,18 @@ body.custom-gradient-bg .ambient-glow-wrap {
   gap: 12px;
   position: sticky;
   top: 0;
+}
+
+@media (max-width: 900px) {
+  .modal-split-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .canvas-preview-column {
+    position: static;
+    top: auto;
+  }
 }
 .mockup-toolbar {
   display: flex;

@@ -751,7 +751,21 @@
     }
   }
 
-  // Mobile Tabs Management
+  // Mobile & Tablet Responsive Tabs Management
+  function isMobileLayout() {
+    const tabs = document.getElementById('mobileTabs');
+    return window.innerWidth <= 900 || (tabs && window.getComputedStyle(tabs).display !== 'none');
+  }
+
+  function syncMobileStickyBar(tabKey) {
+    const stickyBar = document.querySelector('.mobile-sticky-bar');
+    if (stickyBar) {
+      const activeKey = tabKey || document.querySelector('.mobile-tab.active')?.dataset?.tab || 'generator';
+      const shouldShow = activeKey === 'generator' && isMobileLayout() && !document.body.classList.contains('modal-open');
+      stickyBar.style.display = shouldShow ? 'block' : 'none';
+    }
+  }
+
   function setupMobileTabs() {
     const tabs = document.querySelectorAll('.mobile-tab');
     const workspace = document.querySelector('.workspace');
@@ -762,25 +776,39 @@
       const initialKey = activeTab.dataset?.tab || 'generator';
       workspace.classList.remove('tab-mode-generator', 'tab-mode-results', 'tab-mode-history');
       workspace.classList.add(`tab-mode-${initialKey}`);
+      syncMobileStickyBar(initialKey);
     }
 
     tabs.forEach(tab => {
       tab.onclick = () => {
-        tabs.forEach(t => t.classList.remove('active'));
+        tabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
         tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
 
         const tabKey = tab.dataset?.tab || 'generator';
         workspace.classList.remove('tab-mode-generator', 'tab-mode-results', 'tab-mode-history');
         workspace.classList.add(`tab-mode-${tabKey}`);
+        syncMobileStickyBar(tabKey);
 
-        if (tabKey === 'results') {
-          $('resultsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else if (tabKey === 'history') {
-          $('historyPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else if (tabKey === 'generator') {
-          $('controlsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (isMobileLayout()) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          if (tabKey === 'results') {
+            $('resultsPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else if (tabKey === 'history') {
+            $('historyPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else if (tabKey === 'generator') {
+            $('controlsPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
         }
       };
+    });
+
+    window.addEventListener('resize', () => {
+      syncMobileStickyBar();
     });
   }
 
@@ -900,7 +928,7 @@
       Toast.show(`Generated ${generated.length} diverse commercial concepts!`, 'success');
 
       // On mobile, auto-switch to results tab
-      if (window.innerWidth <= 768) {
+      if (isMobileLayout()) {
         switchMobileTab('results');
       }
     } catch (err) {
@@ -1309,7 +1337,7 @@
       const d = cardId ? findDesign(cardId) : null;
       if (d) {
         if (d.category) selectCategory(d.category, false, d.subcategory || null);
-        if (window.innerWidth <= 768) switchMobileTab('generator');
+        if (isMobileLayout()) switchMobileTab('generator');
         return;
       }
     }
@@ -1318,7 +1346,7 @@
     if (catTag) {
       const catName = catTag.textContent.trim();
       selectCategory(catName, true);
-      if (window.innerWidth <= 768) switchMobileTab('generator');
+      if (isMobileLayout()) switchMobileTab('generator');
       return;
     }
 
@@ -1363,7 +1391,7 @@
       if (d.style && d.style !== 'Auto Diversity') $('style').value = d.style;
       if (d.orientation && d.orientation !== 'Auto') $('orientation').value = d.orientation;
       Toast.show(`DNA from ${d.id} set as Generator Seed!`, 'success');
-      if (window.innerWidth <= 768) switchMobileTab('generator');
+      if (isMobileLayout()) switchMobileTab('generator');
     }
 
     if (action === 'delete') {
