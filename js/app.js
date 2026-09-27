@@ -2115,6 +2115,137 @@
       };
     }
 
+
+    // Dedicated API Key Modal Logic
+    const apiKeyModal = $('apiKeyModal');
+    const modalKeyInput = $('modalApiKeyInput');
+    const modalModelSelect = $('modalModelSelect');
+    const modalVisBtn = $('modalToggleKeyVisBtn');
+    const modalTestBtn = $('modalTestKeyBtn');
+    const modalSaveBtn = $('modalSaveKeyBtn');
+    const modalClearBtn = $('modalClearKeyBtn');
+    const modalCloseBtn = $('apiKeyModalClose');
+    const modalFeedback = $('modalApiKeyFeedback');
+    const sidebarKeyOpenBtn = $('openApiKeyModalFromSidebarBtn');
+
+    function openApiKeyModal() {
+      if (!apiKeyModal) return;
+      const currentKey = AiPromptDoctor.config.apiKey || '';
+      const currentModel = AiPromptDoctor.config.model || 'gemini-3.8-flash';
+      if (modalKeyInput) modalKeyInput.value = currentKey;
+      if (modalModelSelect) modalModelSelect.value = currentModel;
+      if (modalFeedback) {
+        modalFeedback.textContent = currentKey ? 'Key currently active' : '';
+        modalFeedback.className = 'key-feedback-msg' + (currentKey ? ' success' : '');
+      }
+      apiKeyModal.classList.remove('hidden');
+      if (modalKeyInput) setTimeout(() => modalKeyInput.focus(), 100);
+    }
+
+    function closeApiKeyModal() {
+      if (apiKeyModal) apiKeyModal.classList.add('hidden');
+    }
+
+    if (modalCloseBtn) modalCloseBtn.onclick = closeApiKeyModal;
+    if (apiKeyModal) {
+      apiKeyModal.onclick = (e) => {
+        if (e.target === apiKeyModal) closeApiKeyModal();
+      };
+    }
+
+    if (sidebarKeyOpenBtn) sidebarKeyOpenBtn.onclick = openApiKeyModal;
+
+    // Connect topApiKeyBtn to open the modal directly
+    if (topKeyBtn) {
+      topKeyBtn.onclick = openApiKeyModal;
+    }
+
+    if (modalVisBtn && modalKeyInput) {
+      modalVisBtn.onclick = () => {
+        const isPass = modalKeyInput.type === 'password';
+        modalKeyInput.type = isPass ? 'text' : 'password';
+        modalVisBtn.textContent = isPass ? '🔒' : '👁';
+      };
+    }
+
+    if (modalKeyInput) {
+      modalKeyInput.oninput = () => {
+        const val = modalKeyInput.value.trim().replace(/^["']|["']$/g, '');
+        if (val.startsWith('AIzaSy')) {
+          if (modalModelSelect && (modalModelSelect.value === 'builtin' || modalModelSelect.value.startsWith('gpt'))) {
+            modalModelSelect.value = 'gemini-3.8-flash';
+          }
+        } else if (val.startsWith('sk-')) {
+          if (modalModelSelect && (modalModelSelect.value === 'builtin' || modalModelSelect.value.startsWith('gemini'))) {
+            modalModelSelect.value = 'gpt-4o-mini';
+          }
+        }
+      };
+    }
+
+    if (modalTestBtn && modalKeyInput) {
+      modalTestBtn.onclick = async () => {
+        const rawKey = modalKeyInput.value.trim().replace(/^["']|["']$/g, '');
+        modalKeyInput.value = rawKey;
+        if (!rawKey) {
+          Toast.show('Please enter an API Key first', 'warning');
+          return;
+        }
+        modalTestBtn.disabled = true;
+        modalTestBtn.textContent = 'Testing...';
+        if (modalFeedback) {
+          modalFeedback.textContent = 'Testing connection...';
+          modalFeedback.className = 'key-feedback-msg';
+        }
+        try {
+          const res = await AiPromptDoctor.testApiKey(modalModelSelect ? modalModelSelect.value : 'gemini-3.8-flash', rawKey);
+          modalTestBtn.disabled = false;
+          modalTestBtn.textContent = '⚡ Test Connection';
+          Toast.show(`✓ ${res.message}`, 'success', 3500);
+          if (modalFeedback) {
+            modalFeedback.textContent = `✓ ${res.message}`;
+            modalFeedback.className = 'key-feedback-msg success';
+          }
+          if (res.detectedModel && modalModelSelect) {
+            modalModelSelect.value = res.detectedModel;
+          }
+        } catch (err) {
+          modalTestBtn.disabled = false;
+          modalTestBtn.textContent = '⚡ Test Connection';
+          Toast.show(`✕ ${err.message}`, 'error', 4500);
+          if (modalFeedback) {
+            modalFeedback.textContent = `✕ ${err.message}`;
+            modalFeedback.className = 'key-feedback-msg error';
+          }
+        }
+      };
+    }
+
+    if (modalSaveBtn && modalKeyInput) {
+      modalSaveBtn.onclick = () => {
+        const rawKey = modalKeyInput.value.trim().replace(/^["']|["']$/g, '');
+        const selModel = modalModelSelect ? modalModelSelect.value : 'gemini-3.8-flash';
+        AiPromptDoctor.saveConfig({ apiKey: rawKey, model: selModel });
+        if (keyInput) keyInput.value = rawKey;
+        if (modelSelect) modelSelect.value = selModel;
+        updateDoctorUI();
+        Toast.show('✓ API Key & Model saved and activated!', 'success');
+        closeApiKeyModal();
+      };
+    }
+
+    if (modalClearBtn) {
+      modalClearBtn.onclick = () => {
+        AiPromptDoctor.saveConfig({ apiKey: '', model: 'builtin' });
+        if (modalKeyInput) modalKeyInput.value = '';
+        if (keyInput) keyInput.value = '';
+        if (modelSelect) modelSelect.value = 'builtin';
+        updateDoctorUI();
+        Toast.show('API Key removed. Reverted to built-in offline engine.', 'info');
+        closeApiKeyModal();
+      };
+    }
+
     if ($('autoDoctorBatchBtn')) {
       $('autoDoctorBatchBtn').onclick = async () => {
         const visible = filtered();

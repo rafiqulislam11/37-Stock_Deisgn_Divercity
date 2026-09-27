@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
   <link rel="apple-touch-icon" href="assets/logo.jpg">
-  <link rel="stylesheet" href="css/style.css?v=3.2.1">
+  <link rel="stylesheet" href="css/style.css?v=3.3.0">
 </head>
 <body>
   <!-- Ambient Gradient Background Mesh Elements -->
@@ -1000,6 +1000,66 @@
     </div>
   </div>
 
+  
+  <!-- Dedicated API Key Manager Modal -->
+  <div id="apiKeyModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="apiKeyModalTitle">
+    <div class="modal-container api-key-modal-container">
+      <div class="modal-header">
+        <div>
+          <h3 id="apiKeyModalTitle">🔑 AI API Key Configuration</h3>
+          <small class="subtle">Enter Google Gemini or OpenAI API Key (Saved safely in browser only)</small>
+        </div>
+        <button type="button" id="apiKeyModalClose" class="icon-btn" aria-label="Close API settings">✕</button>
+      </div>
+
+      <div class="modal-body api-key-modal-body">
+        <div class="api-key-intro-card">
+          <div class="api-key-intro-badge">
+            <span class="sparkle-icon">✨</span>
+            <b>Google Gemini 3.8 Flash (Latest 2026 Engine)</b>
+          </div>
+          <p>আপনার Google Gemini API Key নিচে পেস্ট করুন। এটি সম্পূর্ণ নিরাপদে কেবল আপনার ডিভাইসের লোকাল স্টোরেজে সংরক্ষিত থাকবে।</p>
+        </div>
+
+        <div class="form-group api-key-field-group">
+          <label for="modalApiKeyInput"><b>API Key:</b></label>
+          <div class="modal-key-input-row">
+            <input type="password" id="modalApiKeyInput" class="styled-input modal-key-input" placeholder="Paste your Google Gemini API Key here (starts with AIzaSy...)...">
+            <button type="button" id="modalToggleKeyVisBtn" class="ghost small key-toggle-btn" title="Show/Hide Key">👁</button>
+          </div>
+          <div id="modalApiKeyFeedback" class="key-feedback-msg"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="modalModelSelect"><b>Active AI Model:</b></label>
+          <select id="modalModelSelect" class="styled-select">
+            <option value="gemini-3.8-flash">Google Gemini 3.8 Flash (Latest 2026 - Recommended)</option>
+            <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+            <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
+            <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
+            <option value="gemini-1.5-pro">Google Gemini 1.5 Pro</option>
+            <option value="gpt-4o-mini">OpenAI GPT-4o Mini</option>
+            <option value="builtin">Built-in Neural Doctor (Offline - Free, No Key)</option>
+          </select>
+        </div>
+
+        <div class="api-key-help-box">
+          <b>ফ্রি Google Gemini API Key কীভাবে পাবেন?</b>
+          <p>Google AI Studio থেকে সম্পূর্ণ বিনামূল্যে ইনস্ট্যান্ট কি পাওয়া যায়:</p>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="free-key-direct-btn">
+            👉 Click here for 100% Free Gemini API Key from Google AI Studio ↗
+          </a>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="modalClearKeyBtn" class="ghost danger small">Clear Key</button>
+        <button type="button" id="modalTestKeyBtn" class="secondary small">⚡ Test Connection</button>
+        <button type="button" id="modalSaveKeyBtn" class="primary small">💾 Save & Activate</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Online Image Generator Preview Modal -->
   <div id="onlineImageModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="onlineImgModalTitle">
     <div class="modal-container online-img-modal-container">
@@ -1060,13 +1120,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Application Scripts (Loaded in strict dependency order) -->
-  <script src="js/data.js?v=3.2.1"></script>
-  <script src="js/metadata.js?v=3.2.1"></script>
-  <script src="js/generator.js?v=3.2.1"></script>
-  <script src="js/storage.js?v=3.2.1"></script>
-  <script src="js/csv.js?v=3.2.1"></script>
-  <script src="js/promptDoctor.js?v=3.2.1"></script>
-  <script src="js/ui.js?v=3.2.1"></script>
-  <script src="js/app.js?v=3.2.1"></script>
+  <script src="js/data.js?v=3.3.0"></script>
+  <script src="js/metadata.js?v=3.3.0"></script>
+  <script src="js/generator.js?v=3.3.0"></script>
+  <script src="js/storage.js?v=3.3.0"></script>
+  <script src="js/csv.js?v=3.3.0"></script>
+  <script src="js/promptDoctor.js?v=3.3.0"></script>
+  <script src="js/ui.js?v=3.3.0"></script>
+  <script src="js/app.js?v=3.3.0"></script>
 </body>
 </html>
