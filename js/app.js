@@ -1964,6 +1964,128 @@
     }
 
     // Batch Auto-Doctor Toolbar Button
+
+    // Doctor Direct Playground Setup
+    const doctorTestInput = $('doctorTestPrompt');
+    const doctorRunBtn = $('doctorDirectGenerateBtn');
+    const doctorSampleBtn = $('doctorInsertSampleBtn');
+    const doctorResultBox = $('doctorResultBox');
+    const doctorResultText = $('doctorResultText');
+    const doctorImpList = $('doctorImprovementsList');
+    const doctorCopyBtn = $('doctorCopyResultBtn');
+    const doctorSendBtn = $('doctorSendToResultsBtn');
+
+    if (doctorSampleBtn && doctorTestInput) {
+      doctorSampleBtn.onclick = () => {
+        const samples = [
+          "Nike running shoes floating in mid-air over dark concrete street with neon lights",
+          "Apple iPhone on luxury wooden table with coffee cup and soft morning sunlight",
+          "Coca-cola glass bottle on beach sand with sea waves and sun flare",
+          "BMW luxury sports car speeding on wet asphalt road at dusk with neon motion blur",
+          "Grainy aesthetic aura gradient abstract wallpaper with chromatic blur"
+        ];
+        const randomSample = samples[Math.floor(Math.random() * samples.length)];
+        doctorTestInput.value = randomSample;
+        Toast.show('Sample prompt loaded! Click "Polish with AI"', 'info', 2000);
+      };
+    }
+
+    if (doctorRunBtn && doctorTestInput) {
+      doctorRunBtn.onclick = async () => {
+        let text = doctorTestInput.value.trim();
+        if (!text) {
+          // If empty, take current live prompt synthesis
+          text = $('livePromptPreview')?.textContent?.trim();
+          if (!text || text.includes('Select options')) {
+            text = "Smooth gradient abstract background with soft color blend and fine grain";
+          }
+          doctorTestInput.value = text;
+        }
+
+        const activeModelName = modelSelect?.options[modelSelect.selectedIndex]?.text || 'AI Doctor';
+        doctorRunBtn.disabled = true;
+        doctorRunBtn.innerHTML = '<span class="online-spinner" style="width:14px;height:14px"></span> Polishing...';
+
+        try {
+          const res = await AiPromptDoctor.correct(text, {
+            targetEngine: selectedAiEngine,
+            profile: profileSelect ? profileSelect.value : 'stock'
+          });
+
+          doctorRunBtn.disabled = false;
+          doctorRunBtn.innerHTML = '<span class="btn-sparkle">✨</span> Polish with AI';
+
+          if (doctorResultBox && doctorResultText) {
+            doctorResultBox.classList.remove('hidden');
+            doctorResultText.textContent = res.correctedPrompt;
+            if (doctorImpList) {
+              doctorImpList.innerHTML = (res.improvements || []).map(imp =>
+                `<span class="doctor-imp-chip">✓ ${UI.esc(imp)}</span>`
+              ).join('');
+            }
+          }
+
+          Toast.show(`✓ Prompt enhanced with ${res.modelUsed || activeModelName}!`, 'success', 3500);
+
+          // Scroll to result box if needed
+          doctorResultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (err) {
+          doctorRunBtn.disabled = false;
+          doctorRunBtn.innerHTML = '<span class="btn-sparkle">✨</span> Polish with AI';
+          Toast.show(`Correction error: ${err.message}`, 'error', 4000);
+        }
+      };
+    }
+
+    if (doctorCopyBtn && doctorResultText) {
+      doctorCopyBtn.onclick = () => {
+        const txt = doctorResultText.textContent.trim();
+        if (txt) UI.copyToClipboard(txt, '✓ Enhanced prompt copied to clipboard!');
+      };
+    }
+
+    if (doctorSendBtn && doctorResultText) {
+      doctorSendBtn.onclick = () => {
+        const txt = doctorResultText.textContent.trim();
+        if (!txt) return;
+
+        const cat = $('category')?.value || '01. Gradient Abstract';
+        const sub = $('subcategory')?.value || 'Smooth Gradient';
+        const newItem = {
+          id: 'SD-DOC-' + Math.random().toString(36).substring(2, 6).toUpperCase(),
+          category: cat,
+          subcategory: sub,
+          style: $('style')?.value || 'Auto Diversity',
+          color: $('customColor')?.value || 'Vibrant',
+          lighting: $('customLighting')?.value || 'Studio Softbox',
+          texture: $('customTexture')?.value || 'Film Grain',
+          composition: $('customComposition')?.value || 'Balanced',
+          background: 'Clean commercial backdrop',
+          mood: 'Commercial',
+          prompt: txt,
+          originalPrompt: doctorTestInput?.value || txt,
+          aiCorrected: true,
+          aiDoctorModel: modelSelect?.options[modelSelect.selectedIndex]?.text || 'AI Doctor',
+          uniquenessScore: 92,
+          isFavorite: false,
+          isLocked: false,
+          aspect: $('orientation')?.value || 'Square (1:1)',
+          resolution: '8K Ultra',
+          timestamp: Date.now()
+        };
+        newItem.metadata = MetadataEngine.build(newItem, cat);
+        newItem.cssGradient = DiversityEngine.generateCssGradient(newItem.color, sub, newItem.style, newItem.background);
+
+        current.unshift(newItem);
+        history.unshift(newItem);
+        Store.save(history);
+        renderAll();
+
+        Toast.show('✓ Added to Generated Concepts cards!', 'success');
+        $('resultsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+    }
+
     if ($('autoDoctorBatchBtn')) {
       $('autoDoctorBatchBtn').onclick = async () => {
         const visible = filtered();
@@ -2143,27 +2265,36 @@
           return;
         }
 
-        // Run cloud AI enhancement on all generated prompts
-        for (const d of generated) {
-          try {
-            const res = await AiPromptDoctor.correct(d.prompt, {
-              targetEngine: d.aiEngine || selectedAiEngine
-            });
-            d.originalPrompt = d.prompt;
-            d.prompt = res.correctedPrompt;
-            d.aiCorrected = true;
-            d.aiDoctorModel = res.modelUsed;
-            d.aiImprovements = res.improvements;
-            d.metadata = MetadataEngine.build(d, d.category);
-          } catch (e) {
-            console.warn('Item correction error:', e);
-          }
-        }
-
+        // 1. Immediately display generated concepts with zero latency
         current = generated;
         history = [...generated, ...history].slice(0, 1000);
         Store.save(history);
         renderAll();
+
+        Toast.show(`✓ Generated ${generated.length} concepts! AI Doctor polishing prompts...`, 'info', 2000);
+
+        // 2. Enhance concepts with AI Doctor in background
+        (async () => {
+          for (let i = 0; i < Math.min(generated.length, 5); i++) {
+            const d = generated[i];
+            try {
+              const res = await AiPromptDoctor.correct(d.prompt, {
+                targetEngine: d.aiEngine || selectedAiEngine
+              });
+              d.originalPrompt = d.prompt;
+              d.prompt = res.correctedPrompt;
+              d.aiCorrected = true;
+              d.aiDoctorModel = res.modelUsed;
+              d.aiImprovements = res.improvements;
+              d.metadata = MetadataEngine.build(d, d.category);
+            } catch (e) {
+              console.warn('Item correction error:', e);
+            }
+          }
+          Store.save(history);
+          renderAll();
+          Toast.show(`✓ Polished concepts with ${onlineModel}!`, 'success', 3000);
+        })();
 
         Toast.show(`✓ Generated ${generated.length} Online AI Concepts with ${onlineModel}!`, 'success', 3500);
 

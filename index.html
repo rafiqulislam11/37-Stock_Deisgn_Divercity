@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
   <link rel="apple-touch-icon" href="assets/logo.jpg">
-  <link rel="stylesheet" href="css/style.css?v=3.0.0">
+  <link rel="stylesheet" href="css/style.css?v=3.1.0">
 </head>
 <body>
   <!-- Ambient Gradient Background Mesh Elements -->
@@ -336,6 +336,31 @@
                 <div id="apiKeyFeedback" class="key-feedback-msg"></div>
                 <div class="key-help-row">
                   <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="free-key-link">🔑 Get Free Google Gemini API Key (Instant) ↗</a>
+                </div>
+              </div>
+
+                            <!-- Direct Test & Custom Prompt Polish Box -->
+              <div class="doctor-playground">
+                <div class="playground-label-row">
+                  <label for="doctorTestPrompt"><b>Instant AI Prompt Polish & Rewrite:</b></label>
+                  <button type="button" id="doctorInsertSampleBtn" class="mini-text-btn">Try Sample Prompt</button>
+                </div>
+                <div class="doctor-input-row">
+                  <textarea id="doctorTestPrompt" class="styled-textarea doctor-textarea" rows="2" placeholder="Write or paste any prompt to test AI rewrite (e.g. Nike running shoes floating over neon cyber background)..."></textarea>
+                  <button type="button" id="doctorDirectGenerateBtn" class="primary doctor-run-btn" title="Run AI Doctor Rewrite Now">
+                    <span class="btn-sparkle">✨</span> Polish with AI
+                  </button>
+                </div>
+                <div id="doctorResultBox" class="doctor-result-box hidden">
+                  <div class="doctor-result-head">
+                    <span class="result-badge">✓ AI Polished Commercial Prompt</span>
+                    <div class="doctor-res-actions">
+                      <button type="button" id="doctorSendToResultsBtn" class="mini-copy-btn" title="Add as a generated card on the right panel">📥 Add to Cards</button>
+                      <button type="button" id="doctorCopyResultBtn" class="mini-copy-btn" title="Copy to clipboard">📋 Copy</button>
+                    </div>
+                  </div>
+                  <p id="doctorResultText" class="doctor-result-text"></p>
+                  <div id="doctorImprovementsList" class="doctor-improvements-strip"></div>
                 </div>
               </div>
 
@@ -1028,13 +1053,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Application Scripts (Loaded in strict dependency order) -->
-  <script src="js/data.js?v=3.0.0"></script>
-  <script src="js/metadata.js?v=3.0.0"></script>
-  <script src="js/generator.js?v=3.0.0"></script>
-  <script src="js/storage.js?v=3.0.0"></script>
-  <script src="js/csv.js?v=3.0.0"></script>
-  <script src="js/promptDoctor.js?v=3.0.0"></script>
-  <script src="js/ui.js?v=3.0.0"></script>
-  <script src="js/app.js?v=3.0.0"></script>
+  <script src="js/data.js?v=3.1.0"></script>
+  <script src="js/metadata.js?v=3.1.0"></script>
+  <script src="js/generator.js?v=3.1.0"></script>
+  <script src="js/storage.js?v=3.1.0"></script>
+  <script src="js/csv.js?v=3.1.0"></script>
+  <script src="js/promptDoctor.js?v=3.1.0"></script>
+  <script src="js/ui.js?v=3.1.0"></script>
+  <script src="js/app.js?v=3.1.0"></script>
 </body>
 </html>
