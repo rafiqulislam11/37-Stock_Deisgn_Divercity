@@ -143,7 +143,72 @@ window.DiversityEngine = (() => {
       dna.subcategory = settings.subcategory && settings.subcategory !== 'Auto Diversity' ? settings.subcategory : null;
     }
 
+    // Resolution, Grain Effect & AI Engine resolution
+    dna.grainEffect = settings.grainEffect || 'grain';
+    dna.resolution = settings.resolution || '8K';
+    dna.aiEngine = settings.aiEngine || 'midjourney';
+
+    // Compute live real-time CSS gradient
+    dna.cssGradient = generateCssGradient(dna.color, dna.subcategory || dna.category, dna.style, dna.background);
+
     return dna;
+  }
+
+  // Generate high-fidelity CSS gradient representing the design DNA
+  function generateCssGradient(colorName, catOrSub, styleName, bgName) {
+    const presets = D.gradientPresets || {};
+    let baseGradient = presets[colorName] || '';
+    if (!baseGradient) {
+      const keys = Object.keys(presets);
+      if (keys.length) {
+        const hash = String(colorName || 'Mesh').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+        baseGradient = presets[keys[hash % keys.length]];
+      } else {
+        baseGradient = 'linear-gradient(135deg, #6366f1 0%, #ec4899 50%, #06b6d4 100%)';
+      }
+    }
+
+    const testStr = String((catOrSub || '') + ' ' + (bgName || '') + ' ' + (styleName || '')).toLowerCase();
+
+    // Radial Zoom Rays / Light Burst / Warp
+    if (testStr.includes('burst') || testStr.includes('zoom') || testStr.includes('rays') || testStr.includes('warp') || testStr.includes('flare')) {
+      return "radial-gradient(circle at 50% 50%, #ffffff 0%, #fffbe6 4%, rgba(255, 235, 130, 0.95) 9%, rgba(255, 90, 40, 0.85) 18%, rgba(225, 29, 72, 0.5) 30%, transparent 65%), repeating-conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,0.85) 0deg 0.8deg, transparent 0.8deg 2.6deg, rgba(255,255,255,0.5) 2.6deg 3.2deg, transparent 3.2deg 5.8deg), conic-gradient(from 270deg at 50% 50%, #00f2fe 0deg, #3b82f6 40deg, #8b5cf6 75deg, #ec4899 110deg, #ff0844 145deg, #f97316 180deg, #facc15 215deg, #22c55e 255deg, #06b6d4 295deg, #00f2fe 360deg)";
+    }
+
+    // Pattern Overlays
+    if (testStr.includes('checkerboard')) return `repeating-conic-gradient(rgba(255,255,255,0.22) 0% 25%, transparent 0% 50%) 50% / 28px 28px, ${baseGradient}`;
+    if (testStr.includes('dot') || testStr.includes('polka')) return `radial-gradient(circle, rgba(255,255,255,0.35) 18%, transparent 19%) 0 0 / 18px 18px, ${baseGradient}`;
+    if (testStr.includes('grid') || testStr.includes('wireframe')) return `linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px) 0 0 / 22px 22px, linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px) 0 0 / 22px 22px, ${baseGradient}`;
+    if (testStr.includes('stripe')) return `repeating-linear-gradient(45deg, rgba(255,255,255,0.18) 0 10px, transparent 10px 20px), ${baseGradient}`;
+    if (testStr.includes('zigzag')) return `repeating-linear-gradient(135deg, rgba(255,255,255,0.18) 0 8px, transparent 8px 16px), repeating-linear-gradient(45deg, rgba(255,255,255,0.18) 0 8px, transparent 8px 16px), ${baseGradient}`;
+    if (testStr.includes('hexagon') || testStr.includes('honeycomb')) return `repeating-conic-gradient(from 30deg at 50% 50%, rgba(255,255,255,0.15) 0deg 60deg, transparent 60deg 120deg) 0 0 / 28px 28px, ${baseGradient}`;
+    if (testStr.includes('wave') || testStr.includes('ripple')) return `radial-gradient(ellipse at 50% 0%, transparent 40%, rgba(255,255,255,0.25) 42%, transparent 45%) 0 0 / 36px 20px, radial-gradient(ellipse at 50% 100%, transparent 40%, rgba(255,255,255,0.25) 42%, transparent 45%) 18px 0 / 36px 20px, ${baseGradient}`;
+    if (testStr.includes('spiral') || testStr.includes('mandala')) return `repeating-conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,0.22) 0deg 8deg, transparent 8deg 16deg), ${baseGradient}`;
+
+    // Material & Aesthetic Overlays
+    if (testStr.includes('mesh') || testStr.includes('fluid') || testStr.includes('liquid')) {
+      return "radial-gradient(circle at 75% 25%, #f43f5e 0%, #a855f7 35%, #06b6d4 75%, #0f172a 100%)";
+    }
+    if (testStr.includes('aura') || testStr.includes('glow')) {
+      return "radial-gradient(circle at 45% 40%, #fdba74 0%, #f472b6 35%, #818cf8 70%, #1e1b4b 100%)";
+    }
+    if (testStr.includes('glass') || testStr.includes('frosted')) {
+      return "linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(203,213,225,0.2) 50%, rgba(148,163,184,0.3) 100%), linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%)";
+    }
+    if (testStr.includes('marble')) {
+      return "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 40%, #eab308 50%, #f1f5f9 100%)";
+    }
+    if (testStr.includes('neon') || testStr.includes('cyber')) {
+      return "radial-gradient(circle at 50% 50%, #00f2fe 0%, #7f00ff 50%, #09090b 100%)";
+    }
+    if (testStr.includes('metallic') || testStr.includes('chrome')) {
+      return "linear-gradient(135deg, #f1f5f9 0%, #94a3b8 35%, #e2e8f0 50%, #475569 80%, #cbd5e1 100%)";
+    }
+    if (testStr.includes('luxury') || testStr.includes('gold')) {
+      return "linear-gradient(135deg, #09090b 0%, #27272a 50%, #ca8a04 80%, #fef08a 100%)";
+    }
+
+    return baseGradient;
   }
 
   // Generate commercial prompt text
@@ -167,7 +232,22 @@ window.DiversityEngine = (() => {
 
     const orientationStr = (dna.orientation || 'Landscape').replace(/[\(\)]/g, ' ');
 
-    return `${subCatPrefix}${cat}, ${traitsText}${dna.style.toLowerCase()} aesthetic, ${dna.composition.toLowerCase()}, featuring ${dna.shape.toLowerCase()} elements, ${dna.color.toLowerCase()} palette, ${dna.background.toLowerCase()}, ${dna.lighting.toLowerCase()}, ${dna.texture.toLowerCase()}, ${dna.density.toLowerCase()}, subject positioned ${dna.position.toLowerCase()}, ${copyText}${orientationStr.toLowerCase().trim()} aspect framing, ${styleTrait}${qualityText}${customTagsInject}clean visual hierarchy, impeccable spacing, commercial stock asset quality, 8k resolution, no watermark, no signatures, no trademarks, no copyrighted characters, no distorted artifacts.`;
+    // Texture effect prompt modifier
+    const grainMap = D.grainEffectMap || {};
+    const grainKey = dna.grainEffect || settings.grainEffect || 'grain';
+    const grainText = grainMap[grainKey] && grainMap[grainKey].prompt ? `${grainMap[grainKey].prompt}, ` : '';
+
+    // Resolution prompt modifier
+    const resMap = D.resolutionMap || {};
+    const resKey = dna.resolution || settings.resolution || '8K';
+    const resText = resMap[resKey] && resMap[resKey].prompt ? `${resMap[resKey].prompt}, ` : '8k resolution, ';
+
+    // Target AI engine prompt formatting
+    const aiEngine = dna.aiEngine || settings.aiEngine || 'midjourney';
+    const aiMap = D.aiEngineMap || {};
+    const aiSuffix = aiMap[aiEngine] && aiMap[aiEngine].suffix ? ` ${aiMap[aiEngine].suffix}` : '';
+
+    return `${subCatPrefix}${cat}, ${traitsText}${dna.style.toLowerCase()} aesthetic, ${dna.composition.toLowerCase()}, featuring ${dna.shape.toLowerCase()} elements, ${dna.color.toLowerCase()} palette, ${dna.background.toLowerCase()}, ${dna.lighting.toLowerCase()}, ${grainText}${dna.texture.toLowerCase()}, ${dna.density.toLowerCase()}, subject positioned ${dna.position.toLowerCase()}, ${copyText}${orientationStr.toLowerCase().trim()} aspect framing, ${styleTrait}${qualityText}${customTagsInject}clean visual hierarchy, impeccable spacing, commercial stock asset quality, ${resText}no watermark, no signatures, no trademarks, no copyrighted characters, no distorted artifacts.${aiSuffix}`;
   }
 
   // Batch generation with diversity filtering
@@ -195,6 +275,7 @@ window.DiversityEngine = (() => {
 
         // Pre-build metadata package with full 49-keyword engine
         dna.metadata = window.MetadataEngine.build(dna, dna.category);
+        dna.negativePrompt = dna.metadata.negativePrompt;
 
         out.push(dna);
       }
@@ -208,6 +289,8 @@ window.DiversityEngine = (() => {
     similarity,
     diversityScore,
     buildPrompt,
-    getContextualCopySpace
+    getContextualCopySpace,
+    generateCssGradient
   };
 })();
+

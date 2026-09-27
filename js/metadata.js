@@ -248,6 +248,9 @@ window.MetadataEngine = (() => {
       shCategory = 'Technology';
     }
 
+    // Commercial Rejection Shield Negative Prompt Generator
+    const negativePrompt = generateNegativePrompt(dna);
+
     return {
       title,
       description: desc,
@@ -261,13 +264,35 @@ window.MetadataEngine = (() => {
       secondaryCategory: 'Backgrounds/Textures',
       aiContent: 'Generative AI Concept',
       commercialUse: 'Commercial Royalty-Free',
-      keywordCount: finalKeywords.length
+      keywordCount: finalKeywords.length,
+      negativePrompt
     };
+  }
+
+  // Commercial Rejection Shield / Negative Prompt Generator
+  function generateNegativePrompt(d) {
+    const eff = (d && d.grainEffect) || 'grain';
+    const bg = String(d && (d.background || d.subcategory || d.category) || '');
+    const isBurst = bg.includes('Burst') || bg.includes('Zoom') || bg.includes('Rays') || bg.includes('Warp') || bg.includes('Flare');
+    const isPattern = bg.includes('Pattern') || bg.includes('Grid') || bg.includes('Mosaic');
+
+    if (isBurst) {
+      return 'watermark, signature, logo, text typo, jpeg compression artifacts, distorted geometry, ugly seams, oversaturated color banding, cropped frame, copyrighted character, poor lighting';
+    } else if (isPattern) {
+      return 'broken seams, non-repeating tile boundaries, misaligned grid lines, blurred pattern edges, watermark, signature, logo, text typo, jpeg compression artifacts, ugly seams, oversaturated color banding, cropped frame, copyrighted character, poor lighting';
+    } else if (eff === 'grain' || eff === 'noise') {
+      return 'blurry out of focus lens, watermark, signature, logo, text typo, jpeg compression artifacts, distorted shapes, ugly seams, oversaturated color banding, cropped frame, copyrighted character, poor lighting';
+    } else if (eff === 'blur') {
+      return 'harsh gritty noise, pixelated noise artifacts, watermark, signature, logo, text typo, jpeg compression artifacts, ugly seams, oversaturated color banding, cropped frame, copyrighted character, poor lighting';
+    }
+    return 'blurry, low resolution, watermark, signature, logo, text typo, jpeg artifacts, noise grain artifacts, distorted shapes, ugly seams, oversaturated banding, cropped frame, copyrighted character, poor lighting';
   }
 
   return {
     build,
     extractWords,
-    sanitizeKeyword
+    sanitizeKeyword,
+    generateNegativePrompt
   };
 })();
+

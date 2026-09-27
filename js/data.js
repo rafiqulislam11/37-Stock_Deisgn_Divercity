@@ -1749,5 +1749,52 @@ window.STOCK_DATA = {
       if (key.toLowerCase().includes(str) || str.includes(entry.name.toLowerCase())) return entry;
     }
     return null;
+  },
+
+  // Color gradient definitions for high-fidelity real-time rendering
+  gradientPresets: {
+    "Sunset Peach to Magenta": "linear-gradient(135deg, #ff7e5f 0%, #feb47b 45%, #ff2a85 100%)",
+    "Cyberpunk Cyan & Violet": "linear-gradient(135deg, #00f2fe 0%, #4facfe 35%, #7f00ff 100%)",
+    "Nordic Pastel Haze": "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+    "Emerald Matrix Glow": "linear-gradient(135deg, #052e16 0%, #10b981 50%, #6ee7b7 100%)",
+    "Liquid Gold & Obsidian": "linear-gradient(135deg, #09090b 0%, #27272a 40%, #eab308 85%, #fef08a 100%)",
+    "Holographic Aurora Borealis": "linear-gradient(135deg, #43e97b 0%, #38f9d7 35%, #667eea 70%, #764ba2 100%)",
+    "Ultra Violet Velvet": "linear-gradient(135deg, #18002e 0%, #4c1d95 50%, #c084fc 100%)",
+    "Electric Acid Lime": "linear-gradient(135deg, #84cc16 0%, #10b981 45%, #06b6d4 100%)",
+    "Solar Flare Orange": "linear-gradient(135deg, #fef08a 0%, #f97316 50%, #dc2626 100%)",
+    "Deep Ocean Abyss": "linear-gradient(135deg, #082f49 0%, #0369a1 50%, #38bdf8 100%)",
+    "Black and gold": "linear-gradient(135deg, #09090b 0%, #27272a 60%, #eab308 100%)",
+    "Silver metallic": "linear-gradient(135deg, #f1f5f9 0%, #94a3b8 50%, #475569 100%)",
+    "Earth tone": "linear-gradient(135deg, #d97706 0%, #78350f 50%, #451a03 100%)",
+    "Monochrome": "linear-gradient(135deg, #e4e4e7 0%, #71717a 50%, #18181b 100%)",
+    "Rose Gold Shimmer": "linear-gradient(135deg, #fbcfe8 0%, #f472b6 40%, #fb7185 80%, #fda4af 100%)",
+    "Cosmic Lavender": "linear-gradient(135deg, #2e1065 0%, #7e22ce 50%, #d8b4fe 100%)"
+  },
+
+  // Grain, noise & blur texture configurations
+  grainEffectMap: {
+    none: { label: "None", class: "", prompt: "smooth gradient finish, crystal clean surface" },
+    blur: { label: "Soft Blur", class: "has-blur", prompt: "dreamy soft gaussian blur gradient, ethereal diffused aura glow, silky smooth transitions, atmospheric blur wallpaper" },
+    grain: { label: "Film Grain", class: "has-grain", prompt: "authentic tactile film grain texture, analog 35mm film grain overlay, tactile surface, grainy aesthetic gradient wallpaper, subtle noise stippling" },
+    noise: { label: "Heavy Noise", class: "has-noise", prompt: "heavy analog noise grain, lo-fi grit texture, gritty chromatic noise overlay, retro noise dithering, high-frequency noise wallpaper" },
+    frosted: { label: "Frosted Blur", class: "has-frosted", prompt: "frosted glassmorphism blur, translucent frosted glass surface texture, diffused light refraction, milky frosted glass overlay" }
+  },
+
+  // Resolution presets
+  resolutionMap: {
+    "4K": { label: "4K UHD", prompt: "4k resolution, 3840x2160 ultra-high-definition, hyper-detailed" },
+    "6K": { label: "6K", prompt: "6k resolution, 6144x3456 cinema-grade fine detail" },
+    "8K": { label: "8K Ultra", prompt: "8k resolution, 7680x4320 masterwork ultra-fine stock quality" },
+    "Vector SVG": { label: "Vector SVG", prompt: "clean scalable vector SVG contour aesthetic, crisp bezier paths, zero artifacts" }
+  },
+
+  // AI Target Engine presets
+  aiEngineMap: {
+    "midjourney": { label: "Midjourney v6.1", suffix: "--v 6.1 --style raw" },
+    "dalle3": { label: "DALL-E 3", suffix: "ultra-high commercial stock photography, masterpiece quality" },
+    "flux": { label: "Flux.1 Pro", suffix: "photorealistic texture, state-of-the-art cinematic lighting" },
+    "sdxl": { label: "Stable Diffusion XL", suffix: "masterpiece, 8k resolution, trending on ArtStation" },
+    "firefly": { label: "Adobe Firefly 3", suffix: "commercial stock asset, clean composition, Adobe Stock ready" }
   }
 };
+

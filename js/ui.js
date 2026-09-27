@@ -112,15 +112,32 @@ window.UI = {
     document.body.removeChild(ta);
   },
 
-  // Render Single Concept Card
+  // Render Single Concept Card with Live Gradient Banner and Texture Overlay
   card(d) {
     const meta = d.metadata || window.MetadataEngine.build(d, d.category);
     d.metadata = meta;
 
     const topKeywordsPreview = (meta.keywords || []).slice(0, 8).join(', ');
+    const gradient = d.cssGradient || (window.DiversityEngine && window.DiversityEngine.generateCssGradient(d.color, d.subcategory || d.category, d.style, d.background)) || 'linear-gradient(135deg, #6366f1 0%, #ec4899 50%, #06b6d4 100%)';
+    d.cssGradient = gradient;
+
+    const grainKey = d.grainEffect || 'grain';
+    const grainClass = window.STOCK_DATA?.grainEffectMap?.[grainKey]?.class || '';
+    const testStr = String((d.category || '') + ' ' + (d.subcategory || '') + ' ' + (d.background || '')).toLowerCase();
+    const isBurst = testStr.includes('burst') || testStr.includes('zoom') || testStr.includes('rays') || testStr.includes('warp');
+    const burstClass = isBurst ? 'has-burst' : '';
 
     return `
       <article class="card ${d.favorite ? 'is-fav' : ''} ${d.locked ? 'is-locked' : ''}" data-card-id="${d.id}">
+        <!-- Live Visual CSS Gradient Banner with Real-time Texture Overlay -->
+        <div class="gradient-banner ${burstClass} ${grainClass}" style="background: ${gradient};" data-action="metadata" data-id="${d.id}" title="Click to Inspect Fullscreen Mockup & 49 Keywords">
+          <span class="gradient-banner-badge">${this.esc(d.subcategory || d.category)}</span>
+          <div class="gradient-banner-actions">
+            <button type="button" class="mini-copy-btn" data-action="copy-css" data-id="${d.id}" title="Copy CSS Gradient Code">CSS</button>
+            <button type="button" class="mini-copy-btn" data-action="copy" data-id="${d.id}" title="Copy Prompt">Prompt</button>
+          </div>
+        </div>
+
         <div class="card-head">
           <div class="id-badge-wrap">
             <span class="id">${this.esc(d.id)}</span>
@@ -162,11 +179,13 @@ window.UI = {
           <span><b>Color:</b> ${this.esc(d.color)}</span>
           <span><b>Light:</b> ${this.esc(d.lighting)}</span>
           <span><b>Frame:</b> ${this.esc(d.orientation)}</span>
+          ${d.grainEffect && d.grainEffect !== 'none' ? `<span><b>Texture:</b> ${this.esc(d.grainEffect)}</span>` : ''}
+          ${d.resolution ? `<span><b>Res:</b> ${this.esc(d.resolution)}</span>` : ''}
         </div>
 
         <div class="prompt" title="Full generation prompt">${this.esc(d.prompt)}</div>
 
-        <div class="meta-preview" data-action="metadata" data-id="${d.id}" title="Click to open 49-Keywords Metadata Inspector">
+        <div class="meta-preview" data-action="metadata" data-id="${d.id}" title="Click to open 49-Keywords Metadata Inspector & Live Mockups">
           <div class="meta-preview-header">
             <span class="meta-preview-title">${this.esc(meta.title)}</span>
             <span class="meta-preview-badge">${meta.keywordCount || 49} Tags</span>
@@ -178,8 +197,8 @@ window.UI = {
           <button class="small" data-action="copy" data-id="${d.id}" title="Copy generation prompt">
             📋 Prompt
           </button>
-          <button class="small btn-keywords" data-action="metadata" data-id="${d.id}" title="View & copy 49 keywords">
-            🏷 49 Tags
+          <button class="small btn-keywords" data-action="metadata" data-id="${d.id}" title="View & copy 49 keywords and live mockups">
+            🏷 49 Tags & Mockups
           </button>
           <button class="small" data-action="regenerate" data-id="${d.id}" title="Regenerate this single slot">
             🔄 Replace
@@ -213,10 +232,22 @@ window.UI = {
 
     body.innerHTML = arr.slice(0, 150).map(d => {
       const meta = d.metadata || window.MetadataEngine.build(d, d.category);
+      const gradient = d.cssGradient || (window.DiversityEngine && window.DiversityEngine.generateCssGradient(d.color, d.subcategory || d.category, d.style, d.background)) || '';
+      const grainKey = d.grainEffect || 'grain';
+      const grainClass = window.STOCK_DATA?.grainEffectMap?.[grainKey]?.class || '';
+      const testStr = String((d.category || '') + ' ' + (d.subcategory || '') + ' ' + (d.background || '')).toLowerCase();
+      const isBurst = testStr.includes('burst') || testStr.includes('zoom') || testStr.includes('rays') || testStr.includes('warp');
+      const burstClass = isBurst ? 'has-burst' : '';
+
       return `
         <tr>
           <td><b style="color:var(--accent-primary)">${this.esc(d.id)}</b></td>
-          <td>${this.esc(d.category)}</td>
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="history-thumb ${burstClass} ${grainClass}" style="background:${gradient};" data-action="metadata" data-id="${d.id}" title="Inspect Mockup"></span>
+              <span>${this.esc(d.category)}</span>
+            </div>
+          </td>
           <td><span class="card-subcategory-tag">${this.esc(d.subcategory || d.style || '—')}</span></td>
           <td>${this.esc(d.style)}</td>
           <td>${this.esc(d.composition)}</td>
@@ -226,8 +257,8 @@ window.UI = {
           <td style="color:${d.favorite ? 'var(--star-gold)' : 'var(--text-muted)'}">${d.favorite ? '★' : '—'}</td>
           <td>
             <div class="table-action-btns">
-              <button class="mini-copy-btn" data-action="metadata" data-id="${d.id}" title="View Metadata">Tags</button>
-              <button class="mini-copy-btn" data-action="copy" data-id="${d.id}" title="Copy Prompt">Copy</button>
+              <button class="mini-copy-btn" data-action="metadata" data-id="${d.id}" title="View Metadata & Mockup">Mockup</button>
+              <button class="mini-copy-btn" data-action="copy" data-id="${d.id}" title="Copy Prompt">Prompt</button>
               <button class="mini-copy-btn danger" data-action="delete" data-id="${d.id}" title="Delete">✕</button>
             </div>
           </td>

@@ -10,6 +10,12 @@
   let activeModalDesign = null;
   let currentEngineMode = localStorage.getItem('stockTaxonomyMode') || 'abstract';
 
+  let selectedGrainEffect = 'grain';
+  let selectedResolution = '8K';
+  let selectedAiEngine = 'midjourney';
+  let activeGradientCss = '';
+  let isAppBgCustom = false;
+
   const variations = STOCK_DATA.variation;
 
   function init() {
@@ -92,6 +98,9 @@
     setupSubcategoryPills();
     setupCatalogModal();
     setupSurpriseButton();
+    setupChipsAndPresets();
+    setupAppBackdrop();
+    updateActiveSelectionTag();
 
     // 13. Load initial view
     if (history.length) {
@@ -853,6 +862,9 @@
       category,
       subcategory,
       mode: currentEngineMode,
+      grainEffect: selectedGrainEffect,
+      resolution: selectedResolution,
+      aiEngine: selectedAiEngine,
       batch: Math.min(250, Math.max(1, +$('batch').value || 10)),
       threshold: +$('threshold').value,
       variations: variationsSelected,
@@ -1033,6 +1045,50 @@
       }
     };
 
+    // Mockup switcher buttons inside modal
+    document.querySelectorAll('.mockup-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.mockup-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const mode = btn.dataset.mockup;
+        const d = activeModalDesign;
+        const isBurst = String((d?.category || '') + ' ' + (d?.subcategory || '') + ' ' + (d?.background || '')).toLowerCase().includes('burst');
+        const burstClass = isBurst ? 'has-burst' : '';
+        const grainKey = d?.grainEffect || selectedGrainEffect || 'grain';
+        const grainClass = STOCK_DATA?.grainEffectMap?.[grainKey]?.class || '';
+        const modalCanvas = $('modalCanvas');
+        if (modalCanvas) {
+          modalCanvas.className = `modal-canvas ${mode} ${burstClass} ${grainClass}`;
+        }
+      };
+    });
+
+    // Copy CSS Gradient button inside modal
+    if ($('modalCopyCssBtn')) {
+      $('modalCopyCssBtn').onclick = () => {
+        if (!activeModalDesign) return;
+        const cssCode = `background: ${activeModalDesign.cssGradient || activeGradientCss};`;
+        UI.copyToClipboard(cssCode, '✓ CSS Gradient code copied!');
+      };
+    }
+
+    // Apply Background to app from inside modal
+    if ($('modalApplyBgBtn')) {
+      $('modalApplyBgBtn').onclick = () => {
+        if (!activeModalDesign) return;
+        applyAppBackdrop(activeModalDesign.cssGradient);
+      };
+    }
+
+    // Copy Negative Prompt button
+    if ($('modalCopyNegBtn')) {
+      $('modalCopyNegBtn').onclick = () => {
+        if (!activeModalDesign) return;
+        const neg = $('modalNegPromptText') ? $('modalNegPromptText').textContent : '';
+        UI.copyToClipboard(neg, '✓ Rejection Shield Negative Prompt copied!');
+      };
+    }
+
     // Download Single Design Asset Package (.txt)
     if ($('modalDownloadSingleBtn')) {
       $('modalDownloadSingleBtn').onclick = () => {
@@ -1176,6 +1232,27 @@
     $('modalKeywordCountBadge').textContent = `${meta.keywords.length} / 49`;
     $('modalPromptText').textContent = design.prompt;
 
+    // Canvas Preview & Mockups Initialization
+    const testStr = String((design.category || '') + ' ' + (design.subcategory || '') + ' ' + (design.background || '')).toLowerCase();
+    const isBurst = testStr.includes('burst') || testStr.includes('zoom') || testStr.includes('rays') || testStr.includes('warp');
+    const burstClass = isBurst ? 'has-burst' : '';
+    const grainKey = design.grainEffect || selectedGrainEffect || 'grain';
+    const grainClass = STOCK_DATA?.grainEffectMap?.[grainKey]?.class || '';
+    const modalCanvas = $('modalCanvas');
+    if (modalCanvas) {
+      modalCanvas.className = `modal-canvas clean ${burstClass} ${grainClass}`;
+      modalCanvas.style.background = design.cssGradient || DiversityEngine.generateCssGradient(design.color, design.subcategory || design.category, design.style, design.background);
+    }
+    activeGradientCss = design.cssGradient || '';
+
+    // Reset mockup active chip
+    document.querySelectorAll('.mockup-btn').forEach(b => b.classList.toggle('active', b.dataset.mockup === 'clean'));
+
+    // Populate Negative Prompt Preview
+    if ($('modalNegPromptText')) {
+      $('modalNegPromptText').textContent = design.negativePrompt || MetadataEngine.generateNegativePrompt(design);
+    }
+
     // Render Keyword Chips
     const chipsContainer = $('modalKeywordChips');
     chipsContainer.innerHTML = meta.keywords.map((kw, i) => {
@@ -1309,6 +1386,11 @@
 
     if (action === 'copy') {
       UI.copyToClipboard(d.prompt, 'Prompt copied to clipboard!');
+    }
+
+    if (action === 'copy-css') {
+      const gradient = d.cssGradient || DiversityEngine.generateCssGradient(d.color, d.subcategory || d.category, d.style, d.background);
+      UI.copyToClipboard(`background: ${gradient};`, '✓ CSS Background gradient copied!');
     }
 
     if (action === 'metadata') {
@@ -1484,6 +1566,125 @@
       renderAll();
       Toast.show(`Deleted visible designs.`, 'info');
     });
+  };
+
+  // Setup Chips, Presets, and Backdrop Controls
+  function setupChipsAndPresets() {
+    // 1. Texture Chips
+    document.querySelectorAll('.texture-chip').forEach(chip => {
+      chip.onclick = () => {
+        document.querySelectorAll('.texture-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        selectedGrainEffect = chip.dataset.grain;
+        if ($('grainLabel')) $('grainLabel').textContent = STOCK_DATA?.grainEffectMap?.[selectedGrainEffect]?.label || selectedGrainEffect;
+        Toast.show(`Texture set to ${STOCK_DATA?.grainEffectMap?.[selectedGrainEffect]?.label || selectedGrainEffect}`, 'info');
+        updateActiveSelectionTag();
+        updateLiveConceptPreview();
+      };
+    });
+
+    // 2. Target AI Engine Chips
+    document.querySelectorAll('.engine-chip').forEach(chip => {
+      chip.onclick = () => {
+        document.querySelectorAll('.engine-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        selectedAiEngine = chip.dataset.engine;
+        if ($('aiEngineLabel')) $('aiEngineLabel').textContent = STOCK_DATA?.aiEngineMap?.[selectedAiEngine]?.label || selectedAiEngine;
+        Toast.show(`AI Engine target set to ${STOCK_DATA?.aiEngineMap?.[selectedAiEngine]?.label}`, 'info');
+        updateLiveConceptPreview();
+      };
+    });
+
+    // 3. Resolution Chips
+    document.querySelectorAll('.res-chip').forEach(chip => {
+      chip.onclick = () => {
+        document.querySelectorAll('.res-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        selectedResolution = chip.dataset.res;
+        if ($('resLabel')) $('resLabel').textContent = STOCK_DATA?.resolutionMap?.[selectedResolution]?.label || selectedResolution;
+        Toast.show(`Resolution set to ${selectedResolution}`, 'info');
+        updateLiveConceptPreview();
+      };
+    });
+
+    // 4. Quick Preset Chips
+    document.querySelectorAll('.preset-chip').forEach(chip => {
+      chip.onclick = () => {
+        document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const cat = chip.dataset.cat;
+        const sub = chip.dataset.sub;
+        const grain = chip.dataset.grain;
+
+        if (cat) selectCategory(cat, true);
+        if (sub) {
+          setTimeout(() => selectSubcategory(sub, true), 80);
+        }
+        if (grain) {
+          selectedGrainEffect = grain;
+          document.querySelectorAll('.texture-chip').forEach(c => c.classList.toggle('active', c.dataset.grain === grain));
+          if ($('grainLabel')) $('grainLabel').textContent = STOCK_DATA?.grainEffectMap?.[grain]?.label || grain;
+        }
+
+        updateActiveSelectionTag();
+        generate();
+        Toast.show(`Applied preset: ${chip.textContent.trim()}`, 'success');
+      };
+    });
+  }
+
+  function setupAppBackdrop() {
+    if ($('applyAppBgBtn')) {
+      $('applyAppBgBtn').onclick = () => {
+        const grad = activeGradientCss || (current[0] && current[0].cssGradient) || 'radial-gradient(circle at 50% 50%, #6366f1 0%, #ec4899 50%, #06b6d4 100%)';
+        applyAppBackdrop(grad);
+      };
+    }
+  }
+
+  function applyAppBackdrop(gradientCss) {
+    if (!isAppBgCustom && gradientCss) {
+      document.body.style.setProperty('--custom-app-bg', gradientCss);
+      document.body.classList.add('custom-gradient-bg');
+      isAppBgCustom = true;
+      if ($('applyAppBgBtn')) $('applyAppBgBtn').textContent = '↺ Reset BG';
+      Toast.show('🎨 Applied background to studio backdrop!', 'success');
+    } else {
+      document.body.classList.remove('custom-gradient-bg');
+      document.body.style.removeProperty('--custom-app-bg');
+      isAppBgCustom = false;
+      if ($('applyAppBgBtn')) $('applyAppBgBtn').textContent = '🎨 Apply to App';
+      Toast.show('↺ Reverted app background to default.', 'info');
+    }
+  }
+
+  function updateActiveSelectionTag() {
+    const tag = $('activeSelectionTag');
+    if (!tag) return;
+    const cat = $('category') ? $('category').value : 'Auto Diversity';
+    const sub = $('subcategory') && $('subcategory').value !== 'Auto Diversity' ? ` • ${$('subcategory').value}` : '';
+    const grain = STOCK_DATA?.grainEffectMap?.[selectedGrainEffect]?.label || 'Film Grain';
+    tag.textContent = `Active: ${cat}${sub} [${grain}]`;
+  }
+
+  // Global window helpers for inline action bindings
+  window.copyCss = function(id) {
+    const item = current.find(x => x.id === id) || history.find(x => x.id === id);
+    if (!item || !item.cssGradient) return;
+    UI.copyToClipboard(`background: ${item.cssGradient};`, '✓ CSS Background gradient copied!');
+  };
+
+  window.copyPrompt = function(id) {
+    const item = current.find(x => x.id === id) || history.find(x => x.id === id);
+    if (!item) return;
+    UI.copyToClipboard(item.prompt, '✓ Prompt copied to clipboard!');
+  };
+
+  window.copyKeywords = function(id) {
+    const item = current.find(x => x.id === id) || history.find(x => x.id === id);
+    if (!item) return;
+    const meta = item.metadata || MetadataEngine.build(item, item.category);
+    UI.copyToClipboard(meta.keywords.join(', '), '✓ 49 Keywords copied!');
   };
 
   // Run Initialization

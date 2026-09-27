@@ -11,6 +11,13 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <!-- Ambient Gradient Background Mesh Elements -->
+  <div id="ambientWrap" class="ambient-glow-wrap" aria-hidden="true">
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+  </div>
+
   <!-- Top Navigation Bar -->
   <header class="topbar">
     <div class="brand">
@@ -20,6 +27,13 @@
         <small class="brand-subtitle">Smart Prompt & 49-Keyword Metadata Engine</small>
       </div>
     </div>
+
+    <!-- Center Active Filter Pill & Live App Background Switcher -->
+    <div class="header-center">
+      <span id="activeSelectionTag" class="active-selection-tag">Active: Auto Diversity</span>
+      <button type="button" id="applyAppBgBtn" class="micro-btn-apply" title="Apply active background as page backdrop">🎨 Apply to App</button>
+    </div>
+
     <div class="top-actions">
       <span id="saveState" class="save-state">● LOCAL STORAGE</span>
       <button id="surpriseBtn" class="ghost top-btn" title="Surprise Me - Pick Random Concept">
@@ -131,6 +145,24 @@
           <div class="category-pills-bar" id="categoryPillsBar"></div>
         </div>
 
+        <!-- Trending Quick Presets Strip -->
+        <div class="preset-section">
+          <div class="preset-section-header">
+            <span>⚡ Trending Style Presets</span>
+            <small>1-Click Setup</small>
+          </div>
+          <div class="preset-chips">
+            <button type="button" class="preset-chip active" data-cat="Gradient Abstract" data-sub="Smooth Gradient" data-grain="grain">✦ Grainy Gradient</button>
+            <button type="button" class="preset-chip" data-cat="Light Waves" data-sub="Laser Light Waves" data-grain="none">💥 Zoom Rays Burst</button>
+            <button type="button" class="preset-chip" data-cat="Geometric Abstract" data-sub="Grids Abstract" data-grain="none">🎨 Pattern Geometric</button>
+            <button type="button" class="preset-chip" data-cat="Blur" data-sub="Gaussian Blur" data-grain="blur">✨ Aura Blur</button>
+            <button type="button" class="preset-chip" data-cat="Grain & Noise" data-sub="Film Grain" data-grain="noise">📻 Lo-Fi Noise</button>
+            <button type="button" class="preset-chip" data-cat="Glassmorphism" data-sub="Frosted Glass" data-grain="frosted">🧊 Frosted Blur</button>
+            <button type="button" class="preset-chip" data-cat="3D Abstract" data-sub="3D Shapes" data-grain="none">🏛 3D Studio</button>
+            <button type="button" class="preset-chip" data-cat="Luxury Abstract" data-sub="Gold & Black" data-grain="none">👑 Luxury Gold</button>
+          </div>
+        </div>
+
         <div class="form-group">
           <label for="category" id="categoryLabel">Abstract Category
             <span class="badge-count" id="categoryCountBadge">80 Categories</span>
@@ -155,6 +187,50 @@
           <button type="button" id="browseAll749Btn" class="all-subcats-launch-btn">
             🔍 Browse All 749 Sub-Categories Catalog
           </button>
+        </div>
+
+        <!-- Texture Effect Chips (Grain, Noise, Blur, Frosted) -->
+        <div class="form-group">
+          <div class="subcat-header">
+            <label>Grain & Blur Texture Effect</label>
+            <output id="grainLabel" class="res-badge">Film Grain</output>
+          </div>
+          <div class="texture-chips">
+            <button type="button" class="texture-chip" data-grain="none">None</button>
+            <button type="button" class="texture-chip" data-grain="blur">Soft Blur</button>
+            <button type="button" class="texture-chip active" data-grain="grain">Film Grain</button>
+            <button type="button" class="texture-chip" data-grain="noise">Heavy Noise</button>
+            <button type="button" class="texture-chip" data-grain="frosted">Frosted Blur</button>
+          </div>
+        </div>
+
+        <!-- Target AI Engine Chips -->
+        <div class="form-group">
+          <div class="subcat-header">
+            <label>Target AI Generator</label>
+            <output id="aiEngineLabel" class="res-badge">Midjourney v6.1</output>
+          </div>
+          <div class="engine-chips">
+            <button type="button" class="engine-chip active" data-engine="midjourney">Midjourney v6.1</button>
+            <button type="button" class="engine-chip" data-engine="dalle3">DALL-E 3</button>
+            <button type="button" class="engine-chip" data-engine="flux">Flux.1 Pro</button>
+            <button type="button" class="engine-chip" data-engine="sdxl">SDXL</button>
+            <button type="button" class="engine-chip" data-engine="firefly">Adobe Firefly 3</button>
+          </div>
+        </div>
+
+        <!-- Target Resolution Chips -->
+        <div class="form-group">
+          <div class="subcat-header">
+            <label>Export Resolution</label>
+            <output id="resLabel" class="res-badge">8K Ultra</output>
+          </div>
+          <div class="res-chips">
+            <button type="button" class="res-chip" data-res="4K">4K UHD</button>
+            <button type="button" class="res-chip" data-res="6K">6K</button>
+            <button type="button" class="res-chip active" data-res="8K">8K Ultra</button>
+            <button type="button" class="res-chip" data-res="Vector SVG">Vector SVG</button>
+          </div>
         </div>
 
         <div class="grid-2-col">
@@ -413,108 +489,169 @@
     </button>
   </div>
 
-  <!-- Metadata Inspector Modal / Slide-over Drawer -->
+  <!-- Metadata Inspector Modal / Slide-over Drawer with Live Mockup Canvas -->
   <div id="metaModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-container">
+    <div class="modal-container inspector-modal-container">
       <div class="modal-header">
         <div>
           <span id="modalIdBadge" class="modal-id-badge">SD-001</span>
-          <h3 id="modalTitle">Stock Metadata Inspector</h3>
-          <small id="modalSubtitle" class="modal-subtitle">49 Guaranteed Keywords & Commercial Licensing Package</small>
+          <h3 id="modalTitle">Stock Metadata & Mockup Studio</h3>
+          <small id="modalSubtitle" class="modal-subtitle">Real-time Visual Canvas & 49 Guaranteed Keywords Package</small>
         </div>
         <button id="metaModalClose" class="modal-close-btn" aria-label="Close dialog">✕</button>
       </div>
 
       <div class="modal-body">
-        <!-- Quick Copy Actions Bar -->
-        <div class="modal-quick-actions">
-          <button id="copyAllKeywordsBtn" class="small primary-pill-btn">
-            🏷 Copy All 49 Keywords (Comma-Separated)
-          </button>
-          <button id="copyTop5Btn" class="small ghost-pill-btn">
-            ⭐ Copy Top 5 Priority Tags
-          </button>
-          <button id="copyTitleDescBtn" class="small ghost-pill-btn">
-            📝 Copy Title & Description
-          </button>
-        </div>
+        <div class="modal-split-layout">
+          <!-- Left: Large Live Canvas Preview with Interactive Mockups -->
+          <div class="canvas-preview-column">
+            <!-- Mockup Switcher Toolbar -->
+            <div class="mockup-toolbar">
+              <span class="toolbar-label">Mockup View:</span>
+              <button type="button" class="mockup-btn active" data-mockup="clean">Clean</button>
+              <button type="button" class="mockup-btn" data-mockup="typography">Editorial</button>
+              <button type="button" class="mockup-btn" data-mockup="mobile">Mobile</button>
+              <button type="button" class="mockup-btn" data-mockup="card">Brand Card</button>
+            </div>
 
-        <!-- Title & Description Section -->
-        <div class="meta-section">
-          <div class="section-title-row">
-            <h4>Commercial Stock Title</h4>
-            <button id="copyTitleOnlyBtn" class="mini-copy-btn">Copy Title</button>
-          </div>
-          <input type="text" id="modalInputTitle" class="modal-input" placeholder="Title...">
-        </div>
+            <!-- Canvas Display Area with Dynamic Background and Texture Overlay -->
+            <div id="modalCanvas" class="modal-canvas clean has-grain">
+              <!-- Dynamic Mockup Overlays -->
+              <div class="mockup-overlay overlay-typography">
+                <span class="mock-tag">COMMERCIAL ASSET 2026</span>
+                <h2>CONTEMPORARY HORIZON</h2>
+                <p>Authentic tactile textures with strategic commercial copy space.</p>
+                <button class="mock-cta">Discover More</button>
+              </div>
 
-        <div class="meta-section">
-          <div class="section-title-row">
-            <h4>Description (Shutterstock & Contributor Ready)</h4>
-            <div class="desc-actions-row">
-              <span id="modalDescCharCount" class="char-count-pill">0 / 195 chars</span>
-              <button id="copyDescOnlyBtn" class="mini-copy-btn">Copy Description</button>
+              <div class="mockup-overlay overlay-mobile">
+                <div class="phone-frame">
+                  <div class="phone-notch"></div>
+                  <div class="phone-screen-content">
+                    <span class="phone-time">09:41</span>
+                    <div class="phone-card">Stock Design Studio</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mockup-overlay overlay-card">
+                <div class="brand-card">
+                  <div class="brand-logo">SD</div>
+                  <h4>CREATIVE STUDIO</h4>
+                  <p>Curated Design Diversity Asset</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Canvas Action Quick Buttons -->
+            <div class="canvas-action-bar">
+              <button type="button" id="modalCopyCssBtn" class="small ghost-pill-btn">🎨 Copy CSS Gradient</button>
+              <button type="button" id="modalApplyBgBtn" class="small ghost-pill-btn">🎨 Apply to App Backdrop</button>
             </div>
           </div>
-          <textarea id="modalInputDesc" class="modal-textarea" rows="3" placeholder="Description..."></textarea>
-        </div>
 
-        <!-- Marketplace Taxonomy Badges -->
-        <div class="meta-taxonomy-row">
-          <div class="tax-item">
-            <span class="tax-label">Category:</span>
-            <span id="modalCategoryBadge" class="tax-value">Gradient Abstract</span>
-          </div>
-          <div class="tax-item">
-            <span class="tax-label">Sub-Theme:</span>
-            <span id="modalSubcategoryBadge" class="tax-value">Smooth Gradient</span>
-          </div>
-          <div class="tax-item">
-            <span class="tax-label">Adobe Stock Category:</span>
-            <span id="modalAdobeCategory" class="tax-value">Graphic Resources</span>
-          </div>
-          <div class="tax-item">
-            <span class="tax-label">Shutterstock Category:</span>
-            <span id="modalShutterCategory" class="tax-value">Abstract</span>
-          </div>
-          <div class="tax-item">
-            <span class="tax-label">AI Content Flag:</span>
-            <span class="tax-value ai-pill">Generative AI Concept</span>
-          </div>
-        </div>
+          <!-- Right: Full Stock Metadata Inspector (Prompts & 49 Tags) -->
+          <div class="metadata-column">
+            <!-- Quick Copy Actions Bar -->
+            <div class="modal-quick-actions">
+              <button id="copyAllKeywordsBtn" class="small primary-pill-btn">
+                🏷 Copy All 49 Keywords (Comma-Separated)
+              </button>
+              <button id="copyTop5Btn" class="small ghost-pill-btn">
+                ⭐ Copy Top 5 Priority Tags
+              </button>
+              <button id="copyTitleDescBtn" class="small ghost-pill-btn">
+                📝 Copy Title & Description
+              </button>
+            </div>
 
-        <!-- 49 Keywords Visual Chip Cloud -->
-        <div class="meta-section">
-          <div class="section-title-row">
-            <h4>
-              49 Keywords Cloud
-              <span id="modalKeywordCountBadge" class="count-badge">49 / 49</span>
-            </h4>
-            <small class="chip-hint">Click any tag to copy individually</small>
-          </div>
-          <div class="top5-note">
-            <span class="star-icon">⭐</span>
-            <span>First 5 tags highlighted — carry 80% search weight on Adobe Stock & Shutterstock</span>
-          </div>
-          <div id="modalKeywordChips" class="keyword-chips-grid"></div>
-        </div>
+            <!-- Title & Description Section -->
+            <div class="meta-section">
+              <div class="section-title-row">
+                <h4>Commercial Stock Title</h4>
+                <button id="copyTitleOnlyBtn" class="mini-copy-btn">Copy Title</button>
+              </div>
+              <input type="text" id="modalInputTitle" class="modal-input" placeholder="Title...">
+            </div>
 
-        <!-- Editable Keywords Textarea -->
-        <div class="meta-section">
-          <div class="section-title-row">
-            <h4>Edit Keywords (Comma-Separated)</h4>
-            <button id="copyKeywordsTextBtn" class="mini-copy-btn">Copy Text</button>
-          </div>
-          <textarea id="modalInputKeywords" class="modal-textarea" rows="3" placeholder="Comma-separated keywords..."></textarea>
-        </div>
+            <div class="meta-section">
+              <div class="section-title-row">
+                <h4>Description (Shutterstock & Contributor Ready)</h4>
+                <div class="desc-actions-row">
+                  <span id="modalDescCharCount" class="char-count-pill">0 / 195 chars</span>
+                  <button id="copyDescOnlyBtn" class="mini-copy-btn">Copy Description</button>
+                </div>
+              </div>
+              <textarea id="modalInputDesc" class="modal-textarea" rows="3" placeholder="Description..."></textarea>
+            </div>
 
-        <!-- Prompt Preview -->
-        <div class="meta-section">
-          <div class="section-title-row">
-            <h4>Full Generation Prompt</h4>
-            <button id="modalCopyPromptBtn" class="mini-copy-btn">Copy Prompt</button>
+            <!-- Marketplace Taxonomy Badges -->
+            <div class="meta-taxonomy-row">
+              <div class="tax-item">
+                <span class="tax-label">Category:</span>
+                <span id="modalCategoryBadge" class="tax-value">Gradient Abstract</span>
+              </div>
+              <div class="tax-item">
+                <span class="tax-label">Sub-Theme:</span>
+                <span id="modalSubcategoryBadge" class="tax-value">Smooth Gradient</span>
+              </div>
+              <div class="tax-item">
+                <span class="tax-label">Adobe Stock Category:</span>
+                <span id="modalAdobeCategory" class="tax-value">Graphic Resources</span>
+              </div>
+              <div class="tax-item">
+                <span class="tax-label">Shutterstock Category:</span>
+                <span id="modalShutterCategory" class="tax-value">Abstract</span>
+              </div>
+              <div class="tax-item">
+                <span class="tax-label">AI Content Flag:</span>
+                <span class="tax-value ai-pill">Generative AI Concept</span>
+              </div>
+            </div>
+
+            <!-- 49 Keywords Visual Chip Cloud -->
+            <div class="meta-section">
+              <div class="section-title-row">
+                <h4>
+                  49 Keywords Cloud
+                  <span id="modalKeywordCountBadge" class="count-badge">49 / 49</span>
+                </h4>
+                <small class="chip-hint">Click any tag to copy individually</small>
+              </div>
+              <div class="top5-note">
+                <span class="star-icon">⭐</span>
+                <span>First 5 tags highlighted — carry 80% search weight on Adobe Stock & Shutterstock</span>
+              </div>
+              <div id="modalKeywordChips" class="keyword-chips-grid"></div>
+            </div>
+
+            <!-- Editable Keywords Textarea -->
+            <div class="meta-section">
+              <div class="section-title-row">
+                <h4>Edit Keywords (Comma-Separated)</h4>
+                <button id="copyKeywordsTextBtn" class="mini-copy-btn">Copy Text</button>
+              </div>
+              <textarea id="modalInputKeywords" class="modal-textarea" rows="3" placeholder="Comma-separated keywords..."></textarea>
+            </div>
+
+            <!-- Full Generation Prompt Preview -->
+            <div class="meta-section">
+              <div class="section-title-row">
+                <h4>Full Generation Prompt</h4>
+                <button id="modalCopyPromptBtn" class="mini-copy-btn">Copy Prompt</button>
+              </div>
+              <div id="modalPromptText" class="modal-prompt-box"></div>
+            </div>
+
+            <!-- Commercial Rejection Shield Negative Prompt Preview -->
+            <div class="meta-section">
+              <div class="section-title-row">
+                <h4>Rejection Shield (Negative Prompt)</h4>
+                <button id="modalCopyNegBtn" class="mini-copy-btn">Copy Negative</button>
+              </div>
+              <div id="modalNegPromptText" class="modal-prompt-box negative-box"></div>
+            </div>
           </div>
-          <div id="modalPromptText" class="modal-prompt-box"></div>
         </div>
       </div>
 
