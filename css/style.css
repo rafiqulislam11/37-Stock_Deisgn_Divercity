@@ -5044,3 +5044,48 @@ body:not(.dark) .btn-online-image {
   color: #c084fc;
   border: 1px solid rgba(168, 85, 247, 0.25);
 }
+
+/* Prominent API Key Box Styles */
+.nav-btn-key {
+  color: #c084fc !important;
+  border-color: rgba(168, 85, 247, 0.35) !important;
+}
+
+.nav-btn-key:hover {
+  background: rgba(168, 85, 247, 0.15) !important;
+  color: #e9d5ff !important;
+}
+
+.doctor-key-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+
+.key-status-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+}
+
+.key-status-pill.active {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.doctor-key-wrap.pulse-highlight {
+  animation: keyBoxPulse 1.6s ease-out;
+  border-color: #a855f7 !important;
+}
+
+@keyframes keyBoxPulse {
+  0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.8); }
+  50% { box-shadow: 0 0 0 10px rgba(168, 85, 247, 0.3); }
+  100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+}

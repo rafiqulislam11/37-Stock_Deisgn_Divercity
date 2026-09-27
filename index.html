@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
   <link rel="apple-touch-icon" href="assets/logo.jpg">
-  <link rel="stylesheet" href="css/style.css?v=3.1.0">
+  <link rel="stylesheet" href="css/style.css?v=3.2.0">
 </head>
 <body>
   <!-- Ambient Gradient Background Mesh Elements -->
@@ -324,18 +324,21 @@
                 </div>
               </div>
 
-              <!-- API Key Input (Shown when Gemini/OpenAI API model selected) -->
-              <div id="doctorApiKeyWrap" class="doctor-key-wrap hidden">
-                <label for="aiDoctorApiKey">API Key <small>(Saved locally & securely in browser)</small></label>
+              <!-- API Key Input (Always Prominent & Visible) -->
+              <div id="doctorApiKeyWrap" class="doctor-key-wrap">
+                <div class="doctor-key-label-row">
+                  <label for="aiDoctorApiKey"><b>🔑 Enter API Key (Google Gemini / OpenAI):</b></label>
+                  <span id="apiKeyStatusPill" class="key-status-pill">No Key Set (Using Free Built-in)</span>
+                </div>
                 <div class="key-input-row">
-                  <input type="password" id="aiDoctorApiKey" class="styled-input" placeholder="Paste Google Gemini or OpenAI API Key here...">
+                  <input type="password" id="aiDoctorApiKey" class="styled-input" placeholder="Paste your Google Gemini API key here (AIzaSy...)...">
                   <button type="button" id="toggleApiKeyVisBtn" class="ghost small key-toggle-btn" title="Show/Hide API Key">👁</button>
-                  <button type="button" id="testApiKeyBtn" class="small key-action-btn" title="Test Connection">Test</button>
-                  <button type="button" id="saveApiKeyBtn" class="primary small key-action-btn" title="Save API Key">Save</button>
+                  <button type="button" id="testApiKeyBtn" class="small key-action-btn" title="Test Connection">⚡ Test</button>
+                  <button type="button" id="saveApiKeyBtn" class="primary small key-action-btn" title="Save API Key">💾 Save</button>
                 </div>
                 <div id="apiKeyFeedback" class="key-feedback-msg"></div>
                 <div class="key-help-row">
-                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="free-key-link">🔑 Get Free Google Gemini API Key (Instant) ↗</a>
+                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="free-key-link">👉 Click here to get a 100% Free Gemini API Key from Google AI Studio ↗</a>
                 </div>
               </div>
 
@@ -1053,13 +1056,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Application Scripts (Loaded in strict dependency order) -->
-  <script src="js/data.js?v=3.1.0"></script>
-  <script src="js/metadata.js?v=3.1.0"></script>
-  <script src="js/generator.js?v=3.1.0"></script>
-  <script src="js/storage.js?v=3.1.0"></script>
-  <script src="js/csv.js?v=3.1.0"></script>
-  <script src="js/promptDoctor.js?v=3.1.0"></script>
-  <script src="js/ui.js?v=3.1.0"></script>
-  <script src="js/app.js?v=3.1.0"></script>
+  <script src="js/data.js?v=3.2.0"></script>
+  <script src="js/metadata.js?v=3.2.0"></script>
+  <script src="js/generator.js?v=3.2.0"></script>
+  <script src="js/storage.js?v=3.2.0"></script>
+  <script src="js/csv.js?v=3.2.0"></script>
+  <script src="js/promptDoctor.js?v=3.2.0"></script>
+  <script src="js/ui.js?v=3.2.0"></script>
+  <script src="js/app.js?v=3.2.0"></script>
 </body>
 </html>

@@ -1843,7 +1843,7 @@
 
       function updateDoctorUI() {
         const isApi = modelSelect.value !== 'builtin';
-        if (keyWrap) keyWrap.classList.toggle('hidden', !isApi);
+        if (keyWrap) keyWrap.classList.remove('hidden'); // Always visible for user convenience
         if (statusBadge) {
           if (!isApi) {
             statusBadge.textContent = 'Offline Engine Ready';
@@ -1855,6 +1855,16 @@
           } else {
             statusBadge.textContent = 'API Key Required';
             statusBadge.className = 'doctor-badge-warning';
+          }
+        }
+        const keyPill = $('apiKeyStatusPill');
+        if (keyPill) {
+          if (cfg.apiKey && cfg.apiKey.trim().length > 5) {
+            keyPill.textContent = '✓ API Key Saved';
+            keyPill.className = 'key-status-pill active';
+          } else {
+            keyPill.textContent = 'Optional: Free Offline Mode';
+            keyPill.className = 'key-status-pill';
           }
         }
       }
@@ -2083,6 +2093,25 @@
 
         Toast.show('✓ Added to Generated Concepts cards!', 'success');
         $('resultsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+    }
+
+    // Top Navbar API Key Quick Jump Button
+    const topKeyBtn = $('topApiKeyBtn');
+    if (topKeyBtn) {
+      topKeyBtn.onclick = () => {
+        const card = $('cardArchetype');
+        if (card) card.open = true;
+        const wrap = $('doctorApiKeyWrap');
+        if (wrap) {
+          wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          wrap.classList.remove('pulse-highlight');
+          void wrap.offsetWidth;
+          wrap.classList.add('pulse-highlight');
+        }
+        const inp = $('aiDoctorApiKey');
+        if (inp) inp.focus();
+        Toast.show('Paste your Google Gemini API Key here and click Save or Test', 'info', 3000);
       };
     }
 
