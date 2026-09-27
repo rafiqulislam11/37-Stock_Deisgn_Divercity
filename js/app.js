@@ -100,6 +100,7 @@
     setupCatalogModal();
     setupSurpriseButton();
     setupChipsAndPresets();
+    setupPromptDoctor();
     setupAppBackdrop();
     updateActiveSelectionTag();
 
@@ -970,6 +971,19 @@
         return;
       }
 
+      // Run AI prompt doctor if auto-enhance is enabled
+      if (window.AiPromptDoctor && AiPromptDoctor.config?.autoEnhanceOnGenerate) {
+        for (const d of generated) {
+          const res = AiPromptDoctor.offlineCorrect(d.prompt, AiPromptDoctor.config.profile, d.aiEngine || selectedAiEngine);
+          d.originalPrompt = d.prompt;
+          d.prompt = res.correctedPrompt;
+          d.aiCorrected = true;
+          d.aiDoctorModel = res.modelUsed;
+          d.aiImprovements = res.improvements;
+          d.metadata = MetadataEngine.build(d, d.category);
+        }
+      }
+
       current = generated;
       history = [...generated, ...history].slice(0, 1000);
       Store.save(history);
@@ -1309,6 +1323,23 @@
     $('modalShutterCategory').textContent = meta.shutterstockCategory || 'Abstract';
     $('modalKeywordCountBadge').textContent = `${meta.keywords.length} / 49`;
     $('modalPromptText').textContent = design.prompt;
+    const diffBox = $('modalDoctorDiff');
+    if (diffBox) {
+      if (design.aiImprovements && design.aiImprovements.length) {
+        diffBox.classList.remove('hidden');
+        diffBox.innerHTML = `
+          <div class="doctor-diff-header">
+            <b>✨ AI Doctor Improvements (${design.aiDoctorModel || 'AI Doctor'}):</b>
+          </div>
+          <ul class="doctor-improvements-list">
+            ${design.aiImprovements.map(imp => `<li>✓ ${imp}</li>`).join('')}
+          </ul>
+        `;
+      } else {
+        diffBox.classList.add('hidden');
+        diffBox.innerHTML = '';
+      }
+    }
 
     // Canvas Preview & Mockups Initialization
     const testStr = String((design.category || '') + ' ' + (design.subcategory || '') + ' ' + (design.background || '')).toLowerCase();
@@ -1784,6 +1815,165 @@
     if (!item || !item.cssGradient) return;
     UI.copyToClipboard(`background: ${item.cssGradient};`, '✓ CSS Background gradient copied!');
   };
+
+
+  // Setup AI Prompt Doctor & API Engine
+  function setupPromptDoctor() {
+    if (!window.AiPromptDoctor) return;
+    const cfg = AiPromptDoctor.config;
+
+    const modelSelect = $('aiDoctorModel');
+    const profileSelect = $('aiDoctorProfile');
+    const keyInput = $('aiDoctorApiKey');
+    const keyWrap = $('doctorApiKeyWrap');
+    const statusBadge = $('doctorStatusBadge');
+    const toggleVisBtn = $('toggleApiKeyVisBtn');
+    const testKeyBtn = $('testApiKeyBtn');
+    const saveKeyBtn = $('saveApiKeyBtn');
+    const feedbackEl = $('apiKeyFeedback');
+    const autoCheck = $('autoDoctorOnGenerateCheck');
+
+    if (modelSelect) {
+      modelSelect.value = cfg.model || 'builtin';
+      profileSelect.value = cfg.profile || 'stock';
+      if (keyInput) keyInput.value = cfg.apiKey || '';
+      if (autoCheck) autoCheck.checked = !!cfg.autoEnhanceOnGenerate;
+
+      function updateDoctorUI() {
+        const isApi = modelSelect.value !== 'builtin';
+        if (keyWrap) keyWrap.classList.toggle('hidden', !isApi);
+        if (statusBadge) {
+          if (!isApi) {
+            statusBadge.textContent = 'Offline Engine Ready';
+            statusBadge.className = 'doctor-badge-offline';
+          } else if (cfg.apiKey && cfg.apiKey.trim().length > 5) {
+            const shortName = modelSelect.options[modelSelect.selectedIndex]?.text?.split(' ')?.[0] || 'API';
+            statusBadge.textContent = `${shortName} Connected`;
+            statusBadge.className = 'doctor-badge-connected';
+          } else {
+            statusBadge.textContent = 'API Key Required';
+            statusBadge.className = 'doctor-badge-warning';
+          }
+        }
+      }
+
+      updateDoctorUI();
+
+      modelSelect.onchange = () => {
+        AiPromptDoctor.saveConfig({ model: modelSelect.value });
+        updateDoctorUI();
+        Toast.show(`AI Doctor: ${modelSelect.options[modelSelect.selectedIndex].text}`, 'info');
+      };
+
+      profileSelect.onchange = () => {
+        AiPromptDoctor.saveConfig({ profile: profileSelect.value });
+        Toast.show(`Correction Style: ${profileSelect.options[profileSelect.selectedIndex].text}`, 'info');
+      };
+
+      if (autoCheck) {
+        autoCheck.onchange = () => {
+          AiPromptDoctor.saveConfig({ autoEnhanceOnGenerate: autoCheck.checked });
+          Toast.show(autoCheck.checked ? '⚡ Auto-Doctor enabled for new batches' : 'Auto-Doctor disabled for new batches', 'info');
+        };
+      }
+
+      if (toggleVisBtn && keyInput) {
+        toggleVisBtn.onclick = () => {
+          const isPass = keyInput.type === 'password';
+          keyInput.type = isPass ? 'text' : 'password';
+          toggleVisBtn.textContent = isPass ? '🔒' : '👁';
+        };
+      }
+
+      if (saveKeyBtn && keyInput) {
+        saveKeyBtn.onclick = () => {
+          const key = keyInput.value.trim();
+          AiPromptDoctor.saveConfig({ apiKey: key });
+          updateDoctorUI();
+          Toast.show('✓ API Key saved securely in local browser storage', 'success');
+          if (feedbackEl) {
+            feedbackEl.textContent = 'API Key saved.';
+            feedbackEl.className = 'key-feedback-msg success';
+          }
+        };
+      }
+
+      if (testKeyBtn && keyInput) {
+        testKeyBtn.onclick = async () => {
+          const key = keyInput.value.trim();
+          const model = modelSelect.value;
+          if (!key) {
+            Toast.show('Please paste an API key first', 'warning');
+            return;
+          }
+          testKeyBtn.disabled = true;
+          testKeyBtn.textContent = 'Testing...';
+          if (feedbackEl) {
+            feedbackEl.textContent = 'Testing API connection...';
+            feedbackEl.className = 'key-feedback-msg';
+          }
+          try {
+            const res = await AiPromptDoctor.testApiKey(model, key);
+            testKeyBtn.disabled = false;
+            testKeyBtn.textContent = 'Test';
+            Toast.show(`✓ ${res.message}`, 'success');
+            if (feedbackEl) {
+              feedbackEl.textContent = `✓ ${res.message}`;
+              feedbackEl.className = 'key-feedback-msg success';
+            }
+            AiPromptDoctor.saveConfig({ apiKey: key });
+            updateDoctorUI();
+          } catch (err) {
+            testKeyBtn.disabled = false;
+            testKeyBtn.textContent = 'Test';
+            Toast.show(`Error: ${err.message}`, 'error', 4000);
+            if (feedbackEl) {
+              feedbackEl.textContent = `✕ Connection failed: ${err.message}`;
+              feedbackEl.className = 'key-feedback-msg error';
+            }
+          }
+        };
+      }
+    }
+
+    // Batch Auto-Doctor Toolbar Button
+    if ($('autoDoctorBatchBtn')) {
+      $('autoDoctorBatchBtn').onclick = async () => {
+        const visible = filtered();
+        if (!visible.length) {
+          Toast.show('No generated concepts to correct.', 'info');
+          return;
+        }
+
+        const btn = $('autoDoctorBatchBtn');
+        btn.disabled = true;
+        btn.textContent = '⏳ Optimizing...';
+        Toast.show(`✨ AI Doctor: Optimizing ${visible.length} prompts...`, 'info', 2000);
+
+        let count = 0;
+        for (const d of visible) {
+          try {
+            const res = await AiPromptDoctor.correct(d.prompt, { targetEngine: d.aiEngine || selectedAiEngine });
+            d.originalPrompt = d.originalPrompt || d.prompt;
+            d.prompt = res.correctedPrompt;
+            d.aiCorrected = true;
+            d.aiDoctorModel = res.modelUsed;
+            d.aiImprovements = res.improvements;
+            d.metadata = MetadataEngine.build(d, d.category);
+            count++;
+          } catch (e) {
+            console.warn('Batch doctor item error:', e);
+          }
+        }
+
+        Store.save(history);
+        renderAll();
+        btn.disabled = false;
+        btn.textContent = '✨ AI Doctor All';
+        Toast.show(`✓ Successfully optimized ${count} concepts with AI Doctor!`, 'success', 3500);
+      };
+    }
+  }
 
   window.copyPrompt = function(id) {
     const item = current.find(x => x.id === id) || history.find(x => x.id === id);

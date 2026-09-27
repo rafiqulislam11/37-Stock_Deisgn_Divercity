@@ -4397,3 +4397,302 @@ body:not(.dark) .negative-box {
   background: rgba(239, 68, 68, 0.05) !important;
 }
 
+
+/* ==========================================================================
+   AI Prompt Doctor & API Model Integration Styles
+   ========================================================================== */
+.prompt-doctor-box {
+  background: var(--bg-surface-elevated, rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(168, 85, 247, 0.28);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-top: 14px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 16px rgba(168, 85, 247, 0.08);
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+body:not(.dark) .prompt-doctor-box {
+  background: #fdfcff;
+  border-color: rgba(168, 85, 247, 0.35);
+  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.06);
+}
+
+.prompt-doctor-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+}
+
+.doctor-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  gap: 8px;
+}
+
+.doctor-box-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.doctor-sparkle-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.doctor-badge-offline {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  letter-spacing: 0.3px;
+}
+
+.doctor-badge-connected {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  letter-spacing: 0.3px;
+}
+
+.doctor-badge-warning {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  letter-spacing: 0.3px;
+}
+
+.doctor-box-desc {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0 0 12px 0;
+}
+
+.doctor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 600px) {
+  .doctor-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.doctor-key-wrap {
+  background: var(--bg-surface, rgba(0, 0, 0, 0.2));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  margin-bottom: 10px;
+  transition: all var(--transition-fast);
+}
+
+.key-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.key-input-row input {
+  flex: 1;
+  font-size: 12px;
+}
+
+.key-toggle-btn {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.key-action-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.key-feedback-msg {
+  font-size: 11px;
+  margin-top: 5px;
+  min-height: 14px;
+}
+
+.key-feedback-msg.success {
+  color: #10b981;
+}
+
+.key-feedback-msg.error {
+  color: #ef4444;
+}
+
+.doctor-auto-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+/* Card Button: AI Doctor */
+.btn-ai-doctor {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.16), rgba(168, 85, 247, 0.16)) !important;
+  border: 1px solid rgba(168, 85, 247, 0.38) !important;
+  color: #c084fc !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.2px;
+  transition: all var(--transition-fast) !important;
+}
+
+body:not(.dark) .btn-ai-doctor {
+  background: #f5f3ff !important;
+  color: #7c3aed !important;
+  border-color: #ddd6fe !important;
+}
+
+.btn-ai-doctor:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.32), rgba(168, 85, 247, 0.32)) !important;
+  color: #f3e8ff !important;
+  border-color: #c084fc !important;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(168, 85, 247, 0.25);
+}
+
+/* Batch Toolbar Button */
+.btn-ai-doctor-batch {
+  background: linear-gradient(135deg, #6366f1, #a855f7) !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.35) !important;
+  transition: all var(--transition-fast) !important;
+}
+
+.btn-ai-doctor-batch:hover {
+  background: linear-gradient(135deg, #4f46e5, #9333ea) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.5) !important;
+}
+
+/* Card AI Polished Tag */
+.ai-doctor-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #c084fc;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+
+body:not(.dark) .ai-doctor-tag {
+  background: #f5f3ff;
+  color: #6d28d9;
+  border-color: #ddd6fe;
+}
+
+.ai-doctor-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #a855f7;
+  box-shadow: 0 0 6px #a855f7;
+}
+
+/* Card Shimmer Loading State */
+.card.ai-doctor-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.card.ai-doctor-loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.15), transparent);
+  animation: doctorShimmer 1.4s infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes doctorShimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Modal Improvements Box */
+.btn-doctor-modal {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2)) !important;
+  border: 1px solid rgba(168, 85, 247, 0.4) !important;
+  color: #c084fc !important;
+  font-weight: 700 !important;
+}
+
+.btn-doctor-modal:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(168, 85, 247, 0.35)) !important;
+  color: #ffffff !important;
+}
+
+.modal-doctor-diff {
+  margin-top: 10px;
+  background: rgba(168, 85, 247, 0.08);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 11.5px;
+}
+
+body:not(.dark) .modal-doctor-diff {
+  background: #faf5ff;
+  border-color: #e9d5ff;
+}
+
+.doctor-diff-header {
+  font-size: 11px;
+  color: #a855f7;
+  margin-bottom: 6px;
+}
+
+.doctor-improvements-list {
+  margin: 0;
+  padding-left: 16px;
+  color: var(--text-secondary);
+}
+
+.doctor-improvements-list li {
+  margin-bottom: 3px;
+  line-height: 1.4;
+}
+

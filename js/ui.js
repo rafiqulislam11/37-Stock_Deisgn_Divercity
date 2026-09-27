@@ -183,6 +183,12 @@ window.UI = {
           ${d.resolution ? `<span><b>Res:</b> ${this.esc(d.resolution)}</span>` : ''}
         </div>
 
+        ${d.aiCorrected ? `
+          <div class="ai-doctor-tag" title="Optimized by ${this.esc(d.aiDoctorModel || 'AI Doctor')}">
+            <span class="ai-doctor-dot"></span>
+            <span>✨ AI Polished: ${this.esc(d.aiDoctorModel || 'AI Doctor')}</span>
+          </div>
+        ` : ''}
         <div class="prompt" title="Full generation prompt">${this.esc(d.prompt)}</div>
 
         <div class="meta-preview" data-action="metadata" data-id="${d.id}" title="Click to open 49-Keywords Metadata Inspector & Live Mockups">
@@ -196,6 +202,9 @@ window.UI = {
         <div class="card-footer">
           <button class="small" data-action="copy" data-id="${d.id}" title="Copy generation prompt">
             📋 Prompt
+          </button>
+          <button class="small btn-ai-doctor" data-action="ai-doctor" data-id="${d.id}" title="Inspect, sanitize & auto-correct prompt with AI Doctor">
+            ✨ AI Doctor
           </button>
           <button class="small btn-keywords" data-action="metadata" data-id="${d.id}" title="View & copy 49 keywords and live mockups">
             🏷 49 Tags & Mockups

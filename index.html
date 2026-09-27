@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
   <link rel="apple-touch-icon" href="assets/logo.jpg">
-  <link rel="stylesheet" href="css/style.css?v=2.6.0">
+  <link rel="stylesheet" href="css/style.css?v=2.7.0">
 </head>
 <body>
   <!-- Ambient Gradient Background Mesh Elements -->
@@ -273,11 +273,68 @@
               </div>
               <div class="engine-chips">
                 <button type="button" class="engine-chip active" data-engine="midjourney">Midjourney v6.1</button>
-                <button type="button" class="engine-chip" data-engine="dalle3">DALL-E 3</button>
                 <button type="button" class="engine-chip" data-engine="flux">Flux.1 Pro</button>
-                <button type="button" class="engine-chip" data-engine="sdxl">SDXL</button>
+                <button type="button" class="engine-chip" data-engine="imagen3">Google Imagen 3</button>
+                <button type="button" class="engine-chip" data-engine="sd35">SD 3.5 Large</button>
                 <button type="button" class="engine-chip" data-engine="firefly">Adobe Firefly 3</button>
+                <button type="button" class="engine-chip" data-engine="dalle3">DALL-E 3 HD</button>
+                <button type="button" class="engine-chip" data-engine="ideogram">Ideogram 2</button>
+                <button type="button" class="engine-chip" data-engine="recraft">Recraft V3 (SVG)</button>
               </div>
+            </div>
+
+            <!-- AI Prompt Doctor & Model API System -->
+            <div class="prompt-doctor-box" id="promptDoctorBox">
+              <div class="doctor-box-header">
+                <div class="doctor-box-title">
+                  <span class="doctor-sparkle-icon">✨</span>
+                  <b>AI Prompt Doctor & Correction Engine</b>
+                </div>
+                <span id="doctorStatusBadge" class="doctor-badge-offline">Offline Engine Ready</span>
+              </div>
+              <p class="doctor-box-desc">Automatically inspects image prompts, strips prohibited commercial brand trademarks, and optimizes optical lighting depth for stock marketplaces.</p>
+
+              <div class="doctor-grid">
+                <div class="form-group">
+                  <label for="aiDoctorModel">Correction Model / API</label>
+                  <select id="aiDoctorModel" class="styled-select">
+                    <option value="builtin">Built-in Neural Doctor (Offline - Free)</option>
+                    <option value="gemini-2.5-flash">Google Gemini 2.5 Flash (Ultra Fast)</option>
+                    <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
+                    <option value="gemini-1.5-pro">Google Gemini 1.5 Pro (Deep Scene)</option>
+                    <option value="gpt-4o-mini">OpenAI GPT-4o Mini</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="aiDoctorProfile">Correction Style Goal</label>
+                  <select id="aiDoctorProfile" class="styled-select">
+                    <option value="stock">📸 Commercial Stock (85mm Lens & Softbox)</option>
+                    <option value="vector">🎨 Clean Vector & SVG (Flat Bezier)</option>
+                    <option value="cinematic">🎬 Cinematic 3D Render (Volumetric Fog)</option>
+                    <option value="compliance">🛡️ Strict Stock Compliance (Banned Words)</option>
+                    <option value="punchy">⚡ Short & Punchy (Concise Descriptors)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- API Key Input (Shown when Gemini/OpenAI API model selected) -->
+              <div id="doctorApiKeyWrap" class="doctor-key-wrap hidden">
+                <label for="aiDoctorApiKey">API Key <small>(Saved locally & securely in browser)</small></label>
+                <div class="key-input-row">
+                  <input type="password" id="aiDoctorApiKey" class="styled-input" placeholder="Paste Google Gemini or OpenAI API Key here...">
+                  <button type="button" id="toggleApiKeyVisBtn" class="ghost small key-toggle-btn" title="Show/Hide API Key">👁</button>
+                  <button type="button" id="testApiKeyBtn" class="small key-action-btn" title="Test Connection">Test</button>
+                  <button type="button" id="saveApiKeyBtn" class="primary small key-action-btn" title="Save API Key">Save</button>
+                </div>
+                <div id="apiKeyFeedback" class="key-feedback-msg"></div>
+              </div>
+
+              <!-- Auto-Doctor on Generate Checkbox -->
+              <label class="check doctor-auto-check">
+                <input type="checkbox" id="autoDoctorOnGenerateCheck">
+                <span>⚡ Auto-Correct all prompts during generation</span>
+              </label>
             </div>
 
             <!-- Texture Effect Chips (Grain, Noise, Blur, Frosted) -->
@@ -532,6 +589,9 @@
                 </button>
               </div>
             </div>
+            <button id="autoDoctorBatchBtn" class="small btn-ai-doctor-batch" title="Auto-correct & polish all visible prompts with AI Doctor">
+              ✨ AI Doctor All
+            </button>
             <button id="copyAll" class="small ghost-btn" title="Copy all visible prompts to clipboard">
               📋 Copy Prompts
             </button>
@@ -831,9 +891,13 @@
             <div class="meta-section">
               <div class="section-title-row">
                 <h4>Full Generation Prompt</h4>
-                <button id="modalCopyPromptBtn" class="mini-copy-btn">Copy Prompt</button>
+                <div class="modal-btn-row">
+                  <button id="modalAiDoctorBtn" class="mini-copy-btn btn-doctor-modal" title="Auto-correct & polish this prompt with AI">✨ AI Doctor Polish</button>
+                  <button id="modalCopyPromptBtn" class="mini-copy-btn">Copy Prompt</button>
+                </div>
               </div>
               <div id="modalPromptText" class="modal-prompt-box"></div>
+              <div id="modalDoctorDiff" class="modal-doctor-diff hidden"></div>
             </div>
 
             <!-- Commercial Rejection Shield Negative Prompt Preview -->
@@ -893,12 +957,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Application Scripts (Loaded in strict dependency order) -->
-  <script src="js/data.js?v=2.6.0"></script>
-  <script src="js/metadata.js?v=2.6.0"></script>
-  <script src="js/generator.js?v=2.6.0"></script>
-  <script src="js/storage.js?v=2.6.0"></script>
-  <script src="js/csv.js?v=2.6.0"></script>
-  <script src="js/ui.js?v=2.6.0"></script>
-  <script src="js/app.js?v=2.6.0"></script>
+  <script src="js/data.js?v=2.7.0"></script>
+  <script src="js/metadata.js?v=2.7.0"></script>
+  <script src="js/generator.js?v=2.7.0"></script>
+  <script src="js/storage.js?v=2.7.0"></script>
+  <script src="js/csv.js?v=2.7.0"></script>
+  <script src="js/promptDoctor.js?v=2.7.0"></script>
+  <script src="js/ui.js?v=2.7.0"></script>
+  <script src="js/app.js?v=2.7.0"></script>
 </body>
 </html>

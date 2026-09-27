@@ -1788,13 +1788,35 @@ window.STOCK_DATA = {
     "Vector SVG": { label: "Vector SVG", prompt: "clean scalable vector SVG contour aesthetic, crisp bezier paths, zero artifacts" }
   },
 
-  // AI Target Engine presets
+  // AI Target Engine presets (Updated 2025/2026 Models)
   aiEngineMap: {
-    "midjourney": { label: "Midjourney v6.1", suffix: "--v 6.1 --style raw" },
-    "dalle3": { label: "DALL-E 3", suffix: "ultra-high commercial stock photography, masterpiece quality" },
-    "flux": { label: "Flux.1 Pro", suffix: "photorealistic texture, state-of-the-art cinematic lighting" },
-    "sdxl": { label: "Stable Diffusion XL", suffix: "masterpiece, 8k resolution, trending on ArtStation" },
-    "firefly": { label: "Adobe Firefly 3", suffix: "commercial stock asset, clean composition, Adobe Stock ready" }
+    "midjourney": { label: "Midjourney v6.1", suffix: "--v 6.1 --style raw --q 2" },
+    "flux": { label: "Flux.1 Pro", suffix: "photorealistic fine micro-textures, natural cinematic composition, 35mm optical clarity" },
+    "imagen3": { label: "Google Imagen 3", suffix: "clean commercial photography, natural dynamic range, photorealistic stock asset, color-graded" },
+    "sd35": { label: "SD 3.5 Large", suffix: "masterpiece stock asset, crisp geometric detail, highly detailed, clean lighting, 8k uhd" },
+    "firefly": { label: "Adobe Firefly 3", suffix: "commercial stock asset, clean composition, studio lighting, Adobe Stock ready" },
+    "dalle3": { label: "DALL-E 3 HD", suffix: "commercial studio lighting, razor-sharp focus, professional stock photograph" },
+    "ideogram": { label: "Ideogram v2.0", suffix: "clear graphic design typography, clean stock layout, high fidelity" },
+    "recraft": { label: "Recraft V3 (SVG)", suffix: "clean scalable vector SVG contour aesthetic, crisp bezier paths, zero artifacts" },
+    "sdxl": { label: "SDXL Legacy", suffix: "masterpiece, 8k resolution, photorealistic" }
+  },
+
+  // AI Prompt Doctor Engine Models
+  promptDoctorModels: {
+    "builtin": { name: "Built-in Neural Doctor (Offline)", type: "offline", desc: "Instant offline rule-based prompt cleaner & stock compliance engine (No Key needed)" },
+    "gemini-2.5-flash": { name: "Google Gemini 2.5 Flash", type: "api", provider: "google", desc: "Ultra-fast Google GenAI model, recommended for smart semantic prompt rewrite & expansion" },
+    "gemini-1.5-flash": { name: "Google Gemini 1.5 Flash", type: "api", provider: "google", desc: "Fast & lightweight Google Gemini model for quick prompt enhancement" },
+    "gemini-1.5-pro": { name: "Google Gemini 1.5 Pro", type: "api", provider: "google", desc: "Deep reasoning capacity for complex scene composition & commercial prompts" },
+    "gpt-4o-mini": { name: "OpenAI GPT-4o Mini", type: "api", provider: "openai", desc: "OpenAI fast intelligence model for prompt enhancement" }
+  },
+
+  // AI Correction Profiles
+  promptCorrectionProfiles: {
+    "stock": { label: "Commercial Stock Photo", desc: "Optimizes for commercial buyers, 85mm lens, studio softbox, clean background" },
+    "vector": { label: "Clean Vector & SVG", desc: "Flat colors, bezier vectors, minimal gradients, clean icon aesthetic" },
+    "cinematic": { label: "Cinematic 3D Render", desc: "Volumetric fog, dramatic rim light, Unreal Engine 5 aesthetic, photorealistic" },
+    "compliance": { label: "Stock Compliance & Banned Words", desc: "Strips brand trademarks, copyrighted elements, and spam buzzwords" },
+    "punchy": { label: "Short & Punchy", desc: "Distills prompt into concise visual instructions ideal for Flux & Midjourney v6.1" }
   }
 };
 
