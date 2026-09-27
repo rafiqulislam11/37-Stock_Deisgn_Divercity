@@ -5443,3 +5443,85 @@ html, body {
 .results {
   transition: none; /* Prevent layout jank on resize */
 }
+
+/* ==========================================================================
+   Navigation Button Variants — Mobile-Specific Modifiers (v3.5.2)
+   ========================================================================== */
+
+/* Mobile topbar API key button — purple accent to match desktop .nav-btn-key */
+.nav-btn-key-mobile {
+  color: #c084fc !important;
+  border-color: rgba(168, 85, 247, 0.35) !important;
+}
+
+.nav-btn-key-mobile:hover,
+.nav-btn-key-mobile:focus-visible {
+  background: rgba(168, 85, 247, 0.15) !important;
+  color: #e9d5ff !important;
+}
+
+/* Mobile topbar generate button — green accent */
+.nav-btn-gen-mobile {
+  color: #4ade80 !important;
+  border-color: rgba(74, 222, 128, 0.35) !important;
+}
+
+.nav-btn-gen-mobile:hover,
+.nav-btn-gen-mobile:focus-visible {
+  background: rgba(74, 222, 128, 0.15) !important;
+  color: #86efac !important;
+}
+
+/* ── Mobile Sticky Bar: ensure flex row on all screen sizes ── */
+.mobile-sticky-bar {
+  display: none;
+  flex-direction: row;
+  gap: 8px;
+  align-items: stretch;
+}
+
+/* When generator tab is active on mobile, show as flex row */
+@media (max-width: 900px) {
+  body:has(.tab-mode-generator) .mobile-sticky-bar {
+    display: flex !important;
+  }
+
+  body:has(.tab-mode-results) .mobile-sticky-bar,
+  body:has(.tab-mode-history) .mobile-sticky-bar,
+  body.modal-open .mobile-sticky-bar {
+    display: none !important;
+  }
+
+  /* Each CTA button takes equal space */
+  .mobile-cta-btn {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Give Generate button slightly more space */
+  .mobile-gen-btn {
+    flex: 1.8;
+  }
+
+  /* Mobile topbar nav buttons — show on mobile */
+  .mobile-only-nav-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 34px;
+    padding: 5px 8px;
+    font-size: 11.5px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+/* ── Desktop: hide mobile-only buttons ── */
+@media (min-width: 901px) {
+  .mobile-only-nav-btn {
+    display: none !important;
+  }
+}

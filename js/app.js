@@ -815,7 +815,7 @@
     if (stickyBar) {
       const activeKey = tabKey || document.querySelector('.mobile-tab.active')?.dataset?.tab || 'generator';
       const shouldShow = activeKey === 'generator' && isMobileLayout() && !document.body.classList.contains('modal-open');
-      stickyBar.style.display = shouldShow ? 'block' : 'none';
+      stickyBar.style.display = shouldShow ? 'flex' : 'none'; // flex keeps 3 buttons in a row
     }
   }
 
@@ -1389,6 +1389,9 @@
   // Workspace Event Listeners
   $('generate').onclick = generate;
   $('mobileGenerateBtn').onclick = generate;
+
+  // Mobile topbar generate button (shown on mobile/tablet only)
+  if ($('mobileTopGenBtn')) $('mobileTopGenBtn').onclick = generate;
 
   $('promptBtn').onclick = () => {
     generate();
@@ -2134,24 +2137,8 @@
       };
     }
 
-    // Top Navbar API Key Quick Jump Button
+    // Top Navbar API Key Quick Jump Button — handled by allApiKeyOpeners below
     const topKeyBtn = $('topApiKeyBtn');
-    if (topKeyBtn) {
-      topKeyBtn.onclick = () => {
-        const card = $('cardArchetype');
-        if (card) card.open = true;
-        const wrap = $('doctorApiKeyWrap');
-        if (wrap) {
-          wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          wrap.classList.remove('pulse-highlight');
-          void wrap.offsetWidth;
-          wrap.classList.add('pulse-highlight');
-        }
-        const inp = $('aiDoctorApiKey');
-        if (inp) inp.focus();
-        Toast.show('Paste your Google Gemini API Key here and click Save or Test', 'info', 3000);
-      };
-    }
 
 
     // Dedicated API Key Modal Logic
@@ -2164,7 +2151,6 @@
     const modalClearBtn = $('modalClearKeyBtn');
     const modalCloseBtn = $('apiKeyModalClose');
     const modalFeedback = $('modalApiKeyFeedback');
-    const sidebarKeyOpenBtn = $('openApiKeyModalFromSidebarBtn');
 
     function openApiKeyModal() {
       if (!apiKeyModal) return;
@@ -2191,16 +2177,12 @@
       };
     }
 
-    if (sidebarKeyOpenBtn) sidebarKeyOpenBtn.onclick = openApiKeyModal;
-
-    // Connect all API key buttons across devices to open modal directly
+    // Connect ALL API key buttons across all devices/locations to open modal
+    // Uses null-safe .filter(Boolean) so missing IDs don't crash anything
     const allApiKeyOpeners = [
-      topKeyBtn,
-      $('topApiKeyBtn'),
-      $('sidebarKeyOpenBtn'),
-      $('openApiKeyModalFromSidebarBtn'),
-      $('mobileTopApiKeyBtn'),
-      $('mobileStickyApiKeyBtn')
+      topKeyBtn,                        // Desktop topbar center
+      $('mobileTopApiKeyBtn'),          // Mobile topbar right
+      $('mobileStickyApiKeyBtn'),       // Mobile sticky bottom bar
     ].filter(Boolean);
 
     allApiKeyOpeners.forEach(btn => {
