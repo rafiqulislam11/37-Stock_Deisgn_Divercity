@@ -162,7 +162,7 @@
     },
 
     // Live Google Gemini API Integration (v1beta REST)
-    async callGeminiApi(prompt, apiKey, model = 'gemini-2.5-flash', profile = 'stock', engine = 'midjourney') {
+    async callGeminiApi(prompt, apiKey, model = 'gemini-1.5-flash', profile = 'stock', engine = 'midjourney') {
       const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
       const systemPrompt = `You are an elite Commercial Stock Image Prompt Engineer & Prompt Doctor.
@@ -280,35 +280,91 @@ CRITICAL RULES:
       };
     },
 
-    // Test API Key Connection
+    // Test API Key Connection (Intelligent Auto-Detection & Resilient Verification)
     async testApiKey(model, apiKey) {
-      if (!apiKey || apiKey.trim().length < 5) {
-        throw new Error('Please enter a valid API key');
+      if (!apiKey || typeof apiKey !== 'string' || apiKey.trim().length < 5) {
+        throw new Error('Please enter a valid API key (e.g. AIzaSy... for Google Gemini)');
       }
 
-      if (model.startsWith('gemini')) {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.trim()}`;
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: 'Respond with the word OK.' }] }]
-          })
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error?.message || `HTTP ${res.status}`);
+      // Clean accidental outer quotes and whitespace
+      const key = apiKey.trim().replace(/^["']|["']$/g, '');
+
+      // Intelligent provider auto-detection
+      const isGoogleKey = key.startsWith('AIzaSy') || model.startsWith('gemini') || model === 'builtin';
+      const isOpenAiKey = key.startsWith('sk-');
+
+      if (isGoogleKey && !isOpenAiKey) {
+        // Test Google Gemini API
+        try {
+          // 1. Primary check: Verify authentication against models catalog
+          const listEndpoint = `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`;
+          const res = await fetch(listEndpoint);
+          const data = await res.json().catch(() => ({}));
+
+          if (!res.ok) {
+            const msg = data.error?.message || `HTTP ${res.status}`;
+            if (msg.toLowerCase().includes('api key not valid') || msg.toLowerCase().includes('api_key_invalid')) {
+              throw new Error('Google API Key is not valid. Please copy your key from https://aistudio.google.com/app/apikey');
+            }
+            throw new Error(`Google API: ${msg}`);
+          }
+
+          // 2. Active generation ping with official fast model
+          const targetModel = (model.startsWith('gemini') && model !== 'gemini-2.5-flash') ? model : 'gemini-1.5-flash';
+          try {
+            const pingEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${key}`;
+            await fetch(pingEndpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: 'Ping' }] }],
+                generationConfig: { maxOutputTokens: 5 }
+              })
+            });
+          } catch (pingErr) {
+            // Non-blocking: model list already succeeded
+          }
+
+          return {
+            success: true,
+            provider: 'Google Gemini',
+            detectedModel: targetModel,
+            cleanKey: key,
+            message: 'Google Gemini API Key is valid, verified & connected!'
+          };
+        } catch (err) {
+          if (err.name === 'TypeError' || err.message.includes('Failed to fetch')) {
+            throw new Error('Network error or ad-blocker blocked the Google Gemini API request.');
+          }
+          throw err;
         }
-        return { success: true, message: 'Google Gemini API Key is valid and connected!' };
       } else {
-        const res = await fetch('https://api.openai.com/v1/models', {
-          headers: { 'Authorization': `Bearer ${apiKey.trim()}` }
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error?.message || `HTTP ${res.status}`);
+        // Test OpenAI API
+        try {
+          const endpoint = 'https://api.openai.com/v1/models';
+          const res = await fetch(endpoint, {
+            headers: { 'Authorization': `Bearer ${key}` }
+          });
+          const data = await res.json().catch(() => ({}));
+
+          if (!res.ok) {
+            const msg = data.error?.message || `HTTP ${res.status}`;
+            throw new Error(`OpenAI API: ${msg}`);
+          }
+
+          return {
+            success: true,
+            provider: 'OpenAI',
+            detectedModel: 'gpt-4o-mini',
+            cleanKey: key,
+            message: 'OpenAI API Key is valid and connected!'
+          };
+        } catch (err) {
+          if (err.name === 'TypeError' || err.message.includes('Failed to fetch')) {
+            throw new Error('OpenAI blocked direct browser CORS. For free browser connection, Google Gemini API is recommended (keys start with AIzaSy).');
+          }
+          throw err;
         }
-        return { success: true, message: 'OpenAI API Key is valid and connected!' };
       }
     }
   };

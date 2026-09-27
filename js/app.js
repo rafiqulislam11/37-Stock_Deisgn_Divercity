@@ -1900,37 +1900,62 @@
         };
       }
 
+      if (keyInput) {
+        keyInput.oninput = () => {
+          const val = keyInput.value.trim().replace(/^["']|["']$/g, '');
+          if (val.startsWith('AIzaSy')) {
+            if (modelSelect.value === 'builtin' || modelSelect.value.startsWith('gpt')) {
+              modelSelect.value = 'gemini-1.5-flash';
+              AiPromptDoctor.saveConfig({ model: 'gemini-1.5-flash' });
+              updateDoctorUI();
+            }
+          } else if (val.startsWith('sk-')) {
+            if (modelSelect.value === 'builtin' || modelSelect.value.startsWith('gemini')) {
+              modelSelect.value = 'gpt-4o-mini';
+              AiPromptDoctor.saveConfig({ model: 'gpt-4o-mini' });
+              updateDoctorUI();
+            }
+          }
+        };
+      }
+
       if (testKeyBtn && keyInput) {
         testKeyBtn.onclick = async () => {
-          const key = keyInput.value.trim();
+          const rawKey = keyInput.value.trim().replace(/^["']|["']$/g, '');
+          keyInput.value = rawKey;
           const model = modelSelect.value;
-          if (!key) {
-            Toast.show('Please paste an API key first', 'warning');
+          if (!rawKey) {
+            Toast.show('Please paste an API key first (e.g. AIzaSy...)', 'warning');
             return;
           }
           testKeyBtn.disabled = true;
           testKeyBtn.textContent = 'Testing...';
           if (feedbackEl) {
-            feedbackEl.textContent = 'Testing API connection...';
+            feedbackEl.textContent = 'Verifying API connection...';
             feedbackEl.className = 'key-feedback-msg';
           }
           try {
-            const res = await AiPromptDoctor.testApiKey(model, key);
+            const res = await AiPromptDoctor.testApiKey(model, rawKey);
             testKeyBtn.disabled = false;
             testKeyBtn.textContent = 'Test';
-            Toast.show(`✓ ${res.message}`, 'success');
+            Toast.show(`✓ ${res.message}`, 'success', 3500);
+
+            if (res.detectedModel && modelSelect.value !== res.detectedModel) {
+              modelSelect.value = res.detectedModel;
+            }
+
             if (feedbackEl) {
               feedbackEl.textContent = `✓ ${res.message}`;
               feedbackEl.className = 'key-feedback-msg success';
             }
-            AiPromptDoctor.saveConfig({ apiKey: key });
+            AiPromptDoctor.saveConfig({ apiKey: res.cleanKey || rawKey, model: modelSelect.value });
             updateDoctorUI();
           } catch (err) {
             testKeyBtn.disabled = false;
             testKeyBtn.textContent = 'Test';
-            Toast.show(`Error: ${err.message}`, 'error', 4000);
+            Toast.show(`✕ API Test Failed: ${err.message}`, 'error', 4500);
             if (feedbackEl) {
-              feedbackEl.textContent = `✕ Connection failed: ${err.message}`;
+              feedbackEl.textContent = `✕ ${err.message}`;
               feedbackEl.className = 'key-feedback-msg error';
             }
           }
