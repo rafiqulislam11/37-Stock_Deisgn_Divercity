@@ -5252,181 +5252,196 @@ body:not(.dark) .btn-online-image {
 
 
 /* ==========================================================================
-   COMPREHENSIVE RESPONSIVE FIX — All Devices (v3.5.1)
-   Covers: Mobile-only nav buttons, sticky bar layout, touch targets,
-           card grid, topbar overflow, and cross-device polish
+   MASTER LAYOUT FIX — Navigation, Backdrop Clearance & Responsive (v3.6.0)
+   Consolidates all responsive, nav, and layout fixes into one clean block.
    ========================================================================== */
 
-/* ── Mobile-Only Nav Buttons: Hide on Desktop, Show on Mobile ── */
-.mobile-only-nav-btn {
-  display: none;
-}
-
-/* ── Mobile CTA Sticky Bar: Fix 3-button row layout ── */
-.mobile-sticky-bar {
-  flex-direction: row;
-  gap: 8px;
-  align-items: center;
-}
-
-.mobile-cta-btn {
-  flex: 1;
-  width: auto;
-  min-height: 44px;
-  font-size: 13px;
-  padding: 10px 8px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  white-space: nowrap;
-}
-
-.mobile-gen-btn {
-  flex: 2; /* Give generate button more space */
-}
-
-/* ── Global Box-Sizing Safety ── */
+/* ── Global Box-Sizing ── */
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
-/* ── Prevent Horizontal Scroll on All Screens ── */
+/* ── Prevent Horizontal Overflow ── */
 html, body {
   max-width: 100%;
   overflow-x: hidden;
 }
 
-/* ── Form Inputs: Prevent Zoom on iOS (font-size >= 16px) ── */
-@media (max-width: 768px) {
-  input, select, textarea {
-    font-size: max(16px, 1em) !important;
-  }
+/* ── Desktop App: clear the sticky topbar ── */
+.app {
+  padding-top: calc(var(--topbar-height, 68px) + 8px);
 }
 
-/* ── Topbar: Prevent Overflow on Very Small Screens ── */
-.topbar {
-  min-width: 0;
-  overflow: hidden;
+/* ── Desktop Sidebar: sticky below topbar ── */
+.controls {
+  top: calc(var(--topbar-height, 68px) + 16px);
+  max-height: calc(100vh - var(--topbar-height, 68px) - 24px);
 }
 
-.brand {
-  flex-shrink: 0;
-  min-width: 0;
-}
-
-.top-actions {
-  flex-shrink: 0;
-  min-width: 0;
-}
-
-/* ── Navigation center: Allow shrinking ── */
-.header-center {
-  min-width: 0;
-  flex: 1;
-  overflow: hidden;
-}
-
-/* ── Cards & Result Grid ── */
-.results {
-  width: 100%;
-}
-
+/* ── Cards & prompts: safe word break ── */
 .card {
   min-width: 0;
   word-break: break-word;
   overflow-wrap: anywhere;
 }
 
-/* ── Touch Target Minimum Size (48px) for all interactive elements ── */
+/* ── Topbar: prevent overflow ── */
+.topbar {
+  min-width: 0;
+  overflow: hidden;
+}
+.brand { flex-shrink: 0; min-width: 0; }
+.top-actions { flex-shrink: 0; min-width: 0; }
+.header-center { min-width: 0; flex: 1; overflow: hidden; }
+
+/* ── Mobile-only nav buttons: hidden on desktop ── */
+.mobile-only-nav-btn {
+  display: none;
+}
+
+/* ── Mobile sticky bar: flex row layout ── */
+.mobile-sticky-bar {
+  display: none;
+  flex-direction: row;
+  gap: 8px;
+  align-items: stretch;
+}
+
+/* ── Mobile CTA buttons: equal flex ── */
+.mobile-cta-btn {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  font-size: 13px;
+  padding: 10px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.mobile-gen-btn { flex: 1.8; }
+
+/* ── Nav button mobile color variants ── */
+.nav-btn-key-mobile {
+  color: #c084fc !important;
+  border-color: rgba(168, 85, 247, 0.35) !important;
+}
+.nav-btn-key-mobile:hover { background: rgba(168, 85, 247, 0.15) !important; color: #e9d5ff !important; }
+.nav-btn-gen-mobile {
+  color: #4ade80 !important;
+  border-color: rgba(74, 222, 128, 0.35) !important;
+}
+.nav-btn-gen-mobile:hover { background: rgba(74, 222, 128, 0.15) !important; color: #86efac !important; }
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+
+/* ── Large Desktop (≥1600px) ── */
+@media (min-width: 1600px) {
+  .controls {
+    top: calc(var(--topbar-height, 68px) + 20px);
+    max-height: calc(100vh - var(--topbar-height, 68px) - 32px);
+  }
+}
+
+/* ── Full HD / Ultra-wide (≥1920px) ── */
+@media (min-width: 1920px) {
+  .app { max-width: 1800px; margin-inline: auto; }
+}
+
+/* ── Large Tablets / iPad Pro (900px–1100px) ── */
+@media (min-width: 900px) and (max-width: 1100px) {
+  .workspace { grid-template-columns: 300px 1fr; gap: 16px; }
+}
+
+/* ── Desktop: ensure mobile-only buttons stay hidden ── */
+@media (min-width: 901px) {
+  .mobile-only-nav-btn { display: none !important; }
+}
+
+/* ── Tablet & Mobile (≤900px) ── */
 @media (max-width: 900px) {
+  /* App top padding: clear topbar + mobile tabs */
+  .app {
+    padding-top: calc(var(--topbar-height, 60px) + var(--mobile-tabs-height, 48px) + 8px) !important;
+  }
+
+  /* Controls: not sticky on mobile */
+  .controls {
+    top: auto !important;
+    max-height: none !important;
+  }
+
+  /* Show mobile-only nav buttons */
   .mobile-only-nav-btn {
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
-    min-height: 36px;
-    min-width: 36px;
-    padding: 6px 8px;
-    font-size: 12px;
     gap: 3px;
-  }
-
-  /* Show sticky bar as flex row */
-  body:has(.tab-mode-generator) .mobile-sticky-bar {
-    display: flex !important;
-  }
-
-  /* Card footer: stacked buttons */
-  .card-footer {
-    flex-wrap: wrap;
-  }
-
-  /* Prevent any panel from creating horizontal overflow */
-  .controls, .output, .history {
-    max-width: 100%;
-    overflow-x: hidden;
-  }
-
-  /* Mobile tabs: larger touch targets */
-  .mobile-tab {
-    min-height: 44px;
-    font-size: 12.5px;
-    padding: 6px 10px;
-  }
-}
-
-/* ── iPhone SE / Small Phones (< 390px) ── */
-@media (max-width: 390px) {
-  .mobile-cta-btn {
-    font-size: 12px;
-    padding: 8px 6px;
-  }
-
-  .mobile-cta-btn span:first-child {
-    display: none; /* Hide emoji on very small screens */
-  }
-
-  .mobile-sticky-bar {
-    gap: 6px;
-    padding: 8px 10px max(10px, env(safe-area-inset-bottom, 10px));
-  }
-}
-
-/* ── Landscape Phone (Short Height) ── */
-@media (max-height: 520px) and (orientation: landscape) {
-  .mobile-sticky-bar {
-    padding: 6px 14px max(6px, env(safe-area-inset-bottom, 6px));
-  }
-
-  .mobile-cta-btn {
     min-height: 36px;
-    font-size: 12px;
-    padding: 6px 10px;
+    padding: 5px 8px;
+    font-size: 11.5px;
+    border-radius: var(--radius-sm);
   }
 
-  .mobile-tabs {
-    height: 36px;
-  }
+  /* Mobile sticky bar: show as flex when on generator tab */
+  body:has(.tab-mode-generator) .mobile-sticky-bar { display: flex !important; }
+  body:has(.tab-mode-results) .mobile-sticky-bar,
+  body:has(.tab-mode-history) .mobile-sticky-bar,
+  body.modal-open .mobile-sticky-bar { display: none !important; }
+
+  /* Mobile tabs touch targets */
+  .mobile-tab { min-height: 44px; font-size: 12.5px; padding: 6px 10px; }
+
+  /* Prevent panels from creating horizontal scroll */
+  .controls, .output, .history { max-width: 100%; overflow-x: hidden; }
+
+  /* iOS input zoom prevention */
+  input, select, textarea { font-size: max(16px, 1em) !important; }
 }
 
-/* ── Large Tablets (iPad Pro, Surface Pro) ── */
-@media (min-width: 900px) and (max-width: 1100px) {
-  .workspace {
-    grid-template-columns: 300px 1fr;
-    gap: 16px;
-  }
-}
-
-/* ── Full HD and Ultra-wide ── */
-@media (min-width: 1920px) {
+/* ── Tablet (≤768px) ── */
+@media (max-width: 768px) {
   .app {
-    max-width: 1800px;
-    margin-inline: auto;
+    padding-top: calc(var(--topbar-height, 56px) + var(--mobile-tabs-height, 46px) + 6px) !important;
   }
 }
 
-/* ── Safe Area Insets for Notched Phones ── */
+/* ── Large Phone (≤480px) ── */
+@media (max-width: 480px) {
+  .app {
+    padding-top: calc(var(--topbar-height, 54px) + var(--mobile-tabs-height, 44px) + 6px) !important;
+  }
+  .mobile-cta-btn { font-size: 12px; padding: 8px 6px; }
+}
+
+/* ── Small Phone (≤390px) ── */
+@media (max-width: 390px) {
+  .mobile-sticky-bar { gap: 6px; padding: 8px 10px max(10px, env(safe-area-inset-bottom, 10px)); }
+  .mobile-cta-btn span:first-child { font-size: 0; }
+}
+
+/* ── Very Small Phone (≤360px) ── */
+@media (max-width: 360px) {
+  .app {
+    padding-top: calc(var(--topbar-height, 50px) + var(--mobile-tabs-height, 42px) + 4px) !important;
+  }
+}
+
+/* ── Landscape Phone (short height) ── */
+@media (max-height: 520px) and (orientation: landscape) {
+  .app {
+    padding-top: calc(var(--topbar-height, 44px) + var(--mobile-tabs-height, 38px) + 4px) !important;
+  }
+  .mobile-sticky-bar { padding: 6px 14px max(6px, env(safe-area-inset-bottom, 6px)); }
+  .mobile-cta-btn { min-height: 36px; font-size: 12px; padding: 6px 10px; }
+}
+
+/* ── Safe area insets for notched phones ── */
 @supports (padding: env(safe-area-inset-bottom)) {
   .mobile-sticky-bar {
     padding-bottom: max(12px, env(safe-area-inset-bottom));
@@ -5435,188 +5450,8 @@ html, body {
   }
 }
 
-/* ── Smooth transitions for layout shifts ── */
-.workspace,
-.controls,
-.output,
-.history,
-.results {
-  transition: none; /* Prevent layout jank on resize */
-}
-
-/* ==========================================================================
-   Navigation Button Variants — Mobile-Specific Modifiers (v3.5.2)
-   ========================================================================== */
-
-/* Mobile topbar API key button — purple accent to match desktop .nav-btn-key */
-.nav-btn-key-mobile {
-  color: #c084fc !important;
-  border-color: rgba(168, 85, 247, 0.35) !important;
-}
-
-.nav-btn-key-mobile:hover,
-.nav-btn-key-mobile:focus-visible {
-  background: rgba(168, 85, 247, 0.15) !important;
-  color: #e9d5ff !important;
-}
-
-/* Mobile topbar generate button — green accent */
-.nav-btn-gen-mobile {
-  color: #4ade80 !important;
-  border-color: rgba(74, 222, 128, 0.35) !important;
-}
-
-.nav-btn-gen-mobile:hover,
-.nav-btn-gen-mobile:focus-visible {
-  background: rgba(74, 222, 128, 0.15) !important;
-  color: #86efac !important;
-}
-
-/* ── Mobile Sticky Bar: ensure flex row on all screen sizes ── */
-.mobile-sticky-bar {
-  display: none;
-  flex-direction: row;
-  gap: 8px;
-  align-items: stretch;
-}
-
-/* When generator tab is active on mobile, show as flex row */
-@media (max-width: 900px) {
-  body:has(.tab-mode-generator) .mobile-sticky-bar {
-    display: flex !important;
-  }
-
-  body:has(.tab-mode-results) .mobile-sticky-bar,
-  body:has(.tab-mode-history) .mobile-sticky-bar,
-  body.modal-open .mobile-sticky-bar {
-    display: none !important;
-  }
-
-  /* Each CTA button takes equal space */
-  .mobile-cta-btn {
-    flex: 1;
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* Give Generate button slightly more space */
-  .mobile-gen-btn {
-    flex: 1.8;
-  }
-
-  /* Mobile topbar nav buttons — show on mobile */
-  .mobile-only-nav-btn {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    min-height: 34px;
-    padding: 5px 8px;
-    font-size: 11.5px;
-    border-radius: var(--radius-sm);
-  }
-}
-
-/* ── Desktop: hide mobile-only buttons ── */
-@media (min-width: 901px) {
-  .mobile-only-nav-btn {
-    display: none !important;
-  }
-}
-
-/* ==========================================================================
-   BACKDROP / TOPBAR CLEARANCE FIX (v3.5.3)
-   Problem: Sticky topbar (glassmorphism backdrop-filter) was covering content.
-   Fix: Use CSS variables to always offset .app and .controls correctly.
-   ========================================================================== */
-
-/* Desktop: .app top padding = topbar height + 8px breathing room */
-.app {
-  padding-top: calc(var(--topbar-height, 68px) + 8px);
-}
-
-/* Desktop: sticky sidebar .controls must clear the topbar */
-.controls {
-  top: calc(var(--topbar-height, 68px) + 16px);
-  max-height: calc(100vh - var(--topbar-height, 68px) - 24px);
-}
-
-/* Mobile (≤900px): app top padding = topbar + mobile tabs height */
-@media (max-width: 900px) {
-  .app {
-    padding-top: calc(var(--topbar-height, 60px) + var(--mobile-tabs-height, 48px) + 8px) !important;
-  }
-
-  /* On mobile, controls is not sticky — no top override needed */
-  .controls {
-    top: auto !important;
-    max-height: none !important;
-  }
-}
-
-/* Tablet (768px) */
-@media (max-width: 768px) {
-  .app {
-    padding-top: calc(var(--topbar-height, 56px) + var(--mobile-tabs-height, 46px) + 6px) !important;
-  }
-}
-
-/* Small Phone (480px) */
-@media (max-width: 480px) {
-  .app {
-    padding-top: calc(var(--topbar-height, 54px) + var(--mobile-tabs-height, 44px) + 6px) !important;
-  }
-}
-
-/* Very Small Phone (360px) */
-@media (max-width: 360px) {
-  .app {
-    padding-top: calc(var(--topbar-height, 50px) + var(--mobile-tabs-height, 42px) + 4px) !important;
-  }
-}
-
-/* Landscape phone */
-@media (max-height: 520px) and (orientation: landscape) {
-  .app {
-    padding-top: calc(var(--topbar-height, 44px) + var(--mobile-tabs-height, 38px) + 4px) !important;
-  }
-}
-
-/* Large screens — controls clearance */
-@media (min-width: 1600px) {
-  .controls {
-    top: calc(var(--topbar-height, 68px) + 20px);
-    max-height: calc(100vh - var(--topbar-height, 68px) - 32px);
-  }
-}
-
-/* ── Mobile Tabs must always sit right below the topbar ── */
-.mobile-tabs {
-  top: var(--topbar-height, 68px);
-}
-
-@media (max-width: 900px) {
-  .mobile-tabs {
-    top: var(--topbar-height, 60px);
-  }
-}
-
-@media (max-width: 768px) {
-  .mobile-tabs {
-    top: var(--topbar-height, 56px);
-  }
-}
-
-@media (max-width: 480px) {
-  .mobile-tabs {
-    top: var(--topbar-height, 54px);
-  }
-}
-
-@media (max-width: 360px) {
-  .mobile-tabs {
-    top: var(--topbar-height, 50px);
-  }
+/* ── Print styles ── */
+@media print {
+  .topbar, .mobile-tabs, .mobile-sticky-bar, .ambient-glow-wrap { display: none !important; }
+  .app { padding-top: 0 !important; }
 }
