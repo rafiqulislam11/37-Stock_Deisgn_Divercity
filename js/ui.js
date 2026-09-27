@@ -211,10 +211,14 @@ window.UI = {
   renderResults(arr) {
     const empty = document.getElementById('empty');
     const container = document.getElementById('results');
+    const filters = document.querySelector('.filters');
     if (!container) return;
 
     if (empty) {
-      empty.style.display = arr.length ? 'none' : 'grid';
+      empty.style.display = arr.length ? 'none' : 'block';
+    }
+    if (filters) {
+      filters.style.display = arr.length ? 'grid' : 'none';
     }
     container.innerHTML = arr.map(d => this.card(d)).join('');
   },

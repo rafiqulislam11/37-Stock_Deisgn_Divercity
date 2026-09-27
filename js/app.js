@@ -133,12 +133,14 @@
     const badgeEl = $('categoryCountBadge');
     const pillsWrap = $('categoryPillsWrap');
     const subcatGroup = $('subcategoryGroup');
+    const toggleStripBtn = $('togglePillsStripBtn');
 
     if (isAbstract) {
       if (labelEl) labelEl.childNodes[0].nodeValue = 'Abstract Category ';
       if (badgeEl) badgeEl.textContent = `${STOCK_DATA.abstractCategories.length} Categories`;
-      if (pillsWrap) pillsWrap.style.display = 'block';
+      if (pillsWrap) pillsWrap.style.display = pillsWrap.classList.contains('is-collapsed') ? 'none' : 'block';
       if (subcatGroup) subcatGroup.style.display = 'block';
+      if (toggleStripBtn) toggleStripBtn.style.display = 'inline-flex';
 
       STOCK_DATA.abstractCategories.forEach(cat => {
         const opt = document.createElement('option');
@@ -156,6 +158,7 @@
       if (badgeEl) badgeEl.textContent = '21 Categories';
       if (pillsWrap) pillsWrap.style.display = 'none';
       if (subcatGroup) subcatGroup.style.display = 'none';
+      if (toggleStripBtn) toggleStripBtn.style.display = 'none';
 
       STOCK_DATA.generalCategories.forEach(cat => {
         const opt = document.createElement('option');
@@ -566,6 +569,22 @@
     const catSearch = $('catFilterInput');
     const bar = $('categoryPillsBar');
     const toggleBtn = $('toggleCatGridBtn');
+    const toggleStripBtn = $('togglePillsStripBtn');
+    const pillsWrap = $('categoryPillsWrap');
+
+    // Toggle 80 Pills Drawer (Clean progressive disclosure)
+    if (toggleStripBtn && pillsWrap) {
+      toggleStripBtn.onclick = () => {
+        pillsWrap.classList.toggle('is-collapsed');
+        const isCollapsed = pillsWrap.classList.contains('is-collapsed');
+        pillsWrap.style.display = isCollapsed ? 'none' : 'block';
+        toggleStripBtn.classList.toggle('active', !isCollapsed);
+        toggleStripBtn.textContent = isCollapsed ? '🔍 80 Category Pills' : '✕ Close Pills';
+        if (!isCollapsed && catSearch) {
+          setTimeout(() => catSearch.focus(), 80);
+        }
+      };
+    }
 
     // Toggle between single-row strip and expanded full grid view
     if (toggleBtn && bar) {
@@ -1657,6 +1676,39 @@
         updateActiveSelectionTag();
         generate();
         Toast.show(`Applied preset: ${chip.textContent.trim()}`, 'success');
+      };
+    });
+
+    // 5. Inspiration Launchpad Starter Cards
+    document.querySelectorAll('.starter-card').forEach(card => {
+      const activateStarter = () => {
+        const cat = card.dataset.cat;
+        const sub = card.dataset.sub;
+        const grain = card.dataset.grain;
+
+        if (cat) selectCategory(cat, true);
+        if (sub) {
+          setTimeout(() => selectSubcategory(sub, true), 80);
+        }
+        if (grain) {
+          selectedGrainEffect = grain;
+          document.querySelectorAll('.texture-chip').forEach(c => c.classList.toggle('active', c.dataset.grain === grain));
+          if ($('grainLabel')) $('grainLabel').textContent = STOCK_DATA?.grainEffectMap?.[grain]?.label || grain;
+        }
+
+        updateActiveSelectionTag();
+        setTimeout(() => {
+          generate();
+          Toast.show(`⚡ Generated ${cat} collection!`, 'success');
+        }, 100);
+      };
+
+      card.onclick = activateStarter;
+      card.onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          activateStarter();
+        }
       };
     });
   }
