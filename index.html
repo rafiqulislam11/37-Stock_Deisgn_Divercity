@@ -21,43 +21,72 @@
   </div>
 
   <!-- Top Navigation Bar -->
-  <header class="topbar">
+  <header class="topbar" id="appHeader">
+    <!-- Brand / Identity -->
     <div class="brand">
-      <div class="logo" title="Stock Design Diversity Studio Pro">
-        <img src="assets/logo.jpg" alt="Stock Design Diversity Studio Logo" class="brand-logo-img" width="40" height="40">
+      <div class="logo-wrapper">
+        <div class="logo" title="Stock Design Diversity Studio Pro">
+          <img src="assets/logo.jpg" alt="Stock Design Diversity Studio Logo" class="brand-logo-img" width="38" height="38">
+        </div>
       </div>
       <div class="brand-text">
-        <span class="brand-title">
-          <span class="brand-title-full">Stock Design Diversity Studio</span>
-          <span class="brand-title-compact">Diversity Studio</span>
-          <span class="brand-title-short">SD Studio</span>
-          <span class="pro-tag">PRO</span>
-        </span>
-        <small class="brand-subtitle">Smart Prompt & 49-Keyword Metadata Engine</small>
+        <div class="brand-title">
+          <span class="brand-title-full">Stock Design <span class="brand-gradient-text">Diversity</span></span>
+          <span class="brand-title-compact">Diversity <span class="brand-gradient-text">Studio</span></span>
+          <span class="brand-title-short">SD <span class="brand-gradient-text">Pro</span></span>
+          <span class="pro-tag">PRO v2.5</span>
+        </div>
+        <small class="brand-subtitle">Smart Commercial Prompt & 49-Keyword Engine</small>
       </div>
     </div>
 
     <!-- Center Active Filter Pill & Live App Background Switcher -->
     <div class="header-center">
-      <span id="activeSelectionTag" class="active-selection-tag">Active: Auto Diversity</span>
-      <button type="button" id="applyAppBgBtn" class="micro-btn-apply" title="Apply active background as page backdrop">🎨 Apply to App</button>
+      <div class="nav-context-bar">
+        <div class="nav-context-pill" title="Current Active Category & Sub-style">
+          <span class="pulse-indicator"></span>
+          <span id="activeSelectionTag" class="active-selection-tag">Active: Auto Diversity</span>
+        </div>
+        <div class="nav-center-divider"></div>
+        <button type="button" id="applyAppBgBtn" class="nav-btn-subtle" title="Apply active gradient as ambient app backdrop">
+          <span class="nav-btn-icon">🎨</span>
+          <span class="nav-btn-text">Backdrop</span>
+        </button>
+        <button type="button" id="surpriseBtn" class="nav-btn-subtle nav-btn-surprise" title="Surprise Me - Instant Random Concept & Batch">
+          <span class="nav-btn-icon">⚡</span>
+          <span class="nav-btn-text">Randomize</span>
+        </button>
+      </div>
     </div>
 
+    <!-- Right Actions & System Controls -->
     <div class="top-actions">
-      <span id="saveState" class="save-state">● LOCAL STORAGE</span>
-      <button id="surpriseBtn" class="ghost top-btn" title="Surprise Me - Pick Random Concept">
-        <span class="top-btn-icon">🎲</span><span class="top-btn-text">Randomize</span>
+      <!-- Autosave / Sync Status Badge -->
+      <div class="nav-status-badge" title="Real-time browser local storage sync">
+        <span class="sync-dot"></span>
+        <span id="saveState" class="save-state">● LOCAL STORAGE</span>
+      </div>
+
+      <!-- Project Workspace Action Group -->
+      <div class="nav-btn-group" role="group" aria-label="Project Workspace Actions">
+        <button id="importBtn" class="nav-tool-btn" title="Import JSON project workspace">
+          <span class="nav-tool-icon">📥</span>
+          <span class="nav-tool-text">Import</span>
+        </button>
+        <button id="exportProject" class="nav-tool-btn" title="Export full JSON project file">
+          <span class="nav-tool-icon">💾</span>
+          <span class="nav-tool-text">Export</span>
+        </button>
+      </div>
+
+      <!-- Clear / Reset Action -->
+      <button id="clearHistory" class="nav-tool-btn nav-danger-btn" title="Clear all saved history">
+        <span class="nav-tool-icon">🗑</span>
+        <span class="nav-tool-text">Clear All</span>
       </button>
-      <button id="themeBtn" class="icon-btn" title="Toggle Light/Dark Theme" aria-label="Toggle theme">☾</button>
-      <button id="importBtn" class="ghost top-btn" title="Import JSON project">
-        <span class="top-btn-icon">📥</span><span class="top-btn-text">Import</span>
-      </button>
-      <button id="exportProject" class="ghost top-btn" title="Export full JSON project">
-        <span class="top-btn-icon">💾</span><span class="top-btn-text">Export JSON</span>
-      </button>
-      <button id="clearHistory" class="ghost danger top-btn" title="Clear all saved history">
-        <span class="top-btn-icon">🗑</span><span class="top-btn-text">Clear All</span>
-      </button>
+
+      <!-- Theme Switcher -->
+      <button id="themeBtn" class="nav-theme-btn" title="Toggle Light/Dark Theme" aria-label="Toggle theme">☾</button>
       <input id="importFile" type="file" accept="application/json" hidden>
     </div>
   </header>
