@@ -96,23 +96,32 @@
                           rawErr.includes('rate-limit') ||
                           rawErr.includes('ResourceExhausted');
 
+          // Silent model output errors - just fallback, no spam to user
+          const isModelOutputError = rawErr.includes('model output error') ||
+                                     rawErr.includes('model output blocked') ||
+                                     rawErr.includes('empty text response') ||
+                                     rawErr.includes('no candidates');
+
           if (isQuota) {
             // Activate 45-second cooldown so subsequent calls won't fail or spam
             this.quotaCooldownUntil = Date.now() + 45000;
 
-            // Notify user ONCE per 30 seconds with a polite, clean message (no ugly raw URLs or float dumps)
+            // Notify user ONCE per 30 seconds
             if (Date.now() - (this.lastQuotaNoticeTime || 0) > 30000) {
               this.lastQuotaNoticeTime = Date.now();
               if (window.Toast && !options.silent) {
                 window.Toast.show(
-                  '⚠️ Gemini Free Quota (20 RPM) সীমা অতিক্রম করেছে। বাকি প্রম্পটগুলো বিল্ট-ইন নিউরাল ডক্টর দিয়ে অপটিমাইজ করা হচ্ছে।',
+                  '⚠️ Gemini Free Quota (20 RPM) সীমা অতিক্রম করেছে। বাকি প্রম্পটগুলো বিল্ট-ইন নিউরাল ডক্টর দিয়ে অপটিমাইজ করা হচ্ছে।',
                   'warning',
                   4500
                 );
               }
             }
+          } else if (isModelOutputError) {
+            // Model returned empty/blocked output - silently use offline fallback
+            console.info('Gemini returned empty/blocked output. Using offline neural doctor instead.');
           } else {
-            // Non-quota error (e.g. network or key issue)
+            // Non-quota, non-output error (e.g. network or invalid key)
             if (Date.now() - (this.lastNoticeTime || 0) > 10000) {
               this.lastNoticeTime = Date.now();
               const cleanMsg = rawErr.split('http')[0].replace(/[\*\_\`]/g, '').trim() || 'API temporary issue';
@@ -121,6 +130,7 @@
               }
             }
           }
+        }
         }
       }
 
@@ -250,20 +260,43 @@ CRITICAL RULES:
 
           if (response.ok) {
             const data = await response.json();
-            const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            const cleanedJson = rawText.replace(/^\`\`\`json\s*/i, '').replace(/\`\`\`\s*$/i, '').trim();
+
+            // Check if model produced any output at all
+            const candidate = data.candidates?.[0];
+            const finishReason = candidate?.finishReason || '';
+
+            // Handle safety blocks, recitation, or empty outputs
+            if (!candidate || finishReason === 'SAFETY' || finishReason === 'RECITATION' || finishReason === 'OTHER') {
+              console.warn(`Gemini model output blocked (finishReason: ${finishReason}), trying next model.`);
+              lastError = new Error(`model output blocked: ${finishReason || 'no candidates'}`);
+              continue; // Try next model in chain
+            }
+
+            const rawText = candidate?.content?.parts?.[0]?.text || '';
+
+            // If rawText is completely empty, fall through to next model
+            if (!rawText.trim()) {
+              console.warn(`Gemini ${candidateModel} returned empty text, trying next model.`);
+              lastError = new Error('model output error: empty text response');
+              continue;
+            }
+
+            const cleanedJson = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
             let parsed = null;
             try {
               parsed = JSON.parse(cleanedJson);
             } catch (parseErr) {
               parsed = {
-                correctedPrompt: cleanedJson.replace(/[\{\}"]/g, '').trim(),
+                correctedPrompt: cleanedJson.replace(/[{}"]/g, '').trim() || prompt,
                 improvements: ['Semantic prompt restructuring via Gemini GenAI']
               };
             }
+
+            const finalPrompt = (parsed.correctedPrompt || '').trim() || prompt;
+
             return {
               originalPrompt: prompt,
-              correctedPrompt: parsed.correctedPrompt || prompt,
+              correctedPrompt: finalPrompt,
               improvements: parsed.improvements || ['Enhanced with Google Gemini AI'],
               modelUsed: `Google ${candidateModel.toUpperCase()}`,
               timestamp: Date.now()

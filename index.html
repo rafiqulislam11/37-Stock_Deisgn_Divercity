@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
   <link rel="apple-touch-icon" href="assets/logo.jpg">
-  <link rel="stylesheet" href="css/style.css?v=3.5.0">
+  <link rel="stylesheet" href="css/style.css?v=3.5.1">
 </head>
 <body>
   <!-- Ambient Gradient Background Mesh Elements -->
@@ -76,6 +76,15 @@
 
     <!-- Right Actions & System Controls -->
     <div class="top-actions">
+      <!-- Mobile Quick Actions (Visible on Mobile & Tablet) -->
+      <button type="button" id="mobileTopApiKeyBtn" class="nav-tool-btn mobile-only-nav-btn nav-btn-key-mobile" title="AI API Key (Google Gemini / OpenAI)">
+        <span class="nav-tool-icon">🔑</span>
+        <span class="nav-tool-text">API</span>
+      </button>
+      <button type="button" id="mobileTopGenBtn" class="nav-tool-btn mobile-only-nav-btn nav-btn-gen-mobile" title="⚡ 1-Click Generate 10 Prompts">
+        <span class="nav-tool-icon">⚡</span>
+        <span class="nav-tool-text">Gen</span>
+      </button>
       <!-- Autosave / Sync Status Badge -->
       <div class="nav-status-badge" title="Real-time browser local storage sync">
         <span class="sync-dot"></span>
@@ -789,12 +798,15 @@
   </main>
 
   <!-- Sticky Mobile Action Button -->
-  <div class="mobile-sticky-bar">
-    <button id="mobileOnlineGenerateBtn" class="mobile-cta-btn mobile-online-btn" title="Generate with Online Cloud AI">
-      🌐 Online AI Gen
+  <div class="mobile-sticky-bar" id="mobileStickyBar">
+    <button type="button" id="mobileStickyApiKeyBtn" class="mobile-cta-btn mobile-key-btn" title="AI API Key (Gemini / OpenAI)">
+      🔑 API
     </button>
-    <button id="mobileGenerateBtn" class="mobile-cta-btn">
-      ✦ Local Batch
+    <button type="button" id="mobileGenerateBtn" class="mobile-cta-btn mobile-gen-btn" title="⚡ Instant 1-Click Generate 10 Prompts">
+      ⚡ 10 Prompts
+    </button>
+    <button type="button" id="mobileOnlineGenerateBtn" class="mobile-cta-btn mobile-online-btn" title="Generate with Online Cloud AI">
+      🌐 Online AI
     </button>
   </div>
 
@@ -1129,13 +1141,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Application Scripts (Loaded in strict dependency order) -->
-  <script src="js/data.js?v=3.5.0"></script>
-  <script src="js/metadata.js?v=3.5.0"></script>
-  <script src="js/generator.js?v=3.5.0"></script>
-  <script src="js/storage.js?v=3.5.0"></script>
-  <script src="js/csv.js?v=3.5.0"></script>
-  <script src="js/promptDoctor.js?v=3.5.0"></script>
-  <script src="js/ui.js?v=3.5.0"></script>
-  <script src="js/app.js?v=3.5.0"></script>
+  <script src="js/data.js?v=3.5.1"></script>
+  <script src="js/metadata.js?v=3.5.1"></script>
+  <script src="js/generator.js?v=3.5.1"></script>
+  <script src="js/storage.js?v=3.5.1"></script>
+  <script src="js/csv.js?v=3.5.1"></script>
+  <script src="js/promptDoctor.js?v=3.5.1"></script>
+  <script src="js/ui.js?v=3.5.1"></script>
+  <script src="js/app.js?v=3.5.1"></script>
 </body>
 </html>

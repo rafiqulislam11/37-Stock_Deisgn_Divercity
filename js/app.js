@@ -2193,10 +2193,19 @@
 
     if (sidebarKeyOpenBtn) sidebarKeyOpenBtn.onclick = openApiKeyModal;
 
-    // Connect topApiKeyBtn to open the modal directly
-    if (topKeyBtn) {
-      topKeyBtn.onclick = openApiKeyModal;
-    }
+    // Connect all API key buttons across devices to open modal directly
+    const allApiKeyOpeners = [
+      topKeyBtn,
+      $('topApiKeyBtn'),
+      $('sidebarKeyOpenBtn'),
+      $('openApiKeyModalFromSidebarBtn'),
+      $('mobileTopApiKeyBtn'),
+      $('mobileStickyApiKeyBtn')
+    ].filter(Boolean);
+
+    allApiKeyOpeners.forEach(btn => {
+      btn.onclick = openApiKeyModal;
+    });
 
     if (modalVisBtn && modalKeyInput) {
       modalVisBtn.onclick = () => {

@@ -5249,3 +5249,197 @@ body:not(.dark) .btn-online-image {
   filter: brightness(1.08);
   transform: translateY(-2px);
 }
+
+
+/* ==========================================================================
+   COMPREHENSIVE RESPONSIVE FIX — All Devices (v3.5.1)
+   Covers: Mobile-only nav buttons, sticky bar layout, touch targets,
+           card grid, topbar overflow, and cross-device polish
+   ========================================================================== */
+
+/* ── Mobile-Only Nav Buttons: Hide on Desktop, Show on Mobile ── */
+.mobile-only-nav-btn {
+  display: none;
+}
+
+/* ── Mobile CTA Sticky Bar: Fix 3-button row layout ── */
+.mobile-sticky-bar {
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+}
+
+.mobile-cta-btn {
+  flex: 1;
+  width: auto;
+  min-height: 44px;
+  font-size: 13px;
+  padding: 10px 8px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.mobile-gen-btn {
+  flex: 2; /* Give generate button more space */
+}
+
+/* ── Global Box-Sizing Safety ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* ── Prevent Horizontal Scroll on All Screens ── */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* ── Form Inputs: Prevent Zoom on iOS (font-size >= 16px) ── */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: max(16px, 1em) !important;
+  }
+}
+
+/* ── Topbar: Prevent Overflow on Very Small Screens ── */
+.topbar {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.brand {
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.top-actions {
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+/* ── Navigation center: Allow shrinking ── */
+.header-center {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Cards & Result Grid ── */
+.results {
+  width: 100%;
+}
+
+.card {
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* ── Touch Target Minimum Size (48px) for all interactive elements ── */
+@media (max-width: 900px) {
+  .mobile-only-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    min-width: 36px;
+    padding: 6px 8px;
+    font-size: 12px;
+    gap: 3px;
+  }
+
+  /* Show sticky bar as flex row */
+  body:has(.tab-mode-generator) .mobile-sticky-bar {
+    display: flex !important;
+  }
+
+  /* Card footer: stacked buttons */
+  .card-footer {
+    flex-wrap: wrap;
+  }
+
+  /* Prevent any panel from creating horizontal overflow */
+  .controls, .output, .history {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Mobile tabs: larger touch targets */
+  .mobile-tab {
+    min-height: 44px;
+    font-size: 12.5px;
+    padding: 6px 10px;
+  }
+}
+
+/* ── iPhone SE / Small Phones (< 390px) ── */
+@media (max-width: 390px) {
+  .mobile-cta-btn {
+    font-size: 12px;
+    padding: 8px 6px;
+  }
+
+  .mobile-cta-btn span:first-child {
+    display: none; /* Hide emoji on very small screens */
+  }
+
+  .mobile-sticky-bar {
+    gap: 6px;
+    padding: 8px 10px max(10px, env(safe-area-inset-bottom, 10px));
+  }
+}
+
+/* ── Landscape Phone (Short Height) ── */
+@media (max-height: 520px) and (orientation: landscape) {
+  .mobile-sticky-bar {
+    padding: 6px 14px max(6px, env(safe-area-inset-bottom, 6px));
+  }
+
+  .mobile-cta-btn {
+    min-height: 36px;
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .mobile-tabs {
+    height: 36px;
+  }
+}
+
+/* ── Large Tablets (iPad Pro, Surface Pro) ── */
+@media (min-width: 900px) and (max-width: 1100px) {
+  .workspace {
+    grid-template-columns: 300px 1fr;
+    gap: 16px;
+  }
+}
+
+/* ── Full HD and Ultra-wide ── */
+@media (min-width: 1920px) {
+  .app {
+    max-width: 1800px;
+    margin-inline: auto;
+  }
+}
+
+/* ── Safe Area Insets for Notched Phones ── */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .mobile-sticky-bar {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+}
+
+/* ── Smooth transitions for layout shifts ── */
+.workspace,
+.controls,
+.output,
+.history,
+.results {
+  transition: none; /* Prevent layout jank on resize */
+}
