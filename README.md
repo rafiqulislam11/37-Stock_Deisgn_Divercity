@@ -4,6 +4,14 @@
 
 ---
 
+## 🌐 Live Web Application (Browser Link)
+👉 **[Click Here to Launch App in Browser](https://rafiqulislam11.github.io/37-Stock_Deisgn_Divercity/)**  
+🔗 **URL**: `https://rafiqulislam11.github.io/37-Stock_Deisgn_Divercity/`
+
+> **Note**: GitHub repository link (`github.com/...`) shows source code. To run and use the web app directly in your browser, click the **GitHub Pages link** above!
+
+---
+
 ## 🌟 Key Features
 
 ### 1. 🧬 Dual-Taxonomy Design DNA Engine
