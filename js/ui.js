@@ -206,8 +206,11 @@ window.UI = {
           <button class="small btn-ai-doctor" data-action="ai-doctor" data-id="${d.id}" title="Inspect, sanitize & auto-correct prompt with AI Doctor">
             ✨ AI Doctor
           </button>
+          <button class="small btn-online-image" data-action="online-image" data-id="${d.id}" title="Render or generate this image online with cloud AI">
+            🌐 Online Image
+          </button>
           <button class="small btn-keywords" data-action="metadata" data-id="${d.id}" title="View & copy 49 keywords and live mockups">
-            🏷 49 Tags & Mockups
+            🏷 49 Tags
           </button>
           <button class="small" data-action="regenerate" data-id="${d.id}" title="Regenerate this single slot">
             🔄 Replace

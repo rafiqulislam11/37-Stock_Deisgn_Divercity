@@ -101,6 +101,8 @@
     setupSurpriseButton();
     setupChipsAndPresets();
     setupPromptDoctor();
+    setupOnlineImageModal();
+    setupOnlineGeneratorButtons();
     setupAppBackdrop();
     updateActiveSelectionTag();
 
@@ -1973,6 +1975,190 @@
         Toast.show(`✓ Successfully optimized ${count} concepts with AI Doctor!`, 'success', 3500);
       };
     }
+  }
+
+
+  // Online AI Image Generator Modal & Launchers
+  let activeOnlineImageDesign = null;
+
+  function setupOnlineImageModal() {
+    const modal = $('onlineImageModal');
+    if (!modal) return;
+    const closeBtn = $('onlineImgModalClose');
+    const doneBtn = $('onlineImgModalDoneBtn');
+    const copyBtn = $('onlineImgCopyPromptBtn');
+    const downloadBtn = $('onlineImgDownloadBtn');
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      document.body.classList.remove('modal-open');
+      activeOnlineImageDesign = null;
+    }
+
+    if (closeBtn) closeBtn.onclick = closeModal;
+    if (doneBtn) doneBtn.onclick = closeModal;
+    modal.onclick = (e) => {
+      if (e.target === modal) closeModal();
+    };
+
+    if (copyBtn) {
+      copyBtn.onclick = () => {
+        if (activeOnlineImageDesign) {
+          UI.copyToClipboard(activeOnlineImageDesign.prompt, 'Prompt copied for Image Generator!');
+        }
+      };
+    }
+
+    if (downloadBtn) {
+      downloadBtn.onclick = () => {
+        const img = $('onlineImgPreview');
+        if (img && img.src && !img.classList.contains('hidden')) {
+          const a = document.createElement('a');
+          a.href = img.src;
+          a.download = `stock-ai-render-${activeOnlineImageDesign?.id || Date.now()}.jpg`;
+          a.target = '_blank';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          Toast.show('Starting image download...', 'success');
+        } else {
+          Toast.show('Image is still rendering. Please wait a moment...', 'info');
+        }
+      };
+    }
+  }
+
+  function openOnlineImageModal(d) {
+    const modal = $('onlineImageModal');
+    if (!modal) return;
+    activeOnlineImageDesign = d;
+
+    $('onlineImgPromptText').textContent = d.prompt;
+    $('onlineImgModalTitle').textContent = `🌐 AI Image Generator: ${d.id}`;
+    $('onlineImgModalSubtitle').textContent = `${d.category} • ${d.subcategory || d.style} • Cloud AI Render`;
+
+    // Configure Direct Studio Launcher Links
+    const encoded = encodeURIComponent(d.prompt);
+    const linkBing = $('linkBingDalle');
+    if (linkBing) linkBing.href = `https://www.bing.com/images/create?q=${encoded}`;
+
+    const linkMidjourney = $('linkMidjourney');
+    if (linkMidjourney) linkMidjourney.href = 'https://discord.com/channels/@me';
+
+    const linkFlux = $('linkFlux');
+    if (linkFlux) linkFlux.href = 'https://blackforestlabs.ai/';
+
+    const linkLeonardo = $('linkLeonardo');
+    if (linkLeonardo) linkLeonardo.href = 'https://leonardo.ai/';
+
+    // Render Cloud Image with Pollinations.ai Flux Engine
+    const loader = $('onlineImgLoading');
+    const img = $('onlineImgPreview');
+    if (loader) {
+      loader.classList.remove('hidden');
+      loader.innerHTML = `
+        <span class="online-spinner"></span>
+        <p>Rendering Online AI Image via Cloud Model...</p>
+        <small>Flux.1 / SDXL Cloud Engine (Free Instant Render)</small>
+      `;
+    }
+    if (img) {
+      img.classList.add('hidden');
+      img.src = '';
+
+      // Clean prompt for cloud renderer (remove midjourney flags like --v 6.1 --ar 16:9 for clean image generation)
+      const cleanPromptForRender = d.prompt.replace(/--[a-z0-9\s:.-]+/gi, '').trim();
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(cleanPromptForRender)}?width=768&height=768&nologo=true&seed=${Math.floor(Math.random() * 999999)}&model=flux`;
+
+      img.onload = () => {
+        if (loader) loader.classList.add('hidden');
+        img.classList.remove('hidden');
+      };
+      img.onerror = () => {
+        if (loader) {
+          loader.innerHTML = `
+            <p style="color:var(--text-secondary)">Cloud image preview render timed out.</p>
+            <small style="color:var(--accent-primary)">You can still copy the prompt below and generate in Bing, Midjourney, or Flux!</small>
+          `;
+        }
+      };
+      img.src = imageUrl;
+    }
+
+    modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+  }
+
+  // Setup Online AI Generator Buttons
+  function setupOnlineGeneratorButtons() {
+    async function triggerOnlineGeneration() {
+      const onlineModel = (window.AiPromptDoctor && AiPromptDoctor.config?.model !== 'builtin')
+        ? (AiPromptDoctor.config.model.toUpperCase())
+        : 'Google Gemini 2.5 Flash / Cloud Engine';
+
+      const buttons = [
+        $('onlineGenerateBtn'),
+        $('topOnlineGenBtn'),
+        $('mobileOnlineGenerateBtn')
+      ].filter(Boolean);
+
+      buttons.forEach(b => {
+        b.disabled = true;
+        b.classList.add('btn-loading');
+      });
+
+      Toast.show(`🌐 Online AI Generator: Generating concepts with ${onlineModel}...`, 'info', 2500);
+
+      try {
+        const s = getSettings();
+        const generated = DiversityEngine.generate(s);
+
+        if (!generated.length) {
+          Toast.show('No prompts generated. Lower similarity threshold or change parameters.', 'warning');
+          return;
+        }
+
+        // Run cloud AI enhancement on all generated prompts
+        for (const d of generated) {
+          try {
+            const res = await AiPromptDoctor.correct(d.prompt, {
+              targetEngine: d.aiEngine || selectedAiEngine
+            });
+            d.originalPrompt = d.prompt;
+            d.prompt = res.correctedPrompt;
+            d.aiCorrected = true;
+            d.aiDoctorModel = res.modelUsed;
+            d.aiImprovements = res.improvements;
+            d.metadata = MetadataEngine.build(d, d.category);
+          } catch (e) {
+            console.warn('Item correction error:', e);
+          }
+        }
+
+        current = generated;
+        history = [...generated, ...history].slice(0, 1000);
+        Store.save(history);
+        renderAll();
+
+        Toast.show(`✓ Generated ${generated.length} Online AI Concepts with ${onlineModel}!`, 'success', 3500);
+
+        if (isMobileLayout()) {
+          switchMobileTab('results');
+        }
+      } catch (err) {
+        console.error(err);
+        Toast.show(`Online generator error: ${err.message}`, 'error');
+      } finally {
+        buttons.forEach(b => {
+          b.disabled = false;
+          b.classList.remove('btn-loading');
+        });
+      }
+    }
+
+    if ($('onlineGenerateBtn')) $('onlineGenerateBtn').onclick = triggerOnlineGeneration;
+    if ($('topOnlineGenBtn')) $('topOnlineGenBtn').onclick = triggerOnlineGeneration;
+    if ($('mobileOnlineGenerateBtn')) $('mobileOnlineGenerateBtn').onclick = triggerOnlineGeneration;
   }
 
   window.copyPrompt = function(id) {

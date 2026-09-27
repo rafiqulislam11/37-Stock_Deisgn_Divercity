@@ -4696,3 +4696,237 @@ body:not(.dark) .modal-doctor-diff {
   line-height: 1.4;
 }
 
+
+/* ==========================================================================
+   Online AI Generator & Cloud Image Renderer Styles
+   ========================================================================== */
+.btn-online-gen {
+  background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 50%, #a855f7 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 800 !important;
+  font-size: 13.5px !important;
+  padding: 12px 18px !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 4px 18px rgba(14, 165, 233, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
+  transition: all var(--transition-fast) !important;
+  width: 100%;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-online-gen:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 6px 24px rgba(14, 165, 233, 0.55), 0 0 0 2px #38bdf8 !important;
+}
+
+.btn-local-gen {
+  background: var(--bg-surface-elevated, rgba(255, 255, 255, 0.06)) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  font-weight: 700 !important;
+  width: 100%;
+}
+
+.btn-local-gen:hover {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-focus) !important;
+}
+
+/* Topbar Online AI Button */
+.nav-btn-online {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(99, 102, 241, 0.18)) !important;
+  border: 1px solid rgba(14, 165, 233, 0.45) !important;
+  color: #38bdf8 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2);
+}
+
+.nav-btn-online:hover {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.35), rgba(99, 102, 241, 0.35)) !important;
+  color: #e0f2fe !important;
+  border-color: #38bdf8 !important;
+  transform: translateY(-1px);
+}
+
+body:not(.dark) .nav-btn-online {
+  background: #f0f9ff !important;
+  color: #0284c7 !important;
+  border-color: #bae6fd !important;
+}
+
+/* Mobile Online AI CTA Button */
+.mobile-online-btn {
+  background: linear-gradient(135deg, #0ea5e9, #6366f1) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.35) !important;
+}
+
+/* Card Button: Online Image */
+.btn-online-image {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.14), rgba(56, 189, 248, 0.14)) !important;
+  border: 1px solid rgba(14, 165, 233, 0.35) !important;
+  color: #38bdf8 !important;
+  font-weight: 700 !important;
+  transition: all var(--transition-fast) !important;
+}
+
+body:not(.dark) .btn-online-image {
+  background: #f0f9ff !important;
+  color: #0284c7 !important;
+  border-color: #bae6fd !important;
+}
+
+.btn-online-image:hover {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.28), rgba(56, 189, 248, 0.28)) !important;
+  color: #e0f2fe !important;
+  border-color: #38bdf8 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.25);
+}
+
+/* Online Image Generator Modal */
+.online-img-modal-container {
+  max-width: 680px !important;
+  width: 94%;
+}
+
+.online-img-preview-box {
+  width: 100%;
+  min-height: 280px;
+  background: #000000;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  margin-bottom: 14px;
+}
+
+.online-rendered-img {
+  width: 100%;
+  max-height: 480px;
+  object-fit: contain;
+  display: block;
+}
+
+.online-img-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--text-primary);
+  text-align: center;
+  padding: 30px;
+}
+
+.online-img-loader small {
+  color: var(--text-muted);
+}
+
+.online-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(14, 165, 233, 0.25);
+  border-top-color: #0ea5e9;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.online-img-prompt-box {
+  background: var(--bg-surface, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.online-img-prompt-box label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.online-prompt-content {
+  font-size: 12.5px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0;
+  user-select: text;
+}
+
+.online-generators-list label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.online-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.online-portal-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all var(--transition-fast);
+}
+
+.online-portal-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.portal-bing:hover {
+  background: #0078d4;
+  color: #ffffff;
+  border-color: #0078d4;
+}
+
+.portal-midjourney:hover {
+  background: #5865f2;
+  color: #ffffff;
+  border-color: #5865f2;
+}
+
+.portal-flux:hover {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+}
+
+.portal-leonardo:hover {
+  background: #ec4899;
+  color: #ffffff;
+  border-color: #ec4899;
+}
+

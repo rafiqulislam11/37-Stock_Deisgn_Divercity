@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
   <link rel="apple-touch-icon" href="assets/logo.jpg">
-  <link rel="stylesheet" href="css/style.css?v=2.7.0">
+  <link rel="stylesheet" href="css/style.css?v=2.8.0">
 </head>
 <body>
   <!-- Ambient Gradient Background Mesh Elements -->
@@ -54,6 +54,10 @@
         <button type="button" id="applyAppBgBtn" class="nav-btn-subtle" title="Apply active gradient as ambient app backdrop">
           <span class="nav-btn-icon">🎨</span>
           <span class="nav-btn-text">Backdrop</span>
+        </button>
+        <button type="button" id="topOnlineGenBtn" class="nav-btn-subtle nav-btn-online" title="Generate with Online AI Model (Gemini / Cloud)">
+          <span class="nav-btn-icon">🌐</span>
+          <span class="nav-btn-text">Online AI</span>
         </button>
         <button type="button" id="surpriseBtn" class="nav-btn-subtle nav-btn-surprise" title="Surprise Me - Instant Random Concept & Batch">
           <span class="nav-btn-icon">⚡</span>
@@ -545,8 +549,11 @@
 
             <!-- Primary Generation CTA Buttons -->
             <div class="control-buttons primary-cta-block">
-              <button id="generate" class="primary">
-                <span class="btn-sparkle">✦</span> Generate Diverse Batch
+              <button id="onlineGenerateBtn" class="primary btn-online-gen" title="Generate with Online AI Model (Google Gemini / Cloud Engine)">
+                <span class="btn-sparkle">🌐</span> Online AI Generator
+              </button>
+              <button id="generate" class="primary btn-local-gen" title="Generate instant diverse concepts locally">
+                <span class="btn-sparkle">✦</span> Offline / Local Generator
               </button>
               <button id="promptBtn" class="secondary">
                 📋 Generate & Jump To Prompts
@@ -737,8 +744,11 @@
 
   <!-- Sticky Mobile Action Button -->
   <div class="mobile-sticky-bar">
+    <button id="mobileOnlineGenerateBtn" class="mobile-cta-btn mobile-online-btn" title="Generate with Online Cloud AI">
+      🌐 Online AI Gen
+    </button>
     <button id="mobileGenerateBtn" class="mobile-cta-btn">
-      ✦ Generate Batch
+      ✦ Local Batch
     </button>
   </div>
 
@@ -953,17 +963,73 @@
     </div>
   </div>
 
+  <!-- Online Image Generator Preview Modal -->
+  <div id="onlineImageModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="onlineImgModalTitle">
+    <div class="modal-container online-img-modal-container">
+      <div class="modal-header">
+        <div>
+          <h3 id="onlineImgModalTitle">🌐 Online AI Image Generator</h3>
+          <small id="onlineImgModalSubtitle" class="subtle">Instant Cloud AI Render & Official Studio Launchers</small>
+        </div>
+        <button type="button" id="onlineImgModalClose" class="icon-btn" aria-label="Close modal">✕</button>
+      </div>
+
+      <div class="online-img-modal-body">
+        <!-- Rendered Image Frame -->
+        <div class="online-img-preview-box">
+          <div id="onlineImgLoading" class="online-img-loader">
+            <span class="online-spinner"></span>
+            <p>Rendering Online AI Image via Cloud Model...</p>
+            <small>Flux.1 / SDXL Cloud Engine (Free Instant Render)</small>
+          </div>
+          <img id="onlineImgPreview" class="online-rendered-img hidden" alt="Online AI Generated Stock Concept" loading="lazy">
+        </div>
+
+        <!-- Prompt Display -->
+        <div class="online-img-prompt-box">
+          <label>Prompt:</label>
+          <p id="onlineImgPromptText" class="online-prompt-content"></p>
+        </div>
+
+        <!-- Quick 1-Click Launch Buttons -->
+        <div class="online-generators-list">
+          <label>Open & Generate In Official Web Studio:</label>
+          <div class="online-links-grid">
+            <a id="linkBingDalle" href="https://www.bing.com/images/create" target="_blank" rel="noopener noreferrer" class="online-portal-btn portal-bing">
+              <span>🎨 Bing / DALL-E 3</span>
+            </a>
+            <a id="linkMidjourney" href="https://discord.com/channels/@me" target="_blank" rel="noopener noreferrer" class="online-portal-btn portal-midjourney">
+              <span>⛵ Midjourney (Discord)</span>
+            </a>
+            <a id="linkFlux" href="https://blackforestlabs.ai/" target="_blank" rel="noopener noreferrer" class="online-portal-btn portal-flux">
+              <span>⚡ Flux.1 Studio</span>
+            </a>
+            <a id="linkLeonardo" href="https://leonardo.ai/" target="_blank" rel="noopener noreferrer" class="online-portal-btn portal-leonardo">
+              <span>🦁 Leonardo.ai</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="onlineImgCopyPromptBtn" class="ghost small">📋 Copy Prompt</button>
+        <button type="button" id="onlineImgDownloadBtn" class="primary small">📥 Download Image</button>
+        <button type="button" id="onlineImgModalDoneBtn" class="ghost small">Done</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Application Scripts (Loaded in strict dependency order) -->
-  <script src="js/data.js?v=2.7.0"></script>
-  <script src="js/metadata.js?v=2.7.0"></script>
-  <script src="js/generator.js?v=2.7.0"></script>
-  <script src="js/storage.js?v=2.7.0"></script>
-  <script src="js/csv.js?v=2.7.0"></script>
-  <script src="js/promptDoctor.js?v=2.7.0"></script>
-  <script src="js/ui.js?v=2.7.0"></script>
-  <script src="js/app.js?v=2.7.0"></script>
+  <script src="js/data.js?v=2.8.0"></script>
+  <script src="js/metadata.js?v=2.8.0"></script>
+  <script src="js/generator.js?v=2.8.0"></script>
+  <script src="js/storage.js?v=2.8.0"></script>
+  <script src="js/csv.js?v=2.8.0"></script>
+  <script src="js/promptDoctor.js?v=2.8.0"></script>
+  <script src="js/ui.js?v=2.8.0"></script>
+  <script src="js/app.js?v=2.8.0"></script>
 </body>
 </html>
