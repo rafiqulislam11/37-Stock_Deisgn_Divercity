@@ -1905,8 +1905,8 @@
           const val = keyInput.value.trim().replace(/^["']|["']$/g, '');
           if (val.startsWith('AIzaSy')) {
             if (modelSelect.value === 'builtin' || modelSelect.value.startsWith('gpt')) {
-              modelSelect.value = 'gemini-1.5-flash';
-              AiPromptDoctor.saveConfig({ model: 'gemini-1.5-flash' });
+              modelSelect.value = 'gemini-3.8-flash';
+              AiPromptDoctor.saveConfig({ model: 'gemini-3.8-flash' });
               updateDoctorUI();
             }
           } else if (val.startsWith('sk-')) {

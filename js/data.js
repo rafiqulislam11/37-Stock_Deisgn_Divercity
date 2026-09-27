@@ -1804,8 +1804,10 @@ window.STOCK_DATA = {
   // AI Prompt Doctor Engine Models
   promptDoctorModels: {
     "builtin": { name: "Built-in Neural Doctor (Offline)", type: "offline", desc: "Instant offline rule-based prompt cleaner & stock compliance engine (No Key needed)" },
-    "gemini-1.5-flash": { name: "Google Gemini 1.5 Flash (Recommended)", type: "api", provider: "google", desc: "Fast & reliable Google GenAI model, 100% free tier support" },
-    "gemini-2.0-flash": { name: "Google Gemini 2.0 Flash", type: "api", provider: "google", desc: "Latest ultra-fast Google model for creative prompt expansion" },
+    "gemini-3.8-flash": { name: "Google Gemini 3.8 Flash (Latest 2026 - Recommended)", type: "api", provider: "google", desc: "Latest Google GenAI flagship model for high-precision prompt rewrite & expansion" },
+    "gemini-3.5-flash": { name: "Google Gemini 3.5 Flash", type: "api", provider: "google", desc: "Next-gen Google Gemini 3.5 model for creative prompt enhancement" },
+    "gemini-2.0-flash": { name: "Google Gemini 2.0 Flash", type: "api", provider: "google", desc: "Ultra-fast Google GenAI model with free tier support" },
+    "gemini-1.5-flash": { name: "Google Gemini 1.5 Flash", type: "api", provider: "google", desc: "Fast & reliable Google GenAI model for stock metadata" },
     "gemini-1.5-pro": { name: "Google Gemini 1.5 Pro", type: "api", provider: "google", desc: "Deep reasoning capacity for complex scene composition & commercial prompts" },
     "gpt-4o-mini": { name: "OpenAI GPT-4o Mini", type: "api", provider: "openai", desc: "OpenAI fast intelligence model for prompt enhancement" }
   },

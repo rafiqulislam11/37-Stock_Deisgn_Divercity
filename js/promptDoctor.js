@@ -162,9 +162,7 @@
     },
 
     // Live Google Gemini API Integration (v1beta REST)
-    async callGeminiApi(prompt, apiKey, model = 'gemini-1.5-flash', profile = 'stock', engine = 'midjourney') {
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
+    async callGeminiApi(prompt, apiKey, model = 'gemini-3.8-flash', profile = 'stock', engine = 'midjourney') {
       const systemPrompt = `You are an elite Commercial Stock Image Prompt Engineer & Prompt Doctor.
 Your goal is to inspect, correct, and upgrade an image generation prompt.
 Target Image Generator: ${engine}
@@ -195,41 +193,59 @@ CRITICAL RULES:
         }
       };
 
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+      // Resilient fallback chain: Try user's requested model (e.g. gemini-3.8-flash) first; if account doesn't have preview access, fall back smoothly
+      const modelsToTry = [model];
+      if (model !== 'gemini-2.0-flash') modelsToTry.push('gemini-2.0-flash');
+      if (model !== 'gemini-1.5-flash') modelsToTry.push('gemini-1.5-flash');
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const msg = errorData.error?.message || `HTTP ${response.status} ${response.statusText}`;
-        throw new Error(msg);
+      let lastError = null;
+      for (const candidateModel of modelsToTry) {
+        try {
+          const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${candidateModel}:generateContent?key=${apiKey}`;
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            const cleanedJson = rawText.replace(/^\`\`\`json\s*/i, '').replace(/\`\`\`\s*$/i, '').trim();
+            let parsed = null;
+            try {
+              parsed = JSON.parse(cleanedJson);
+            } catch (parseErr) {
+              parsed = {
+                correctedPrompt: cleanedJson.replace(/[\{\}"]/g, '').trim(),
+                improvements: ['Semantic prompt restructuring via Gemini GenAI']
+              };
+            }
+            return {
+              originalPrompt: prompt,
+              correctedPrompt: parsed.correctedPrompt || prompt,
+              improvements: parsed.improvements || ['Enhanced with Google Gemini AI'],
+              modelUsed: `Google ${candidateModel.toUpperCase()}`,
+              timestamp: Date.now()
+            };
+          } else {
+            const errorData = await response.json().catch(() => ({}));
+            lastError = new Error(errorData.error?.message || `HTTP ${response.status}`);
+            if (response.status === 404 || response.status === 400) {
+              // Try next model in chain
+              continue;
+            }
+            throw lastError;
+          }
+        } catch (callErr) {
+          lastError = callErr;
+          if (callErr.message && (callErr.message.includes('not found') || callErr.message.includes('404'))) {
+            continue;
+          }
+          throw callErr;
+        }
       }
-
-      const data = await response.json();
-      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-      // Strip markdown code fences if model returned ```json ... ```
-      const cleanedJson = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
-      let parsed = null;
-      try {
-        parsed = JSON.parse(cleanedJson);
-      } catch (parseErr) {
-        // Fallback: extract text if not strict JSON
-        parsed = {
-          correctedPrompt: cleanedJson.replace(/[\{\}"]/g, '').trim(),
-          improvements: ['Semantic prompt restructuring via Gemini GenAI']
-        };
-      }
-
-      return {
-        originalPrompt: prompt,
-        correctedPrompt: parsed.correctedPrompt || prompt,
-        improvements: parsed.improvements || ['Enhanced with Google Gemini AI'],
-        modelUsed: `Google ${model.toUpperCase()}`,
-        timestamp: Date.now()
-      };
+      throw lastError || new Error('Failed to generate with Google Gemini API');
     },
 
     // Live OpenAI API Integration
@@ -309,8 +325,23 @@ CRITICAL RULES:
             throw new Error(`Google API: ${msg}`);
           }
 
-          // 2. Active generation ping with official fast model
-          const targetModel = (model.startsWith('gemini') && model !== 'gemini-2.5-flash') ? model : 'gemini-1.5-flash';
+          // 2. Discover available models from catalog
+          const availableModels = Array.isArray(data.models) ? data.models.map(m => m.name ? m.name.replace(/^models\//, '') : '') : [];
+          
+          let targetModel = model.startsWith('gemini') ? model : 'gemini-3.8-flash';
+          if (availableModels.length > 0) {
+            if (availableModels.includes('gemini-3.8-flash')) {
+              targetModel = 'gemini-3.8-flash';
+            } else if (availableModels.includes('gemini-3.5-flash')) {
+              targetModel = 'gemini-3.5-flash';
+            } else if (availableModels.includes('gemini-2.0-flash')) {
+              targetModel = 'gemini-2.0-flash';
+            } else if (availableModels.includes('gemini-1.5-flash')) {
+              targetModel = 'gemini-1.5-flash';
+            }
+          }
+
+          // 3. Optional ping test
           try {
             const pingEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${key}`;
             await fetch(pingEndpoint, {
@@ -322,7 +353,7 @@ CRITICAL RULES:
               })
             });
           } catch (pingErr) {
-            // Non-blocking: model list already succeeded
+            // Non-blocking: catalog query already verified auth
           }
 
           return {
@@ -330,7 +361,7 @@ CRITICAL RULES:
             provider: 'Google Gemini',
             detectedModel: targetModel,
             cleanKey: key,
-            message: 'Google Gemini API Key is valid, verified & connected!'
+            message: `Google Gemini API Key is valid & connected! (Active: ${targetModel})`
           };
         } catch (err) {
           if (err.name === 'TypeError' || err.message.includes('Failed to fetch')) {
